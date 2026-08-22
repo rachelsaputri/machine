@@ -156,3 +156,5 @@ MIT
 - Created/Updated module: `splus_data_processing_utility` (See `splus_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./gpss_data_processing_utility` (See `./gpss_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `./nasm_data_processing_utility` (See `./nasm_data_processing_utility/README.md` for details)
