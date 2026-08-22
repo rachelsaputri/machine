@@ -1,0 +1,15 @@
+data_source:
+  type: file
+  path: ./data/input.csv
+
+processing:
+  batch_size: 100
+  parallel_workers: 4
+
+output:
+  destination: ./output
+  format: json
+
+logging:
+  level: info
+  file: ./logs/processing.log
