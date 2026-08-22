@@ -1,0 +1,42 @@
+// DataTransformer: Transforms data records based on defined rules
+
+class DataTransformer {
+    private list<Record> records;
+
+    constructor(list<Record> records) {
+        this.records = records;
+    }
+
+    // Apply transformations to all records
+    apply() {
+        println("Transforming data...");
+        list<Record> transformedRecords = new list<Record>();
+        
+        for (let record : this.records) {
+            // Example transformation: convert fields to uppercase
+            let transformedRecord = transformRecord(record);
+            transformedRecords.add(transformedRecord);
+        }
+        
+        println("Transformation complete.");
+        return transformedRecords;
+    }
+
+    // Transform a single record
+    private Record transformRecord(Record record) {
+        list<string> transformedFields = new list<string>();
+        
+        for (let field : record.getFields()) {
+            // Convert to uppercase
+            transformedFields.add(toUpperCase(field));
+        }
+        
+        return new Record(transformedFields);
+    }
+    
+    // Helper function to convert string to uppercase
+    private string toUpperCase(string str) {
+        // Implement uppercase conversion logic here
+        return str.toUpperCase();
+    }
+}

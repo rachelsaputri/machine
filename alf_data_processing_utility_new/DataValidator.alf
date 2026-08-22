@@ -1,0 +1,50 @@
+// DataValidator: Validates data records against predefined rules
+
+class DataValidator {
+    private list<Record> records;
+    private list<string> errors;
+
+    constructor(list<Record> records) {
+        this.records = records;
+        this.errors = new list<string>();
+    }
+
+    // Validate all records
+    validate() {
+        println("Validating data...");
+        let isValid = true;
+        
+        for (let i = 0; i < this.records.size(); i++) {
+            let record = this.records[i];
+            if (!validateRecord(record, i)) {
+                isValid = false;
+            }
+        }
+        
+        if (!isValid) {
+            println("Validation errors found:");
+            for (let error : this.errors) {
+                println("  - " + error);
+            }
+        } else {
+            println("Validation passed for all records.");
+        }
+        return isValid;
+    }
+
+    // Validate a single record
+    private boolean validateRecord(Record record, int index) {
+        // Example validation: check if required fields are not empty
+        for (let field : record.getFields()) {
+            if (field == null || field.trim() == "") {
+                let errorMsg = "Record at index " + index + " has empty or null fields.";
+                this.errors.add(errorMsg);
+                println(errorMsg);
+                return false;
+            }
+        }
+        
+        // Additional validation logic can be added here
+        return true;
+    }
+}

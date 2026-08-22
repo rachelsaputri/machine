@@ -1,0 +1,44 @@
+// DataReporter: Generates reports from processed data
+
+class DataReporter {
+    private list<Record> records;
+    private string outputPath;
+
+    constructor(list<Record> records) {
+        this.records = records;
+        this.outputPath = "./output/report.txt";
+    }
+
+    // Set the output path for the report
+    setOutputPath(string path) {
+        this.outputPath = path;
+    }
+
+    // Generate a report and write it to the output path
+    generate(string outputPath) {
+        this.outputPath = outputPath;
+        println("Generating report at: " + this.outputPath);
+        
+        // Create output directory if it doesn't exist
+        createDirectory("./output");
+        
+        // Write report content
+        StringBuilder sb = new StringBuilder();
+        sb.append("Data Processing Report\n");
+        sb.append("=====================\n");
+        sb.append("Total Records: " + this.records.size() + "\n\n");
+        
+        for (int i = 0; i < this.records.size(); i++) {
+            let record = this.records[i];
+            sb.append("Record " + (i + 1) + ":\n");
+            for (let field : record.getFields()) {
+                sb.append("  Field: " + field + "\n");
+            }
+            sb.append("\n");
+        }
+        
+        // Write to file
+        writeToFile(this.outputPath, sb.toString());
+        println("Report generated successfully.");
+    }
+}

@@ -1,0 +1,40 @@
+// Utils: Common utility functions
+
+// Read content of a file
+list<string> readFile(string path) {
+    list<string> lines = new list<string>();
+    // Simulate file reading logic
+    // In a real implementation, this would interact with the OS
+    lines.add("field1,field2,field3");
+    lines.add("data1,data2,data3");
+    lines.add("data4,data5,data6");
+    return lines;
+}
+
+// Write content to a file
+void writeToFile(string path, string content) {
+    // Simulate file writing logic
+    println("Writing content to " + path);
+    println(content);
+}
+
+// Create a directory if it doesn't exist
+void createDirectory(string path) {
+    // Simulate directory creation logic
+    println("Creating directory: " + path);
+}
+
+// Split a string by delimiter
+list<string> split(string str, string delimiter) {
+    list<string> parts = new list<string>();
+    // Simple split logic for demonstration
+    // In a real implementation, this would handle edge cases
+    int startIndex = 0;
+    int endIndex;
+    while ((endIndex = str.indexOf(delimiter, startIndex)) != -1) {
+        parts.add(str.substring(startIndex, endIndex));
+        startIndex = endIndex + delimiter.size();
+    }
+    parts.add(str.substring(startIndex));
+    return parts;
+}

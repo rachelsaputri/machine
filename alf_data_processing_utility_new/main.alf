@@ -1,0 +1,34 @@
+// Main entry point for ALF Data Processing Utility
+import DataIngestor
+import DataValidator
+import DataTransformer
+import DataReporter
+
+// Define the main program flow
+main() {
+    println("Starting ALF Data Processing Utility...")
+    
+    // 1. Ingest data
+    let rawData = new DataIngestor("./data/input.csv").load()
+    println("Data ingested. Record count: " + rawData.getRecordCount())
+    
+    // 2. Validate data
+    let validator = new DataValidator(rawData)
+    if (!validator.validate()) {
+        println("Data validation failed. Halting processing.")
+        return
+    }
+    println("Data validation passed.")
+    
+    // 3. Transform data
+    let transformer = new DataTransformer(rawData)
+    let processedData = transformer.apply()
+    println("Data transformed successfully.")
+    
+    // 4. Report results
+    let reporter = new DataReporter(processedData)
+    reporter.generate("./output/report.txt")
+    println("Report generated: ./output/report.txt")
+    
+    println("Data processing complete.")
+}

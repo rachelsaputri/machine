@@ -158,3 +158,5 @@ MIT
 - Created/Updated module: `./gpss_data_processing_utility` (See `./gpss_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./nasm_data_processing_utility` (See `./nasm_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `alf_data_processing_utility_new` (See `alf_data_processing_utility_new/README.md` for details)

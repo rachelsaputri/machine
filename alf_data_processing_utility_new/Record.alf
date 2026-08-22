@@ -1,0 +1,30 @@
+// Record: Represents a data record with fields
+
+class Record {
+    private list<string> fields;
+
+    // Constructor
+    constructor(list<string> fields) {
+        this.fields = fields;
+    }
+
+    // Get all fields of the record
+    getFields() {
+        return this.fields;
+    }
+
+    // Get a specific field by index
+    getField(int index) {
+        if (index >= 0 && index < this.fields.size()) {
+            return this.fields[index];
+        }
+        return null;
+    }
+
+    // Set a specific field by index
+    setField(int index, string value) {
+        if (index >= 0 && index < this.fields.size()) {
+            this.fields[index] = value;
+        }
+    }
+}
