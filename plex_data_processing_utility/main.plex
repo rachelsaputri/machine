@@ -1,0 +1,127 @@
+PLEX
+
+PROGRAM Main
+
+IMPORT Ingester
+IMPORT Validator
+IMPORT Transformer
+IMPORT Reporter
+
+CONSTANT CONFIG_FILE = "config.ini"
+
+TYPE ConfigRecord = RECORD
+    inputFormat : STRING
+    outputFormat : STRING
+    logLevel : STRING
+    strictMode : BOOLEAN
+    nullableFields : ARRAY[STRING]
+    normalizeStrings : BOOLEAN
+    roundDecimals : INTEGER
+END_RECORD
+
+PROCEDURE LoadConfig(filename : STRING) : ConfigRecord
+    VAR config : ConfigRecord
+    VAR fileHandle : INTEGER
+    VAR line : STRING
+    VAR section : STRING
+
+    config.inputFormat <- "csv"
+    config.outputFormat <- "csv"
+    config.logLevel <- "INFO"
+    config.strictMode <- FALSE
+    config.nullableFields <- NEW ARRAY[STRING]
+    config.normalizeStrings <- FALSE
+    config.roundDecimals <- 2
+
+    section <- ""
+    OPEN FILE fileHandle FOR INPUT FROM filename
+    WHILE NOT EOF(fileHandle) DO
+        READ LINE fileHandle INTO line
+        IF line STARTS WITH "[" AND line ENDS_WITH "]" THEN
+            section <- SUBSTR(line, 2, LENGTH(line) - 2)
+        ELSE
+            SWITCH section DO
+                CASE "general"
+                    IF line STARTS_WITH "input_format = " THEN
+                        config.inputFormat <- TRIM(SUBSTR(line, 15))
+                    ELSE IF line STARTS_WITH "output_format = " THEN
+                        config.outputFormat <- TRIM(SUBSTR(line, 16))
+                    ELSE IF line STARTS_WITH "log_level = " THEN
+                        config.logLevel <- TRIM(SUBSTR(line, 12))
+                    END_IF
+                CASE "validation"
+                    IF line STARTS_WITH "strict_mode = " THEN
+                        config.strictMode <- (TRIM(SUBSTR(line, 14)) = "true")
+                    ELSE IF line STARTS_WITH "nullable_fields = " THEN
+                        ADD TO config.nullableFields VALUE TRIM(SUBSTR(line, 17))
+                    END_IF
+                CASE "transformation"
+                    IF line STARTS_WITH "normalize_strings = " THEN
+                        config.normalizeStrings <- (TRIM(SUBSTR(line, 22)) = "true")
+                    ELSE IF line STARTS_WITH "round_decimals = " THEN
+                        config.roundDecimals <- PARSE_INT(TRIM(SUBSTR(line, 17)))
+                    END_IF
+            END_SWITCH
+        END_IF
+    END_WHILE
+    CLOSE FILE fileHandle
+
+    RETURN config
+END_PROCEDURE
+
+PROCEDURE Main(args : ARRAY[STRING])
+    VAR inputPath : STRING
+    VAR outputPath : STRING
+    VAR configPath : STRING
+    VAR config : ConfigRecord
+    VAR rawData : ARRAY[ARRAY[STRING]]
+    VAR validatedData : ARRAY[ARRAY[STRING]]
+    VAR transformedData : ARRAY[ARRAY[STRING]]
+    VAR rowIndex : INTEGER
+    VAR colIndex : INTEGER
+
+    ; Parse command-line arguments
+    IF LENGTH(args) < 3 THEN
+        PRINT "Usage: main.plex <input_path> <output_path> [config_path]"
+        HALT 1
+    END_IF
+
+    inputPath <- args[0]
+    outputPath <- args[1]
+    IF LENGTH(args) >= 4 THEN
+        configPath <- args[3]
+    ELSE
+        configPath <- CONFIG_FILE
+    END_IF
+
+    PRINT "Loading configuration from " + configPath
+    config <- LoadConfig(configPath)
+
+    PRINT "Ingesting data from " + inputPath
+    rawData <- Ingester.Ingest(inputPath, config.inputFormat)
+    IF rawData = NIL THEN
+        PRINT "Error: Failed to ingest data."
+        HALT 1
+    END_IF
+
+    PRINT "Validating data..."
+    validatedData <- Validator.Validate(rawData, config)
+    IF validatedData = NIL THEN
+        PRINT "Error: Validation failed."
+        HALT 1
+    END_IF
+
+    PRINT "Transforming data..."
+    transformedData <- Transformer.Transform(validatedData, config)
+    IF transformedData = NIL THEN
+        PRINT "Error: Transformation failed."
+        HALT 1
+    END_IF
+
+    PRINT "Generating report to " + outputPath
+    Reporter.Report(transformedData, outputPath, config.outputFormat)
+
+    PRINT "Processing complete."
+END_PROCEDURE
+
+MAIN Main

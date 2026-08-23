@@ -1,0 +1,56 @@
+PLEX
+
+MODULE Reporter
+
+PROCEDURE Report(data : ARRAY[ARRAY[STRING]], filePath : STRING, format : STRING)
+    VAR fileHandle : INTEGER
+    VAR rowIndex : INTEGER
+    VAR colIndex : INTEGER
+    VAR line : STRING
+
+    OPEN FILE fileHandle FOR OUTPUT TO filePath
+    IF fileHandle = -1 THEN
+        PRINT "Error: Failed to open output file " + filePath
+        RETURN
+    END_IF
+
+    SWITCH format DO
+        CASE "csv"
+            FOR rowIndex <- 0 TO LENGTH(data) - 1 DO
+                line <- ""
+                FOR colIndex <- 0 TO LENGTH(data[rowIndex]) - 1 DO
+                    line <- line + data[rowIndex][colIndex]
+                    IF colIndex < LENGTH(data[rowIndex]) - 1 THEN
+                        line <- line + ","
+                    END_IF
+                END_FOR
+                WRITE LINE fileHandle TO line
+            END_FOR
+        CASE "txt"
+            FOR rowIndex <- 0 TO LENGTH(data) - 1 DO
+                WRITE LINE fileHandle TO data[rowIndex][0]
+            END_FOR
+        CASE "json"
+            ; Simple JSON array of arrays output
+            PRINT "["
+            FOR rowIndex <- 0 TO LENGTH(data) - 1 DO
+                PRINT "["
+                FOR colIndex <- 0 TO LENGTH(data[rowIndex]) - 1 DO
+                    PRINT '"' + data[rowIndex][colIndex] + '"'
+                    IF colIndex < LENGTH(data[rowIndex]) - 1 THEN
+                        PRINT ","
+                    END_IF
+                END_FOR
+                PRINT "]"
+                IF rowIndex < LENGTH(data) - 1 THEN
+                    PRINT ","
+                END_IF
+            END_FOR
+            PRINT "]"
+        DEFAULT
+            PRINT "Error: Unsupported output format " + format
+    END_SWITCH
+
+    CLOSE FILE fileHandle
+    PRINT "Report generated successfully at " + filePath
+END_PROCEDURE
