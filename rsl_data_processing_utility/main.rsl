@@ -1,0 +1,25 @@
+-- RSL Data Processing Utility - Main Entry Point
+-- This module initializes the processing pipeline.
+
+import DataIngestor;
+import DataTransformer;
+import DataValidator;
+import DataReporter;
+
+module main {
+  
+  procedure process_data(input_file: string, output_file: string) {
+    var data := DataIngestor.load(input_file);
+    var transformed_data := DataTransformer.transform(data);
+    var validation_result := DataValidator.validate(transformed_data);
+    
+    if validation_result.success {
+      DataReporter.report(output_file, validation_result.data);
+      print("Processing complete successfully.");
+    } else {
+      print("Processing failed validation errors: " + validation_result.errors);
+    }
+  }
+  
+  start process_data("input.csv", "output.json");
+}

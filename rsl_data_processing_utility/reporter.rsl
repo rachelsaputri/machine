@@ -1,0 +1,20 @@
+-- RSL Data Reporter Module
+-- Outputs processed data to files or logs.
+
+module DataReporter {
+  
+  import DataIngestor;
+  
+  procedure report(file_path: string, records: list<DataIngestor.DataRecord>) {
+    try {
+      var lines := map(r -> to_string(r.id) + "," + r.timestamp + "," + to_string(r.value), records);
+      write_lines(file_path, lines);
+    } catch e {
+      error("Failed to write report: " + e.message);
+    }
+  }
+  
+  function to_string(record: DataIngestor.DataRecord) -> string {
+    return record.id + "," + record.timestamp + "," + record.value;
+  }
+}

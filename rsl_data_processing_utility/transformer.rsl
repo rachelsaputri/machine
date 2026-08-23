@@ -1,0 +1,25 @@
+-- RSL Data Transformer Module
+-- Handles data cleaning, normalization, and enrichment.
+
+module DataTransformer {
+  
+  import DataIngestor;
+  
+  function transform(records: list<DataIngestor.DataRecord>) -> list<DataIngestor.DataRecord> {
+    -- Example transformation: Normalize values between 0 and 1
+    var min_val := min(map(r -> r.value, records));
+    var max_val := max(map(r -> r.value, records));
+    var range := max_val - min_val;
+    
+    var normalized_records := map(r -> {
+      var normalized_value := if range > 0 then (r.value - min_val) / range else 0.0;
+      {
+        id: r.id,
+        timestamp: r.timestamp,
+        value: normalized_value
+      }
+    }, records);
+    
+    return normalized_records;
+  }
+}

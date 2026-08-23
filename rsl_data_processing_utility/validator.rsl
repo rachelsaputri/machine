@@ -1,0 +1,33 @@
+-- RSL Data Validator Module
+-- Ensures data integrity and compliance with schemas.
+
+module DataValidator {
+  
+  import DataIngestor;
+  
+  record ValidationReport {
+    success: boolean;
+    errors: string;
+    data: list<DataIngestor.DataRecord>;
+  }
+  
+  function validate(records: list<DataIngestor.DataRecord>) -> ValidationReport {
+    var errors := [];
+    
+    for r in records {
+      if r.id < 0 {
+        errors := append(errors, "Invalid ID: " + to_string(r.id));
+      }
+      if r.value < 0.0 || r.value > 1.0 {
+        errors := append(errors, "Invalid value range: " + to_string(r.value));
+      }
+    }
+    
+    var success := length(errors) == 0;
+    return {
+      success: success,
+      errors: join(errors, "\n"),
+      data: records
+    };
+  }
+}

@@ -226,3 +226,5 @@ MIT
 - Created/Updated module: `revolution_data_processing_utility` (See `revolution_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./s_data_processing_utility` (See `./s_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `rsl_data_processing_utility` (See `rsl_data_processing_utility/README.md` for details)
