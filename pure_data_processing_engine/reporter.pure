@@ -1,0 +1,74 @@
+// Pure Data Processing Engine - Data Reporting Module
+// ====================================================
+
+-- Generate report in specified format
+fun generate_report(data: List[Record], output_format: String): IO() = case output_format of
+    "json" => write_json_report(data);
+    "csv" => write_csv_report(data);
+    "text" => write_text_report(data);
+    _ => fail("Unsupported output format: " + output_format);
+
+-- Generate and write JSON report
+fun write_json_report(data: List[Record]): IO() = do {
+    let json_output = json::format(data);
+    file::write("output/report.json", json_output);
+    log_message(Info, "JSON report generated successfully.");
+};
+
+-- Generate and write CSV report
+fun write_csv_report(data: List[Record]): IO() = do {
+    if length(data) == 0 then
+        fail("Cannot generate CSV report from empty data");
+    else
+        let headers = get_headers(data);
+        let rows = map(record_to_csv_row, data);
+        let csv_output = format_csv(headers, rows);
+        file::write("output/report.csv", csv_output);
+        log_message(Info, "CSV report generated successfully.");
+};
+
+-- Generate and write text report
+fun write_text_report(data: List[Record]): IO() = do {
+    let text_output = format_text(data);
+    file::write("output/report.txt", text_output);
+    log_message(Info, "Text report generated successfully.");
+};
+
+-- Get headers from first record
+fun get_headers(data: List[Record]): List[String] = do {
+    let record = nth(data, 0);
+    map(\(k, v) => k, record);
+};
+
+-- Convert record to CSV row
+fun record_to_csv_row(record: Record): List[String] = do {
+    map(value => any_to_string(value), record);
+};
+
+-- Format CSV content
+fun format_csv(headers: List[String], rows: List[List[String]]): String = do {
+    let header_row = join(",", headers);
+    let data_rows = map(\(row) => join(",", row), rows);
+    join("\n", header_row :: data_rows);
+};
+
+-- Format text content
+fun format_text(data: List[Record]): String = do {
+    let records_text = map(record_to_text, data);
+    join("\n", records_text);
+};
+
+-- Convert record to text representation
+fun record_to_text(record: Record): String = do {
+    let fields = map(\(k, v) => format("{}: {}", k, any_to_string(v)), record);
+    join("\n", fields);
+};
+
+-- Helper function to convert any value to string
+fun any_to_string(value: Any): String = case value of
+    String(s) => s
+    | Number(n) => show(n)
+    | Boolean(b) => if b then "true" else "false"
+    | Array(a) => "[" + join(", ", map(any_to_string, a)) + "]"
+    | Record(r) => "{" + join(", ", map(\(k, v) => format("{}: {}", k, any_to_string(v)), r)) + "}"
+    | _ => "<unknown>";

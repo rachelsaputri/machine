@@ -1,0 +1,96 @@
+// Pure Data Processing Engine - Data Transformation Module
+// ========================================================
+
+-- Transform data based on provided rules
+fun transform_data(data: List[Record], rules: List[TransformRule]): List[Record] = do {
+    fold_left(
+        (records, rule) => map(record => apply_transform(record, rule), records),
+        data,
+        rules
+    );
+};
+
+-- Apply a single transformation rule to a record
+fun apply_transform(record: Record, rule: TransformRule): Record = case rule#operation of
+    "filter" => apply_filter(record, rule);
+    "map" => apply_map(record, rule);
+    "aggregate" => apply_aggregation(record, rule);
+    "rename" => apply_rename(record, rule);
+    "default" => record;
+
+-- Apply a filter rule (keeps only records that match criteria)
+fun apply_filter(record: Record, rule: TransformRule): Record = do {
+    let field = rule#field;
+    let value = rule#params#"value";
+    if record_contains_field(record, field) then
+        if record_get_field(record, field) == value then
+            record
+        else
+            None;
+    else
+        None;
+};
+
+-- Apply a map rule (transforms field values)
+fun apply_map(record: Record, rule: TransformRule): Record = do {
+    let field = rule#field;
+    let transform_fn = rule#params#"function";
+    if record_contains_field(record, field) then
+        let new_value = transform_fn(record_get_field(record, field));
+        record_update_field(record, field, new_value);
+    else
+        record;
+};
+
+-- Apply aggregation rule (simplifies record based on aggregate function)
+fun apply_aggregation(record: Record, rule: TransformRule): Record = do {
+    -- Aggregation typically works on a list of records.
+    -- This implementation simplifies by returning the original record
+    -- as aggregation logic would be more complex in a pure functional language.
+    record;
+};
+
+-- Apply rename rule (changes field names)
+fun apply_rename(record: Record, rule: TransformRule): Record = do {
+    let old_name = rule#field;
+    let new_name = rule#params#"new_name";
+    if record_contains_field(record, old_name) then
+        let value = record_get_field(record, old_name);
+        record_remove_field(record, old_name)
+    else
+        record;
+};
+
+-- Check if record contains a specific field
+fun record_contains_field(record: Record, field: String): Bool = do {
+    let keys = map(\(k, v) => k, record);
+    member(field, keys);
+};
+
+-- Get field value from record
+fun record_get_field(record: Record, field: String): Any = do {
+    let keys = map(\(k, v) => k, record);
+    let values = map(\(k, v) => v, record);
+    nth(values, index_of(field, keys)) # error: "Field not found";
+};
+
+-- Update field value in record
+fun record_update_field(record: Record, field: String, value: Any): Record = do {
+    let new_entries = map(\(k, v) => if k == field then (field, value) else (k, v), record);
+    new_entries;
+};
+
+-- Remove field from record
+fun record_remove_field(record: Record, field: String): Record = do {
+    filter(\(k, v) => k != field, record);
+};
+
+-- Helper function to get index of element in list
+fun index_of(element: Any, list: List[Any]): Int = do {
+    let indexed = zip(list, range(0, length(list)));
+    let found = filter(\(e, i) => e == element, indexed);
+    if length(found) > 0 then
+        nth(found, 0)#1
+    else
+        -1;
+};

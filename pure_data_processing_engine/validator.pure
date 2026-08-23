@@ -1,0 +1,59 @@
+// Pure Data Processing Engine - Data Validation Module
+// ====================================================
+
+-- Validate data against a schema
+fun validate_data(data: List[Record]): List[Record] = do {
+    let schema = load_schema("schema.json");
+    filter(record => validate_record(record, schema), data);
+};
+
+-- Load schema from JSON file
+fun load_schema(path: String): Schema = do {
+    let content = file::read(path);
+    json::parse(content);
+};
+
+-- Validate a single record against the schema
+fun validate_record(record: Record, schema: Schema): Bool = do {
+    -- Check required fields
+    let required_fields = schema#"required";
+    if not all(field => record_contains_field(record, field), required_fields) then
+        false;
+    else
+        -- Check data types
+        all(\(field, type_spec) => validate_field_type(record, field, type_spec), schema#"fields");
+};
+
+-- Validate a single field against its type specification
+fun validate_field_type(record: Record, field: String, type_spec: Any): Bool = do {
+    let value = record_get_field(record, field);
+    let expected_type = type_spec#"type";
+    case expected_type of
+        "string" => is_string(value);
+        "number" => is_number(value);
+        "boolean" => is_boolean(value);
+        "array" => is_array(value);
+        "object" => is_object(value);
+        _ => true;
+};
+
+-- Helper functions for type checking
+fun is_string(value: Any): Bool = case value of
+    String(_) => true
+    | _ => false;
+
+fun is_number(value: Any): Bool = case value of
+    Number(_) => true
+    | _ => false;
+
+fun is_boolean(value: Any): Bool = case value of
+    Boolean(_) => true
+    | _ => false;
+
+fun is_array(value: Any): Bool = case value of
+    Array(_) => true
+    | _ => false;
+
+fun is_object(value: Any): Bool = case value of
+    Record(_) => true
+    | _ => false;
