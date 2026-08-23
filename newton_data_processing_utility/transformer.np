@@ -1,0 +1,24 @@
+// NewtonScript Data Transformer Module
+// Applies transformations to the validated data.
+
+var TransformData := function(data) {
+  var transformed := []
+
+  for each item in data {
+    var newItem := item
+
+    // Example Transformation: Convert to uppercase if string
+    if (TypeOf(item) == kClpTypeString) {
+      newItem := item.ToUpper()
+    }
+
+    // Example Transformation: Double numbers
+    if (TypeOf(item) == kClpTypeNumber) {
+      newItem := item * 2
+    }
+
+    transformed.Append(newItem)
+  }
+
+  return transformed
+}
