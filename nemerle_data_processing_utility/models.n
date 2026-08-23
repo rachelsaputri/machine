@@ -1,0 +1,62 @@
+namespace DataProcessing.Models
+
+using System
+using System.Collections.Generic
+using System.IO
+
+module DataProcessing.Models
+{
+    public record DataRecord
+    {
+        public Dictionary<string, string> Fields { get; init; }
+        public string SourceFile { get; init; }
+        public int LineNumber { get; init; }
+        
+        public override string ToString() => 
+            $"DataRecord(SourceFile={SourceFile}, Line={LineNumber}, Fields={string.Join(", ", Fields.Select(kv => $"{kv.Key}={kv.Value}"))})"
+    }
+
+    public record ProcessingConfig
+    {
+        public string InputFile { get; init; }
+        public string OutputFile { get; init; }
+        public string Format { get; init; }
+        public bool EnableValidation { get; init; }
+        public bool EnableTransformation { get; init; }
+        public List<string> TransformationRules { get; init; }
+        public List<string> RequiredFields { get; init; }
+        
+        public static ProcessingConfig Default => 
+            new(
+                InputFile: "input.csv",
+                OutputFile: "output.json",
+                Format: "csv",
+                EnableValidation: true,
+                EnableTransformation: true,
+                TransformationRules: List("TrimWhitespace"),
+                RequiredFields: List()
+            )
+    }
+
+    public record ProcessingResult
+    {
+        public int TotalRecordsProcessed { get; init; }
+        public int RecordsWithErrors { get; init; }
+        public List<string> Errors { get; init; }
+        public List<DataRecord> ProcessedRecords { get; init; }
+        public DateTime ProcessingTimestamp { get; init; }
+
+        public override string ToString() =>
+            $"ProcessingResult({TotalRecordsProcessed} processed, {RecordsWithErrors} errors, {ProcessingTimestamp})"
+    }
+
+    public record ValidationError
+    {
+        public string FieldName { get; init; }
+        public string Message { get; init; }
+        public string Record { get; init; }
+        
+        public override string ToString() =>
+            $"ValidationError(Field={FieldName}, Message={Message}, Record={Record})"
+    }
+}
