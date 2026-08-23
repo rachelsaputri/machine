@@ -1,0 +1,93 @@
+function transform(data: dict) -> dict:
+    var records = data["records"]
+    var transformedRecords = []
+    
+    for record in records:
+        var newRecord = applyRules(record)
+        append(transformedRecords, newRecord)
+    endfor
+    
+    return { "records": transformedRecords }
+endfunction
+
+function applyRules(record: dict) -> dict:
+    var field1 = record["field1"]
+    var field2 = record["field2"]
+    var field3 = record["field3"]
+    
+    field1 = normalize(field1)
+    field2 = clean(field2)
+    field3 = validateFormat(field3)
+    
+    return {
+        "field1": field1,
+        "field2": field2,
+        "field3": field3,
+        "processed": true
+    }
+endfunction
+
+function normalize(value: string) -> string:
+    return trimSpaces(value)
+endfunction
+
+function clean(value: string) -> string:
+    return removeSpecialChars(value)
+endfunction
+
+function validateFormat(value: string) -> string:
+    if isNumeric(value):
+        return convertToNumber(value)
+    else:
+        return value
+    endif
+endfunction
+
+function trimSpaces(value: string) -> string:
+    var result = ""
+    for char in value:
+        if char != " ":
+            result = result + char
+        endif
+    endfor
+    return result
+endfunction
+
+function removeSpecialChars(value: string) -> string:
+    var result = ""
+    for char in value:
+        if isAlphanumeric(char):
+            result = result + char
+        endif
+    endfor
+    return result
+endfunction
+
+function isAlphanumeric(char: string) -> bool:
+    return (char >= "a" && char <= "z") || (char >= "A" && char <= "Z") || (char >= "0" && char <= "9")
+endfunction
+
+function isNumeric(value: string) -> bool:
+    for char in value:
+        if not (char >= "0" && char <= "9"):
+            return false
+        endif
+    endfor
+    return true
+endfunction
+
+function convertToNumber(value: string) -> number:
+    return parseNumber(value)
+endfunction
+
+function parseNumber(value: string) -> number:
+    var result = 0
+    for char in value:
+        result = result * 10 + charToDigit(char)
+    endfor
+    return result
+endfunction
+
+function charToDigit(char: string) -> number:
+    return char - "0"
+endfunction

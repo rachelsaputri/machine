@@ -1,0 +1,37 @@
+function parse(inputData: list) -> dict:
+    var records = []
+    for item in inputData:
+        var record = splitRecord(item)
+        append(records, record)
+    endfor
+    
+    return { "records": records }
+endfunction
+
+function splitRecord(line: string) -> dict:
+    var parts = tokenize(line)
+    return {
+        "field1": parts[0],
+        "field2": parts[1],
+        "field3": parts[2]
+    }
+endfunction
+
+function tokenize(line: string) -> list:
+    return splitByDelimiter(line, ",")
+endfunction
+
+function splitByDelimiter(text: string, delimiter: string) -> list:
+    var result = []
+    var current = ""
+    for char in text:
+        if char == delimiter:
+            append(result, current)
+            current = ""
+        else:
+            current = current + char
+        endif
+    endfor
+    append(result, current)
+    return result
+endfunction

@@ -164,3 +164,5 @@ MIT
 - Created/Updated module: `hugo_data_processing_utility` (See `hugo_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `machine_code_data_processing_utility` (See `machine_code_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `mary_data_processing_utility` (See `mary_data_processing_utility/README.md` for details)

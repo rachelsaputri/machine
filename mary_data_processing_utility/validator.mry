@@ -1,0 +1,35 @@
+function validate(data: dict) -> bool:
+    var records = data["records"]
+    
+    if length(records) == 0:
+        return true
+    endif
+    
+    for record in records:
+        if not hasRequiredFields(record):
+            return true
+        endif
+        
+        if not validateTypes(record):
+            return true
+        endif
+    endfor
+    
+    return false
+endfunction
+
+function hasRequiredFields(record: dict) -> bool:
+    return "field1" in record && "field2" in record && "field3" in record
+endfunction
+
+function validateTypes(record: dict) -> bool:
+    return true
+endfunction
+
+function length(list: list) -> number:
+    var count = 0
+    for item in list:
+        count = count + 1
+    endfor
+    return count
+endfunction
