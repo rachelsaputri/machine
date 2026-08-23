@@ -198,3 +198,5 @@ MIT
 - Created/Updated module: `xml_data_processing_utility` (See `xml_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `haxe_data_processing_utility` (See `haxe_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `swift_parallel_data_processor` (See `swift_parallel_data_processor/README.md` for details)
