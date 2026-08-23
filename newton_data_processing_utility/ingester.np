@@ -1,0 +1,33 @@
+// NewtonScript Data Ingestor Module
+// Handles the raw ingestion of input data streams or objects.
+
+var IngestData := function(rawInput) {
+  if (rawInput == nil) {
+    throw "Error: Input data cannot be null."
+  }
+
+  var ingestedData := []
+  try {
+    if (TypeOf(rawInput) == kClpTypeList) {
+      ingestedData := rawInput
+    } else if (TypeOf(rawInput) == kClpTypeString) {
+      ingestedData := self:ParseString(rawInput)
+    } else {
+      ingestedData := [rawInput]
+    }
+  } catch (e) {
+    throw "Ingestion failed: " + e
+  }
+
+  return ingestedData
+}
+
+var ParseString := function(str) {
+  var items := []
+  var separator := ","
+  var tokens := StringSplit(str, separator)
+  for each token in tokens {
+    items.Append(TrimSpaces(token))
+  }
+  return items
+}

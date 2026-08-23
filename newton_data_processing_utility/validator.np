@@ -1,0 +1,33 @@
+// NewtonScript Data Validator Module
+// Ensures data conforms to expected schemas and constraints.
+
+var ValidateData := function(data) {
+  var validItems := []
+  var errors := []
+
+  for each item in data {
+    if (self:CheckItem(item)) {
+      validItems.Append(item)
+    } else {
+      errors.Append("Invalid item: " + item)
+    }
+  }
+
+  if (errors.Count() > 0) {
+    Print("Validation Errors: " + errors.Join(", "))
+  }
+
+  return validItems
+}
+
+var CheckItem := function(item) {
+  if (item == nil) {
+    return false
+  }
+  // Simple type check for demonstration
+  var t := TypeOf(item)
+  if (t == kClpTypeString || t == kClpTypeNumber || t == kClpTypeList) {
+    return true
+  }
+  return false
+}
