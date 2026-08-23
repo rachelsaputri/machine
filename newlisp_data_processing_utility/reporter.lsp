@@ -1,0 +1,20 @@
+; reporter.lsp - Reporting Functions
+
+(define (generate-report data)
+  (println "--- Report Start ---")
+  (println (length data) " records processed.")
+  (println "Records:")
+  (dolist (item data)
+    (println "  - " item)
+  )
+  (println "--- Report End ---")
+)
+
+(define (generate-error-report data)
+  (println "--- Error Report ---")
+  (println "Processing failed. Data state:")
+  (dolist (item data)
+    (println "  - " item)
+  )
+  (println "--- End Error Report ---")
+)
