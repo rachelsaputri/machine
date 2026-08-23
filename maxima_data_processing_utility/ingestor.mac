@@ -1,0 +1,77 @@
+/*
+  Maxima Data Processing Utility - Data Ingestion Module
+  Description: Handles loading data from various formats.
+*/
+
+/*
+  Function: load_matrix_from_file
+  Description: Reads a CSV file into a Maxima matrix.
+  Arguments:
+    - filename: String path to the CSV file.
+  Returns:
+    - A Maxima matrix.
+*/
+load_matrix_from_file(filename) := block(
+    [f, line, data, rows],
+    f : open_input(filename),
+    data : [],
+    while not eof(f) do (
+        line : readlined(f),
+        if line # "" then (
+            rows : split_string(line, ","),
+            data : append(data, [rows])
+        )
+    ),
+    close(f),
+    makematrix(length(data[1]), length(data), 
+        for i : 1 thru length(data) 
+        do for j : 1 thru length(data[i]) 
+        do data[i][j] : rat(data[i][j]))
+);
+
+/*
+  Function: load_symbolic_data
+  Description: Loads symbolic mathematical expressions as a matrix.
+  Arguments:
+    - n: Number of rows.
+    - m: Number of columns.
+  Returns:
+    - A symbolic Maxima matrix.
+*/
+load_symbolic_data(n, m) := block(
+    [i, j, sym_matrix],
+    sym_matrix : makematrix(n, m),
+    for i : 1 thru n do (
+        for j : 1 thru m do (
+            sym_matrix[i][j] : symfunc(i, j)
+        )
+    ),
+    sym_matrix
+);
+
+/*
+  Function: split_string
+  Description: Helper to split a string by a delimiter.
+*/
+split_string(str, delim) := block(
+    [parts, token, rest],
+    parts : [],
+    rest : str,
+    while rest # "" do (
+        token : part(rest, 1, partstring(delim, rest) - 1),
+        parts : append(parts, [token]),
+        rest : substring(rest, partstring(delim, rest) + length(delim))
+    ),
+    parts
+);
+
+/*
+  Function: partstring
+  Description: Returns the index of the first occurrence of a substring.
+*/
+partstring(sub, s) := block(
+    [i, lsub, ls],
+    lsub : length(sub),
+    ls : length(s),
+    for i : 1 thru ls - lsub + 1 while substring(s, i, i + lsub - 1) # sub do i
+);

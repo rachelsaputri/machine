@@ -1,0 +1,87 @@
+/*
+  Maxima Data Processing Utility - Export Module
+  Description: Handles saving processed data to files.
+*/
+
+/*
+  Function: export_to_csv
+  Description: Exports a Maxima matrix to a CSV file.
+  Arguments:
+    - mat: A Maxima matrix.
+    - filename: String path for the output CSV.
+*/
+export_to_csv(mat, filename) := block(
+    [f, i, j, row_str, vals],
+    f : open_output(filename),
+    
+    for i : 1 thru rows(mat) do (
+        row_str : "",
+        for j : 1 thru cols(mat) do (
+            if j > 1 then row_str : row_str + ",",
+            row_str : row_str + string(mat[i][j])
+        ),
+        printline(f, row_str)
+    ),
+    
+    close(f),
+    print("Data exported to " + filename)
+);
+
+/*
+  Function: export_to_matrix_file
+  Description: Exports a Maxima matrix to a .mac file for Maxima reloading.
+  Arguments:
+    - mat: A Maxima matrix.
+    - filename: String path for the output .mac file.
+*/
+export_to_matrix_file(mat, filename) := block(
+    [f],
+    f : open_output(filename),
+    write(f, "processed_data : " + string(mat) + ";"),
+    close(f),
+    print("Matrix exported to " + filename)
+);
+
+/*
+  Function: export_to_txt
+  Description: Exports a matrix to a plain text file with alignment.
+  Arguments:
+    - mat: A Maxima matrix.
+    - filename: String path for the output TXT.
+*/
+export_to_txt(mat, filename) := block(
+    [f, i, j, max_len, row_str, val_str, padding],
+    f : open_output(filename),
+    
+    /* Determine max width for alignment */
+    max_len : 10,
+    for i : 1 thru rows(mat) do (
+        for j : 1 thru cols(mat) do (
+            max_len : max(max_len, length(string(mat[i][j])))
+        )
+    ),
+    
+    for i : 1 thru rows(mat) do (
+        row_str : "",
+        for j : 1 thru cols(mat) do (
+            val_str : string(mat[i][j]),
+            padding : make_list(max_len - length(val_str), " "),
+            row_str : row_str + val_str + format_list(padding),
+            if j < cols(mat) then row_str : row_str + " "
+        ),
+        printline(f, row_str)
+    ),
+    
+    close(f),
+    print("Text file exported to " + filename)
+);
+
+/* Helper to format list of spaces */
+format_list(lst) := block(
+    [s, i],
+    s : "",
+    for i : 1 thru length(lst) do (
+        s : s + " "
+    ),
+    s
+);

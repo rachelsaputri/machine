@@ -1,0 +1,68 @@
+/*
+  Maxima Data Processing Utility - Data Validation Module
+  Description: Checks data integrity and consistency.
+*/
+
+/*
+  Function: validate_data
+  Description: Performs comprehensive validation on a matrix.
+  Arguments:
+    - mat: A Maxima matrix.
+  Returns:
+    - A list: [is_valid, error_messages].
+*/
+validate_data(mat) := block(
+    [errors, i, j, vals, type_errors, missing_vals],
+    errors : [],
+    
+    /* Check if empty */
+    if mat = [] then (
+        errors : append(errors, ["Data matrix is empty."])
+    ),
+    
+    /* Check dimensions consistency */
+    for i : 1 thru rows(mat) do (
+        if cols(mat[i]) # cols(mat[1]) then (
+            errors : append(errors, ["Row " + string(i) + " has inconsistent column count."])
+        )
+    ),
+    
+    /* Check for non-numeric values */
+    type_errors : [],
+    for i : 1 thru rows(mat) do (
+        for j : 1 thru cols(mat) do (
+            if not numberp(mat[i][j]) and not rationalp(mat[i][j]) and not floatp(mat[i][j]) then (
+                type_errors : append(type_errors, ["Non-numeric value at [" + string(i) + "," + string(j) + "]: " + string(mat[i][j])])
+            )
+        )
+    ),
+    errors : append(errors, type_errors),
+    
+    /* Check for missing/null values (represented as nil or empty) */
+    missing_vals : [],
+    for i : 1 thru rows(mat) do (
+        for j : 1 thru cols(mat) do (
+            if mat[i][j] = nil or mat[i][j] = "" then (
+                missing_vals : append(missing_vals, ["Missing value at [" + string(i) + "," + string(j) + "]"])
+            )
+        )
+    ),
+    errors : append(errors, missing_vals),
+    
+    /* Return result */
+    [length(errors) = 0, errors]
+);
+
+/*
+  Function: check_consistency
+  Description: Checks if a matrix is consistent for mathematical operations.
+  Arguments:
+    - mat: A Maxima matrix.
+  Returns:
+    - Boolean.
+*/
+check_consistency(mat) := block(
+    [valid_result, _],
+    valid_result : validate_data(mat),
+    valid_result[1]
+);
