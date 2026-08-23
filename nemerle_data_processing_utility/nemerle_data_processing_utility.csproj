@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>DataProcessing</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nemerle" Version="4.0.0" />
+    <PackageReference Include="System.Text.Json" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="main.n" />
+    <Compile Include="models.n" />
+    <Compile Include="ingestor.n" />
+    <Compile Include="transformer.n" />
+    <Compile Include="validator.n" />
+    <Compile Include="reporter.n" />
+  </ItemGroup>
+
+</Project>

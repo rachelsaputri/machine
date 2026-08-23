@@ -1,0 +1,47 @@
+namespace DataProcessing
+
+using System
+using System.Collections.Generic
+using System.IO
+using System.Text.Json
+using DataProcessing.Models
+
+module DataProcessing.Reporter
+{
+    public class DataReporter
+    {
+        public void GenerateReport(ProcessingResult result, string outputFile)
+        {
+            var directory = Path.GetDirectoryName(outputFile);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            var jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            var json = JsonSerializer.Serialize(result, jsonOptions);
+            File.WriteAllText(outputFile, json);
+        }
+
+        public void PrintSummary(ProcessingResult result)
+        {
+            System.Console.WriteLine("=== Processing Summary ===");
+            System.Console.WriteLine($"Total Records Processed: {result.TotalRecordsProcessed}");
+            System.Console.WriteLine($"Records With Errors: {result.RecordsWithErrors}");
+            System.Console.WriteLine($"Processing Timestamp: {result.ProcessingTimestamp}");
+            
+            if (result.Errors.Count > 0)
+            {
+                System.Console.WriteLine("\nErrors:");
+                foreach (var error in result.Errors)
+                {
+                    System.Console.WriteLine($"  - {error}");
+                }
+            }
+        }
+    }
+}

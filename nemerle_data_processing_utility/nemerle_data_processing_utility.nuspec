@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>nemerle-data-processing-utility</id>
+    <version>1.0.0</version>
+    <title>Nemerle Data Processing Utility</title>
+    <authors>Nemerle Contributors</authors>
+    <owners>Nemerle Contributors</owners>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/nemerle/nemerle-data-processing-utility</projectUrl>
+    <iconUrl>https://www.nemerle.org/images/nemerle-logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A comprehensive data processing utility written in Nemerle, a multi-paradigm .NET language.</description>
+    <tags>nemerle data processing utility csharp dotnet</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Text.Json" version="4.7.2" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin/Release/net6.0/nemerle_data_processing_utility.dll" target="lib/net6.0" />
+  </files>
+</package>

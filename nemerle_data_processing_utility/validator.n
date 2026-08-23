@@ -1,0 +1,51 @@
+namespace DataProcessing
+
+using System
+using System.Collections.Generic
+using System.Linq
+using DataProcessing.Models
+
+module DataProcessing.Validator
+{
+    public class DataValidator
+    {
+        public (List<DataRecord> ValidRecords, List<ValidationError> Errors) Validate(
+            List<DataRecord> records, 
+            List<string> requiredFields)
+        {
+            var validRecords = new List<DataRecord>();
+            var errors = new List<ValidationError>();
+            
+            foreach (var record in records)
+            {
+                var recordErrors = new List<ValidationError>();
+                
+                foreach (var requiredField in requiredFields)
+                {
+                    if (!record.Fields.ContainsKey(requiredField) || 
+                        string.IsNullOrWhiteSpace(record.Fields[requiredField]))
+                    {
+                        var error = new ValidationError
+                        {
+                            FieldName = requiredField,
+                            Message = $"Missing or empty required field: {requiredField}",
+                            Record = record.ToString()
+                        };
+                        recordErrors.Add(error);
+                    }
+                }
+                
+                if (recordErrors.Count > 0)
+                {
+                    errors.AddRange(recordErrors);
+                }
+                else
+                {
+                    validRecords.Add(record);
+                }
+            }
+            
+            return (validRecords, errors);
+        }
+    }
+}

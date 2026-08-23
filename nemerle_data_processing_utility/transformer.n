@@ -1,0 +1,78 @@
+namespace DataProcessing
+
+using System
+using System.Collections.Generic
+using System.Linq
+using DataProcessing.Models
+
+module DataProcessing.Transformer
+{
+    public class DataTransformer
+    {
+        public List<DataRecord> Transform(List<DataRecord> records, List<string> rules)
+        {
+            var transformed = new List<DataRecord>();
+            
+            foreach (var record in records)
+            {
+                var newRecord = record;
+                var newFields = new Dictionary<string, string>(record.Fields);
+                
+                foreach (var rule in rules)
+                {
+                    newFields = ApplyRule(newFields, rule);
+                }
+                
+                newRecord = newRecord with { Fields = newFields };
+                transformed.Add(newRecord);
+            }
+            
+            return transformed;
+        }
+
+        private Dictionary<string, string> ApplyRule(Dictionary<string, string> fields, string rule)
+        {
+            return rule.ToUpperInvariant() switch
+            {
+                "TRIMWHITESPACE" =>
+                {
+                    foreach (var key in fields.Keys.ToList())
+                    {
+                        fields[key] = fields[key].Trim();
+                    }
+                    fields;
+                },
+                "UPPERCASE" =>
+                {
+                    foreach (var key in fields.Keys.ToList())
+                    {
+                        fields[key] = fields[key].ToUpperInvariant();
+                    }
+                    fields;
+                },
+                "LOWERCASE" =>
+                {
+                    foreach (var key in fields.Keys.ToList())
+                    {
+                        fields[key] = fields[key].ToLowerInvariant();
+                    }
+                    fields;
+                },
+                "REMOVEEMPTYFIELDS" =>
+                {
+                    var emptyKeys = fields.Where(kv => string.IsNullOrWhiteSpace(kv.Value)).Select(kv => kv.Key).ToList();
+                    foreach (var key in emptyKeys)
+                    {
+                        fields.Remove(key);
+                    }
+                    fields;
+                },
+                _ =>
+                {
+                    // Unknown rule, ignore
+                    fields;
+                }
+            };
+        }
+    }
+}

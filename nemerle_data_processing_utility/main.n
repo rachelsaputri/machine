@@ -1,0 +1,93 @@
+namespace DataProcessing
+
+using System
+using System.Collections.Generic
+using System.Linq
+using DataProcessing.Models
+
+module DataProcessing
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            System.Console.WriteLine("Nemerle Data Processing Utility");
+            System.Console.WriteLine("===============================");
+
+            var config = ParseArgs(args);
+            
+            try
+            {
+                var ingestor = new DataIngestor();
+                var transformer = new DataTransformer();
+                var validator = new DataValidator();
+                var reporter = new DataReporter();
+
+                // Step 1: Ingest Data
+                System.Console.WriteLine("Step 1: Ingesting data...");
+                var records = ingestor.Ingest(config.InputFile, config.Format);
+                ingestor.SetSourceFile(records, config.InputFile);
+                System.Console.WriteLine($"  Ingested {records.Count} records.");
+
+                // Step 2: Transform Data
+                List<DataRecord> transformedRecords = records;
+                if (config.EnableTransformation)
+                {
+                    System.Console.WriteLine("Step 2: Transforming data...");
+                    transformedRecords = transformer.Transform(records, config.TransformationRules);
+                    System.Console.WriteLine("  Transformation complete.");
+                }
+
+                // Step 3: Validate Data
+                List<ValidationError> errors = new List<ValidationError>();
+                List<DataRecord> validRecords = transformedRecords;
+                if (config.EnableValidation)
+                {
+                    System.Console.WriteLine("Step 3: Validating data...");
+                    var (valid, validationErrors) = validator.Validate(transformedRecords, config.RequiredFields);
+                    validRecords = valid;
+                    errors = validationErrors;
+                    System.Console.WriteLine($"  Found {errors.Count} validation errors.");
+                }
+
+                // Step 4: Generate Report
+                System.Console.WriteLine("Step 4: Generating report...");
+                var result = new ProcessingResult
+                {
+                    TotalRecordsProcessed = transformedRecords.Count,
+                    RecordsWithErrors = errors.Count,
+                    Errors = errors,
+                    ProcessedRecords = validRecords,
+                    ProcessingTimestamp = DateTime.Now
+                };
+
+                reporter.GenerateReport(result, config.OutputFile);
+                reporter.PrintSummary(result);
+
+                System.Console.WriteLine("\nProcessing complete.");
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine($"Error: {ex.Message}");
+                System.Console.WriteLine(ex.StackTrace);
+                Environment.Exit(1);
+            }
+        }
+
+        private static ProcessingConfig ParseArgs(string[] args)
+        {
+            var config = ProcessingConfig.Default;
+            
+            if (args.Length >= 1)
+            {
+                config = config with { InputFile = args[0] };
+            }
+            if (args.Length >= 2)
+            {
+                config = config with { OutputFile = args[1] };
+            }
+            
+            return config;
+        }
+    }
+}
