@@ -182,3 +182,5 @@ MIT
 - Created/Updated module: `./nemerle_data_processing_utility` (See `./nemerle_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `netrexx_data_processing_utility` (See `netrexx_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `newp_data_processing_utility` (See `newp_data_processing_utility/README.md` for details)
