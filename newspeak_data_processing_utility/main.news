@@ -1,0 +1,36 @@
+"main" extends 'Application
+    | ingestor transformer validator reporter utilities
+
+    onInitialize
+        ingestor := 'Ingestor' new.
+        transformer := 'Transformer' new.
+        validator := 'Validator' new.
+        reporter := 'Reporter' new.
+        utilities := 'Utilities' new.
+
+        "1. Ingest"
+        |initialData|
+        initialData := 'Ingestor' new onProcess.
+        utilities onInitialize.
+        initialData do: [:each | utilities onData: each addIntoProcessor ].
+
+        "2. Transform"
+        |transformedData|
+        transformedData := transformer onTransformAll: utilities onGetDataFromProcessor.
+
+        "3. Validate"
+        |validationResults|
+        validationResults := validator onValidateAll: transformedData.
+
+        "4. Report"
+        |summary|
+        summary := reporter onReport: validationResults.
+        ^self
+gui
+        [ 'Utilities initialized.' ].
+        
+        "Execute pipeline"
+        self onInitialize.
+        
+        "Output results"
+        ^summary .

@@ -184,3 +184,5 @@ MIT
 - Created/Updated module: `netrexx_data_processing_utility` (See `netrexx_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `newp_data_processing_utility` (See `newp_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `newspeak_data_processing_utility` (See `newspeak_data_processing_utility/README.md` for details)

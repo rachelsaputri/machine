@@ -1,0 +1,9 @@
+"Transformer" extends 'Object
+    | transformFunction
+
+    onInitialize
+        self transformFunction := [:data | data upperCase ].
+        ^self    onTransform:data
+        ^self transformFunction value: data    onTransformAll:dataCollection
+        ^dataCollection collect: [:each | self transform: each ].    onFinalize
+    
