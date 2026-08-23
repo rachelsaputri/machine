@@ -1,0 +1,367 @@
+/**
+ * NetRexx Data Processing Utility
+ * 
+ * A complete data processing pipeline including ingestion, validation,
+ * transformation, and reporting capabilities.
+ */
+
+class NetRexxDataProcessor
+
+  /* Configuration constants */
+  constant LINE_SEPARATOR = System.getProperty("line.separator")
+  constant DEFAULT_ENCODING = "UTF-8"
+  constant MAX_LINE_LENGTH = 10000
+
+  /* Main entry point */
+  method main(args) static
+    /* Initialize the processor */
+    processor = NetRexxDataProcessor()
+    
+    /* Parse command line arguments */
+    parse args inputfile outputfile format
+    
+    /* Validate arguments */
+    if inputfile = null then do
+      say "Error: Input file is required."
+      say "Usage: NetRexxDataProcessor <inputfile> <outputfile> [format]"
+      return 1
+    end
+    
+    if outputfile = null then do
+      say "Error: Output file is required."
+      return 1
+    end
+    
+    if format = null then format = "csv"
+    
+    /* Execute pipeline */
+    exitCode = processor.execute(inputfile, outputfile, format)
+    return exitCode
+
+  /* Constructor */
+  method init
+    self.ingestor = NetRexxDataIngestor()
+    self.validator = NetRexxDataValidator()
+    self.transformer = NetRexxDataTransformer()
+    self.reporter = NetRexxDataReporter()
+    self.stats = ["total": 0, "valid": 0, "invalid": 0, "transformed": 0]
+
+  /* Execute the full pipeline */
+  method execute(inputFile, outputFile, format) private
+    
+    /* Phase 1: Ingest */
+    say "Starting data ingestion from: " inputFile
+    rawLines = self.ingestor.readLines(inputFile)
+    self.stats["total"] = rawLines.size()
+    say "Ingested " rawLines.size() " lines."
+    
+    if rawLines.size() = 0 then do
+      say "Warning: No data found in input file."
+      return 0
+    end
+    
+    /* Phase 2: Validate */
+    say "Starting validation..."
+    validData = []
+    invalidData = []
+    
+    do lineNum = 1 to rawLines.size()
+      line = rawLines[lineNum]
+      if line = "" then iterate
+      
+      errors = self.validator.validate(line, lineNum)
+      if errors.size() > 0 then do
+        invalidData[invalidData.size() + 1] = ["line": lineNum, "content": line, "errors": errors]
+      end
+      else do
+        validData[validData.size() + 1] = line
+      end
+    end
+    
+    self.stats["valid"] = validData.size()
+    self.stats["invalid"] = invalidData.size()
+    say "Validation complete. Valid: " validData.size() ", Invalid: " invalidData.size()
+    
+    /* Phase 3: Transform */
+    say "Starting transformation..."
+    transformedData = []
+    
+    do i = 1 to validData.size()
+      line = validData[i]
+      transformedLine = self.transformer.process(line, i)
+      if transformedLine = null then iterate
+      transformedData[transformedData.size() + 1] = transformedLine
+    end
+    
+    self.stats["transformed"] = transformedData.size()
+    say "Transformation complete. " transformedData.size() " records processed."
+    
+    /* Phase 4: Report */
+    say "Generating report in format: " format
+    self.reporter.writeReport(transformedData, outputFile, format)
+    
+    /* Generate summary */
+    self._generateSummary()
+    
+    return 0
+
+  /* Generate a summary of the processing run */
+  method _generateSummary private
+    say "========================================"
+    say "PROCESSING SUMMARY"
+    say "========================================"
+    say "Total lines ingested:   " self.stats["total"]
+    say "Valid lines:            " self.stats["valid"]
+    say "Invalid lines:          " self.stats["invalid"]
+    say "Successfully transformed: " self.stats["transformed"]
+    say "Output file:            " self.reporter.lastOutputFile
+    say "========================================"
+
+  /* Override toString for debugging */
+  method toString
+    return "NetRexxDataProcessor[stats=" self.stats "]"
+
+end NetRexxDataProcessor
+
+/**
+ * NetRexxDataIngestor
+ * Handles reading data from files and standard input.
+ */
+class NetRexxDataIngestor
+  
+  method init
+
+  /* Read lines from a file */
+  method readLines(filename) private
+    lines = []
+    
+    try
+      reader = java.io.BufferedReader(java.io.FileReader(filename))
+      line = reader.readLine()
+      
+      while line \= null do
+        if line.size() <= MAX_LINE_LENGTH then
+          lines[lines.size() + 1] = line
+        else
+          say "Warning: Line too long, skipped: " line.size() " chars"
+        
+        line = reader.readLine()
+      
+      reader.close()
+      
+    catch e = java.io.IOException
+      say "Error reading file " filename ": " e.getMessage()
+      return lines
+    
+    return lines
+
+end NetRexxDataIngestor
+
+/**
+ * NetRexxDataValidator
+ * Validates data format, content, and business rules.
+ */
+class NetRexxDataValidator
+  
+  /* Basic validation rules */
+  constant MIN_LINE_LENGTH = 1
+  constant MAX_LINE_LENGTH = 1000
+  constant RESERVED_PREFIX = "!@#$"
+
+  method init
+
+  /* Validate a single line of data */
+  method validate(line, lineNum) private
+    errors = []
+    
+    /* Check empty lines */
+    if line.strip().size() = 0 then
+      return ["Empty line at position " lineNum]
+    
+    /* Check minimum length */
+    if line.size() < MIN_LINE_LENGTH then
+      errors[errors.size() + 1] = "Line too short at position " lineNum
+    
+    /* Check maximum length */
+    if line.size() > MAX_LINE_LENGTH then
+      errors[errors.size() + 1] = "Line too long at position " lineNum
+    
+    /* Check for reserved/prefix characters */
+    if line.substring(1, 4) = RESERVED_PREFIX then
+      errors[errors.size() + 1] = "Reserved prefix detected at line " lineNum
+    
+    /* Check for null bytes */
+    if line.contains("\x00") then
+      errors[errors.size() + 1] = "Null byte detected at line " lineNum
+    
+    /* Check for malformed UTF-8 sequences (basic check) */
+    if line.contains("\\x") then
+      errors[errors.size() + 1] = "Potential malformed escape sequence at line " lineNum
+    
+    return errors
+
+end NetRexxDataValidator
+
+/**
+ * NetRexxDataTransformer
+ * Cleans, normalizes, and transforms data structures.
+ */
+class NetRexxDataTransformer
+  
+  constant UPPER_CASE_FIELDS = 3  /* Transform first 3 fields to uppercase */
+  constant TRIM_WHITESPACE = true
+  constant REMOVE_CONTROL_CHARS = true
+
+  method init
+
+  /* Process a single line of data */
+  method process(line, lineNum) private
+    if line = null then return null
+    
+    /* Trim whitespace if configured */
+    if TRIM_WHITESPACE then
+      line = line.strip()
+    
+    /* Remove control characters */
+    if REMOVE_CONTROL_CHARS then
+      line = self._removeControlChars(line)
+    
+    /* Normalize line endings */
+    line = line.replace("\r\n", "").replace("\r", "")
+    
+    /* Split into fields */
+    fields = self._splitLine(line)
+    
+    /* Transform specific fields */
+    do i = 1 to fields.size()
+      if i <= UPPER_CASE_FIELDS then
+        fields[i] = fields[i].upper()
+      
+      /* Clean individual fields */
+      fields[i] = self._cleanField(fields[i])
+    end
+    
+    /* Rejoin fields */
+    result = fields.intersect(",")
+    
+    return result
+
+  /* Split line by comma (handles basic cases) */
+  method _splitLine(line) private
+    fields = []
+    currentField = ""
+    inQuote = false
+    
+    do i = 1 to line.size()
+      char = line.substring(i, i)
+      
+      if char = '"' then
+        inQuote = !inQuote
+      else if char = ',' then
+        if inQuote then
+          currentField = currentField || char
+        else do
+          fields[fields.size() + 1] = currentField.strip()
+          currentField = ""
+        end
+      else
+        currentField = currentField || char
+      
+    end
+    
+    /* Add last field */
+    if currentField.strip() = "" then
+      fields[fields.size() + 1] = ""
+    else
+      fields[fields.size() + 1] = currentField.strip()
+    
+    return fields
+
+  /* Clean a single field */
+  method _cleanField(field) private
+    if field = null then return ""
+    
+    /* Trim whitespace */
+    field = field.strip()
+    
+    /* Remove leading/trailing quotes */
+    if field.startsWith('"') & field.endsWith('"') then
+      if field.size() > 1 then
+        field = field.substring(2, field.size() - 1)
+    
+    /* Replace multiple spaces with single space */
+    field = field.replaceAll("\\s+", " ")
+    
+    return field
+
+  /* Remove control characters from string */
+  method _removeControlChars(text) private
+    result = ""
+    do i = 1 to text.size()
+      char = text.substring(i, i)
+      /* Allow printable ASCII and tab */
+      if char >= " " | char = "\t" then
+        result = result || char
+    end
+    return result
+
+end NetRexxDataTransformer
+
+/**
+ * NetRexxDataReporter
+ * Generates reports in various formats (CSV, JSON, Text).
+ */
+class NetRexxDataReporter
+  
+  constant OUTPUT_FORMAT_CSV = "csv"
+  constant OUTPUT_FORMAT_JSON = "json"
+  constant OUTPUT_FORMAT_TEXT = "text"
+  
+  property lastOutputFile
+
+  method init
+    self.lastOutputFile = ""
+
+  /* Write the report to a file */
+  method writeReport(data, outputFile, format) private
+    if data = null | data.size() = 0 then
+      say "Warning: No data to write."
+      return
+    
+    self.lastOutputFile = outputFile
+    
+    try
+      writer = java.io.BufferedWriter(java.io.FileWriter(outputFile, false))
+      
+      do lineNum = 1 to data.size()
+        line = data[lineNum]
+        
+        if format = self.OUTPUT_FORMAT_CSV then
+          writer.write(line)
+        else if format = self.OUTPUT_FORMAT_JSON then
+          /* Wrap in JSON array */
+          if lineNum = 1 then
+            writer.write("[" || LINE_SEPARATOR)
+          writer.write("  " || line)
+          if lineNum < data.size() then
+            writer.write(",")
+          writer.newLine()
+        else if format = self.OUTPUT_FORMAT_TEXT then
+          writer.write(lineNum || ": " || line)
+          writer.newLine()
+        
+        writer.newLine()
+      end
+      
+      if format = self.OUTPUT_FORMAT_JSON then
+        writer.write("]" || LINE_SEPARATOR)
+      
+      writer.close()
+      
+    catch e = java.io.IOException
+      say "Error writing to file " outputFile ": " e.getMessage()
+      return
+    
+    say "Report written to: " outputFile
+
+end NetRexxDataReporter
