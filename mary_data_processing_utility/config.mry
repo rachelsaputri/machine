@@ -1,0 +1,3 @@
+var MAX_RECORDS = 10000
+var DELIMITER = ","
+var OUTPUT_FORMAT = "csv"

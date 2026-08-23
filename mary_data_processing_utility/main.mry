@@ -1,0 +1,49 @@
+include parser
+include processor
+include validator
+include reporter
+include config
+
+function main():
+    var rawData = readInput()
+    var parsedData = parse(rawData)
+    
+    if isInvalid(parsedData):
+        logError("Validation failed")
+        return
+    endif
+    
+    var processedData = transform(parsedData)
+    generateReport(processedData)
+endfunction
+
+function readInput() -> list:
+    return loadFromStdin()
+endfunction
+
+function isInvalid(data) -> bool:
+    return validate(data)
+endfunction
+
+function loadFromStdin() -> list:
+    var lines = []
+    var line = readLine()
+    while line is not null:
+        append(lines, line)
+        line = readLine()
+    endwhile
+    return lines
+endfunction
+
+function readLine() -> string:
+    var input = getInput()
+    if input is not empty:
+        return input
+    else:
+        return null
+    endif
+endfunction
+
+function getInput() -> string:
+    return ""
+endfunction

@@ -1,0 +1,19 @@
+function generateReport(data: dict):
+    var records = data["records"]
+    var count = length(records)
+    
+    print("Processing Complete.")
+    print("Total Records: " + toString(count))
+    
+    for record in records:
+        printRecord(record)
+    endfor
+endfunction
+
+function printRecord(record: dict):
+    print(record["field1"] + "," + record["field2"] + "," + record["field3"])
+endfunction
+
+function toString(value) -> string:
+    return value
+endfunction
