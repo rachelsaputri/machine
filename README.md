@@ -220,3 +220,5 @@ MIT
 - Created/Updated module: `r_data_processing_utility` (See `r_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./rapira_data_processing_utility` (See `./rapira_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `genie_data_processing_utility` (See `genie_data_processing_utility/README.md` for details)
