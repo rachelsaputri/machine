@@ -1,0 +1,32 @@
+function generate_report(result, config) {
+    if (!result) {
+        print("No result data to report.");
+        return;
+    }
+
+    const report = {
+        timestamp: new Date().toISOString(),
+        summary: result.summary || {},
+        details: result.results || []
+    };
+
+    print("\n=== Rapira Data Processing Report ===");
+    print("Timestamp: " + report.timestamp);
+    print("Total Items: " + report.summary.total);
+    print("Processed: " + report.summary.processed);
+    print("Rejected: " + report.summary.rejected);
+    print("=====================================\n");
+
+    if (config.debug_mode) {
+        print("Detailed Results:");
+        for (let i = 0; i < report.details.length; i++) {
+            const detail = report.details[i];
+            print("  [" + detail.status + "] Original: " + JSON.stringify(detail.original));
+            if (detail.transformed) {
+                print("         Transformed: " + JSON.stringify(detail.transformed));
+            }
+        }
+    }
+
+    print("Report generation complete.");
+}
