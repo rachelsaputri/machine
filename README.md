@@ -238,3 +238,5 @@ MIT
 - Created/Updated module: `postscript_data_processing_utility` (See `postscript_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./sml_data_processing_utility` (See `./sml_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `newton_data_processing_utility` (See `newton_data_processing_utility/README.md` for details)

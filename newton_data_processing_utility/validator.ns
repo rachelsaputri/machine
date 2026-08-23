@@ -1,0 +1,40 @@
+-- NewtonScript Data Processing Utility - Validator
+
+-- Function to validate data
+DEFINE validateData(data) {
+    DEFINE validatedData := [];
+    DEFINE errors := [];
+    
+    FOR EACH record IN data {
+        DEFINE isValid := TRUE;
+        DEFINE recordErrors := [];
+        
+        -- Validate required fields
+        IF !record.has("field1") {
+            isValid := FALSE;
+            recordErrors.add("Missing field1");
+        }
+        
+        IF !record.has("field2") {
+            isValid := FALSE;
+            recordErrors.add("Missing field2");
+        }
+        
+        IF !isValid {
+            FOR EACH error IN recordErrors {
+                errors.add("Record Error: " + error);
+            }
+        } ELSE {
+            validatedData.add(record);
+        }
+    }
+    
+    IF errors.length > 0 {
+        LOG "Validation Errors:";
+        FOR EACH error IN errors {
+            LOG "  - " + error;
+        }
+    }
+    
+    RETURN validatedData;
+};

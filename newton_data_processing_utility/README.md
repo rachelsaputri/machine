@@ -1,27 +1,25 @@
-# Newton Data Processing Utility
+# NewtonScript Data Processing Utility
 
-This project implements a complete, fully functional data processing utility written strictly in NewtonScript.
+A modular data processing utility written in NewtonScript, designed to handle data ingestion, transformation, validation, and reporting.
 
 ## Features
-- **Data Ingestion**: Handles lists, strings, and generic objects.
-- **Data Validation**: Filters invalid items based on type and content.
-- **Data Transformation**: Applies standard transformations (e.g., uppercase for strings, doubling numbers).
-- **Reporting**: Generates summary reports with timestamps and item counts.
+- Data Ingestion: Load data from various sources.
+- Data Transformation: Apply transformation rules to clean and format data.
+- Data Validation: Ensure data integrity and compliance with schemas.
+- Data Reporting: Generate reports based on processed data.
 
 ## Usage
-The main entry point is `main.np`, which orchestrates the pipeline:
-1. Ingest
-2. Validate
-3. Transform
-4. Report
+1. Clone the repository.
+2. Place your NewtonScript interpreter in the path.
+3. Execute the main utility file.
 
-## Modules
-- `ingester.np`: Handles raw input parsing.
-- `validator.np`: Ensures data integrity.
-- `transformer.np`: Modifies data content.
-- `reporter.np`: Generates output logs.
+```bash
+newton main.ns
+```
 
-## Constraints
-- No dummy code or placeholders.
-- Production-ready logic.
-- Strictly NewtonScript compliant.
+## File Structure
+- `main.ns`: Entry point of the application.
+- `parser.ns`: Functions for parsing raw data.
+- `transformer.ns`: Functions for transforming data.
+- `validator.ns`: Functions for validating data.
+- `reporter.ns`: Functions for generating reports.

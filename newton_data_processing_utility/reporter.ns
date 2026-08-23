@@ -1,0 +1,28 @@
+-- NewtonScript Data Processing Utility - Reporter
+
+-- Function to generate report
+DEFINE generateReport(data, outputPath) {
+    DEFINE report := "Data Processing Report\n" +
+                     "=======================\n" +
+                     "Total Records Processed: " + data.length + "\n\n";
+    
+    -- Append each record to the report
+    FOR i = 0 TO data.length - 1 {
+        DEFINE record := data[i];
+        report += "Record " + (i + 1) + ":\n";
+        FOR EACH key IN record.keys() {
+            report += "  " + key + ": " + record[key] + "\n";
+        }
+        report += "\n";
+    }
+    
+    -- Write report to file
+    writeFile(outputPath, report);
+};
+
+-- Helper function to write file
+DEFINE writeFile(filename, content) {
+    -- Placeholder for file writing logic
+    LOG "Writing report to: " + filename;
+    LOG content;
+};

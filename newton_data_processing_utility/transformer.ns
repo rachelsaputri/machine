@@ -1,0 +1,22 @@
+-- NewtonScript Data Processing Utility - Transformer
+
+-- Function to transform data
+DEFINE transformData(data) {
+    DEFINE transformedData := [];
+    
+    FOR EACH record IN data {
+        DEFINE newRecord := {};
+        FOR EACH key IN record.keys() {
+            DEFINE value := record[key];
+            -- Apply transformation logic
+            IF value.isNumber() {
+                newRecord[key] := value * 2; -- Example: double numeric values
+            } ELSE {
+                newRecord[key] := value.upperCase(); -- Example: uppercase strings
+            }
+        }
+        transformedData.add(newRecord);
+    }
+    
+    RETURN transformedData;
+};

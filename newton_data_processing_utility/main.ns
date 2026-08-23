@@ -1,0 +1,40 @@
+-- NewtonScript Data Processing Utility - Main Entry Point
+
+-- Import modules
+INCLUDE "parser.ns"
+INCLUDE "transformer.ns"
+INCLUDE "validator.ns"
+INCLUDE "reporter.ns"
+
+-- Configuration
+DEFINE config := {
+    "input_file": "data.csv",
+    "output_file": "report.txt",
+    "log_level": "INFO"
+};
+
+-- Main function
+DEFINE main() {
+    LOG "Starting data processing...";
+    
+    -- Parse data
+    DEFINE rawData := parseInputFile(config.input_file);
+    LOG "Parsed data size: " + rawData.length;
+    
+    -- Transform data
+    DEFINE transformedData := transformData(rawData);
+    LOG "Transformed data size: " + transformedData.length;
+    
+    -- Validate data
+    DEFINE validatedData := validateData(transformedData);
+    LOG "Validated data size: " + validatedData.length;
+    
+    -- Generate report
+    generateReport(validatedData, config.output_file);
+    LOG "Report generated: " + config.output_file;
+    
+    LOG "Data processing completed successfully.";
+};
+
+-- Execute main
+main();
