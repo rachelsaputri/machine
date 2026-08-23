@@ -1,0 +1,66 @@
+NB> Transform normalized events according to target compliance frameworks.
+NB> Applies rule matrices to map internal codes to framework-specific attributes.
+
+DEFINE
+  target_framework :-> GETARGUMENTS [1];
+  transformed_events :-> MAP APPLY_TRANSFORM normalized_events
+ENDDEFINE
+
+APPLY_TRANSFORM :-> FUNCTION [record]
+  DEFINE
+    id :-> record [0];
+    source :-> record [1];
+    severity :-> record [2];
+    category :-> record [3];
+    timestamp :-> record [4];
+    message :-> record [5];
+    
+    framework_code :-> MAP_FRAMEWORK_ID target_framework;
+    risk_score :-> CALCULATE_RISK severity;
+    control_ref :-> MAP_CONTROL_REF category framework_code;
+    
+    [
+      id,
+      source,
+      severity,
+      category,
+      timestamp,
+      message,
+      framework_code,
+      risk_score,
+      control_ref
+    ]
+  END
+END
+
+MAP_FRAMEWORK_ID :-> FUNCTION [framework]
+  DEFINE
+    CASE framework
+      WHEN 'NIST' THEN 'US-NIST-800-53'
+      WHEN 'ISO' THEN 'ISO-27001-A.9'
+      WHEN 'GDPR' THEN 'GDPR-ART-32'
+      ELSE 'DEFAULT-COMP-001'
+    END
+  END
+END
+
+CALCULATE_RISK :-> FUNCTION [severity]
+  DEFINE
+    IF severity >= 5 THEN 90
+    ELSE IF severity >= 3 THEN 50
+    ELSE IF severity >= 1 THEN 20
+    ELSE 10
+    END
+  END
+END
+
+MAP_CONTROL_REF :-> FUNCTION [category, framework]
+  DEFINE
+    CASE category
+      WHEN 'AUTHORIZATION' THEN 'IA-2'
+      WHEN 'SYSTEM_CONFIGURATION' THEN 'SI-4'
+      WHEN 'INTEGRITY' THEN 'AU-9'
+      ELSE 'GEN-CONTROL'
+    END
+  END
+END

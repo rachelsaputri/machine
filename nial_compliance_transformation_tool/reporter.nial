@@ -1,0 +1,32 @@
+NB> Generate deterministic compliance manifests from transformed events.
+NB> Outputs a structured CSV-like compliance report.
+
+DEFINE
+  output_file :-> GETARGUMENTS [2] DEFAULT 'compliance_report.out';
+  report_lines :-> GENERATE_REPORT transformed_events;
+  REPORT report_lines TO output_file
+ENDDEFINE
+
+GENERATE_REPORT :-> FUNCTION [events]
+  DEFINE
+    header :-> 'ID,Source,Severity,Category,Timestamp,Message,Framework,RiskScore,ControlRef';
+    data_lines :-> MAP FORMAT_RECORD events;
+    [header] UNION data_lines
+  END
+END
+
+FORMAT_RECORD :-> FUNCTION [record]
+  DEFINE
+    id :-> record [0];
+    source :-> record [1];
+    severity :-> record [2];
+    category :-> record [3];
+    timestamp :-> record [4];
+    message :-> record [5];
+    framework :-> record [6];
+    risk :-> record [7];
+    control :-> record [8];
+    
+    CONCAT [id, source, severity, category, timestamp, message, framework, risk, control] SEPARATED BY ','
+  END
+END

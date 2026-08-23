@@ -1,0 +1,71 @@
+NB> Main execution entry point for the Nial Compliance Transformation Tool.
+NB> Orchestrates ingestion, normalization, transformation, and reporting.
+
+DEFINE
+  args :-> GETARGUMENTS;
+  input_file :-> IF LENGTH args > 0 THEN args [0] ELSE 'stdin' END;
+  framework :-> IF LENGTH args > 1 THEN args [1] ELSE 'DEFAULT' END;
+  report_file :-> IF LENGTH args > 2 THEN args [2] ELSE 'compliance_report.out' END;
+  
+  NB> Step 1: Ingest
+  raw_input :-> IF input_file = 'stdin' THEN GETLINES ELSE READFILE input_file END;
+  parsed_events :-> MAP PARSE_RECORD raw_input;
+  
+  NB> Step 2: Normalize
+  normalized_events :-> MAP NORMALIZE_RECORD parsed_events;
+  
+  NB> Step 3: Transform
+  transformed_events :-> MAP APPLY_TRANSFORM normalized_events;
+  
+  NB> Step 4: Report
+  report_lines :-> GENERATE_REPORT transformed_events;
+  REPORT report_lines TO report_file;
+  
+  PRINT 'Compliance transformation complete. Report saved to ' report_file
+END
+
+NB> Helper functions defined locally to ensure single-file portability
+PARSE_RECORD :-> FUNCTION [record]
+  DEFINE
+    parts :-> SCAN [':'] record;
+    IF LENGTH parts < 3 THEN FAIL :-> 'Invalid format' ELSE
+      [parts [0], parts [1], SUBSTRING (LENGTH parts [0] + LENGTH parts [1] + 2) FROM record]
+    END
+  END
+END
+
+NORMALIZE_RECORD :-> FUNCTION [record]
+  DEFINE
+    id :-> record [0]; source :-> record [1]; payload :-> record [2];
+    severity :-> IF source = 'CRITICAL' THEN 5 ELSE IF source = 'WARNING' THEN 3 ELSE 2 END END;
+    category :-> IF payload CONTAINS 'ACCESS' THEN 'AUTHORIZATION' ELSE 'GENERAL' END;
+    timestamp :-> FORMAT '%Y-%m-%d %H:%M:%S' NOW;
+    message :-> TRIM payload;
+    [id, source, severity, category, timestamp, message]
+  END
+END
+
+APPLY_TRANSFORM :-> FUNCTION [record]
+  DEFINE
+    id :-> record [0]; source :-> record [1]; severity :-> record [2];
+    category :-> record [3]; timestamp :-> record [4]; message :-> record [5];
+    framework :-> IF framework = 'NIST' THEN 'US-NIST-800-53' ELSE 'DEFAULT-COMP' END;
+    risk :-> IF severity >= 4 THEN 90 ELSE IF severity >= 2 THEN 50 ELSE 20 END END;
+    control :-> IF category = 'AUTHORIZATION' THEN 'IA-2' ELSE 'GEN-CTRL' END;
+    [id, source, severity, category, timestamp, message, framework, risk, control]
+  END
+END
+
+GENERATE_REPORT :-> FUNCTION [events]
+  DEFINE
+    header :-> 'ID,Source,Severity,Category,Timestamp,Message,Framework,RiskScore,ControlRef';
+    data :-> MAP FORMAT_RECORD events;
+    [header] UNION data
+  END
+END
+
+FORMAT_RECORD :-> FUNCTION [record]
+  DEFINE
+    CONCAT record SEPARATED BY ','
+  END
+END
