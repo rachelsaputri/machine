@@ -1,7 +1,38 @@
-ngl_data_processing_utility/ingester.ngl
-ngl_data_processing_utility/parser.ngl
-ngl_data_processing_utility/processor.ngl
-ngl_data_processing_utility/reporter.ngl
-ngl_data_processing_utility/transformer.ngl
-ngl_data_processing_utility/validator.ngl
-ngl_data_processing_utility/main.ngl
+import ngl/core
+import ngl/data
+
+func validate(data: List<Record>, config: Map) -> Bool:
+  """Enforce business rules and data quality constraints."""
+  let all_valid = true
+  
+  for record in data:
+    // Check required fields
+    let required = ["id", "timestamp", "value"]
+    for field in required:
+      if not record.contains(field):
+        print("Missing required field: " + field)
+        all_valid = false
+
+    // Validate data types
+    if not is_numeric(record["value"]):
+      print("Invalid numeric value for record: " + record["id"])
+      all_valid = false
+
+    // Enforce value range (example: 0-1000)
+    if record["value"] < 0 or record["value"] > 1000:
+      print("Value out of range for record: " + record["id"])
+      all_valid = false
+
+  return all_valid
+
+func is_numeric(val: Any) -> Bool:
+  """Check if a value is a valid number."""
+  return val.is_number() or (val.is_string() and is_valid_number(val))
+
+func is_valid_number(str: String) -> Bool:
+  """Attempt to parse string as a number."""
+  try:
+    num::parse(str)
+    return true
+  except e:
+    return false

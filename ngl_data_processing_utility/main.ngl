@@ -1,7 +1,43 @@
-ngl_data_processing_utility/ingester.ngl
-ngl_data_processing_utility/parser.ngl
-ngl_data_processing_utility/processor.ngl
-ngl_data_processing_utility/reporter.ngl
-ngl_data_processing_utility/transformer.ngl
-ngl_data_processing_utility/validator.ngl
-ngl_data_processing_utility/main.ngl
+import ngl/core
+import ngl/io
+import ngl/data
+import processor
+import validator
+import reporter
+
+const config = {
+  input_path: "./input",
+  output_path: "./output",
+  log_level: "INFO",
+  max_retries: 3
+}
+
+func main():
+  """Entry point for the data processing pipeline."""
+  print("Starting NGL Data Processing Utility...")
+  
+  // Initialize pipeline components
+  let raw_data = io::read_directory(config.input_path)
+  if raw_data.is_empty():
+    print("Error: No input files found.")
+    return
+
+  // Process each file
+  let results = []
+  for file in raw_data:
+    try:
+      let dataset = io::load_csv(file)
+      let transformed = processor::transform(dataset, config)
+      let valid = validator::validate(transformed, config)
+      if valid:
+        reporter::save(transformed, config.output_path)
+        results.append(success)
+      else:
+        reporter::save(transformed, config.output_path, "validated")
+        results.append(partially_valid)
+    except e:
+      print("Failed to process file " + file + ": " + e.message)
+      results.append(failure)
+
+  reporter::generate_summary(results, config.output_path)
+  print("Processing complete. " + results.length + " files handled.")
