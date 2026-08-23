@@ -1,0 +1,47 @@
+(**
+ * Lustre Data Processing Utility
+ * 
+ * This file defines the core nodes for data processing in Lustre.
+ * It includes nodes for data ingestion, validation, transformation, and reporting.
+ **)
+
+(** Data Validation Node **)
+(** Validates that the input data stream meets the expected format and constraints. **)
+node validate_data (input: int) -> (valid: bool);
+let
+  valid = input > 0; (** Simple validation: data must be positive **)
+tel;
+
+(** Data Transformation Node **)
+(** Transforms the validated data by applying a mathematical operation. **)
+node transform_data (input: int) -> (transformed: int);
+let
+  transformed = input * 2; (** Simple transformation: double the value **)
+tel;
+
+(** Data Aggregation Node **)
+(** Aggregates the transformed data over a window of time. **)
+node aggregate_data (input: int; window: int) -> (sum: int);
+let
+  sum = rec 0 (x -> x + input) fby 0;
+  (** Note: Lustre does not have direct support for sliding window aggregation in this simple form. **)
+  (** This is a placeholder for a more complex aggregation logic. **)
+tel;
+
+(** Data Reporting Node **)
+(** Generates a report based on the aggregated data. **)
+node report_data (sum: int) -> (report: string);
+let
+  report = if sum > 100 then "High sum" else "Low sum";
+  (** Note: Lustre does not have built-in string support. This is a placeholder. **)
+tel;
+
+(** Main Pipeline Node **)
+(** Orchestrates the data processing pipeline. **)
+node data_processing_pipeline (input: int) -> (report: string);
+let
+  valid = validate_data(input);
+  transformed = if valid then transform_data(input) else 0;
+  sum = aggregate_data(transformed, 10);
+  report = report_data(sum);
+tel;

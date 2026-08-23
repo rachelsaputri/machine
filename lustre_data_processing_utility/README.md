@@ -1,29 +1,36 @@
 # Lustre Data Processing Utility
 
-A high-performance, formally verified data processing utility written in Lustre.
-Lustre is a synchronous data-flow language used for specifying and generating code for real-time systems.
-This utility demonstrates how to implement a data pipeline (Ingest, Transform, Validate, Report) using Lustre's
-stream-based reactive programming model.
+## Overview
+This utility provides a Lustre-based implementation for data processing pipelines. Lustre is a synchronous dataflow programming language primarily used for real-time embedded systems and formal verification. This utility adapts Lustre's strong typing and deterministic execution model for robust data processing tasks.
 
 ## Features
-- **Data Ingestion**: Reads integer streams representing raw data points.
-- **Transformation**: Applies configurable linear transformations (scale and offset).
-- **Validation**: Checks for anomalies based on configurable thresholds.
-- **Reporting**: Generates summary statistics and anomaly flags.
+- Data ingestion and validation
+- Data transformation and enrichment
+- Data reporting and output
+- Formal verification of processing logic
 
-## How to Run
-This project is designed to be compiled using the Lustre compiler (`lsc`).
+## Structure
+- `main.lus`: Main Lustre node definitions and pipeline orchestration
+- `README.md`: This file
 
-1. Ensure you have the Lustre compiler installed (`apt-get install lustre` or via OCHRE).
-2. Compile the main node:
-   ```bash
-   lsc -o lustre_dpu lustre_data_processing_utility.dlu
-   ```
-3. Generate C code for simulation:
-   ```bash
-   lsc -C lustre_data_processing_utility.dlu
-   ```
-4. Run the generated C simulation with a test signal.
+## Usage
+1. Compile the Lustre nodes using a Lustre compiler (e.g., Lucid Synthesizer).
+2. Generate test vectors to validate the processing logic.
+3. Execute the compiled nodes with your data streams.
 
-## Architecture
-- `lustre_data_processing_utility.dlu`: The main Lustre definition file containing all nodes.
+## Lustre Language Details
+Lustre is a declarative, synchronous language that models systems as networks of nodes. Each node has inputs, outputs, and local variables. The semantics are based on the synchronous hypothesis, meaning that the evaluation of a node is instantaneous and all outputs are available at the same time step.
+
+### Key Concepts
+- **Streams**: Sequences of values over time.
+- **Nodes**: Functions that transform input streams into output streams.
+- **Operators**: Lustre provides various operators for data manipulation, such as `+`, `-`, `*`, `/`, `and`, `or`, `not`, etc.
+- **Built-in functions**: Lustre has built-in functions for common operations like `pre`, `fby`, `when`, etc.
+
+## Example
+```lustre
+node sample_node (input: int) -> (output: int);
+let
+  output = input + 1;
+tel;
+```

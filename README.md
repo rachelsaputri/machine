@@ -212,3 +212,5 @@ MIT
 - Created/Updated module: `plankalkul_data_processing_utility` (See `plankalkul_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `plex_data_processing_utility` (See `plex_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `lustre_data_processing_utility` (See `lustre_data_processing_utility/README.md` for details)
