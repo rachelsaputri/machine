@@ -196,3 +196,5 @@ MIT
 - Created/Updated module: `nial_compliance_transformation_tool` (See `nial_compliance_transformation_tool/README.md` for details)
 
 - Created/Updated module: `xml_data_processing_utility` (See `xml_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `haxe_data_processing_utility` (See `haxe_data_processing_utility/README.md` for details)
