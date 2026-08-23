@@ -1,0 +1,10 @@
+"Utilities" extends 'Object
+    | dataProcessor
+
+    onInitialize
+        self dataProcessor := OrderedCollection new.
+        ^self    onData:record addIntoProcessor
+        self dataProcessor add: record.    onGetDataFromProcessor
+        ^self dataProcessor    onClearProcessor
+        self dataProcessor removeAll.
+    

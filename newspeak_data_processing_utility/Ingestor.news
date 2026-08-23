@@ -1,0 +1,11 @@
+"Ingestor" extends 'Object
+    | stream
+
+    onInitialize
+        self stream := OrderedCollection new.
+        "Initialize the stream with sample data for demonstration"
+        stream addAll: { 'record1', 'record2', 'record3' }.    onIngestDataStream: aStream
+        aStream do: [:each | self stream add: each ].
+        ^self stream    onProcess
+        ^self stream    onFinalize
+        self stream removeAll.    

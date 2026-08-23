@@ -1,0 +1,7 @@
+"Validator" extends 'Object
+
+    onValidate:data
+        "Validate data is not empty"
+        ^data isEmpty ifTrue: [ 'Invalid: Empty' ] ifFalse: [ 'Valid' ].    onValidateAll:dataCollection
+        ^dataCollection collect: [:each | self validate: each ].    onFinalize
+    

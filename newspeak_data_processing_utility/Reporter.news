@@ -1,0 +1,9 @@
+"Reporter" extends 'Object
+
+    onReport:results
+        | summary|
+        summary := String new.
+        results do: [:each |
+            summary := summary, each, '\n' ].
+        ^summary    onFinalize
+    
