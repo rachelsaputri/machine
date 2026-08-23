@@ -1,0 +1,20 @@
+PL11 MAIN MODULE DATA_PROCESSING_ENGINE;
+
+IMPORTS: DataIngestor, DataValidator, DataTransformer, DataReporter;
+
+PROCEDURE MAIN();
+  DECLARE raw_data POINTER TO RECORD;
+  DECLARE processed_data POINTER TO RECORD;
+  DECLARE report POINTER TO RECORD;
+
+  CALL DataIngestor.ingest_data(raw_data);
+  
+  IF DataValidator.validate_data(raw_data) THEN
+    CALL DataTransformer.transform_data(raw_data, processed_data);
+    CALL DataReporter.generate_report(processed_data, report);
+    CALL System.write_report(report);
+  ELSE
+    CALL System.log_error('Validation failed for incoming data.');
+  END IF;
+
+END MAIN;

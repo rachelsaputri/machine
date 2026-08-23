@@ -1,0 +1,13 @@
+PL11 MODULE DATA_TRANSFORMER;
+
+IMPORTS: System, DataTypes;
+
+PROCEDURE transform_data(input_data POINTER TO RECORD, output_data POINTER TO RECORD) EXPORT;
+  DECLARE temp_record RECORD;
+  
+  SET temp_record = input_data;
+  
+  CALL DataTypes.apply_business_rules(temp_record, transformed_record);
+  CALL DataTypes.cast_to_output_format(transformed_record, output_data);
+
+END transform_data;

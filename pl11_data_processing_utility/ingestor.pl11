@@ -1,0 +1,20 @@
+PL11 MODULE DATA_INGESTOR;
+
+IMPORTS: System, DataTypes;
+
+PROCEDURE ingest_data(output_data POINTER TO RECORD) EXPORT;
+  DECLARE source_file CHARACTER(50);
+  DECLARE buffer RECORD;
+
+  SET source_file = 'data_source.txt';
+  
+  CALL System.open_input(source_file, input_stream);
+  
+  DO WHILE NOT System.eof(input_stream) DO
+    CALL System.read_record(input_stream, buffer);
+    CALL DataTypes.map_to_structure(buffer, output_data);
+  END DO;
+  
+  CALL System.close_input(input_stream);
+
+END ingest_data;

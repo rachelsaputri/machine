@@ -1,0 +1,20 @@
+PL11 MODULE DATA_VALIDATOR;
+
+IMPORTS: System, DataTypes;
+
+FUNCTION validate_data(input_data POINTER TO RECORD) RETURNS BOOLEAN EXPORT;
+  DECLARE is_valid BOOLEAN;
+  
+  SET is_valid = TRUE;
+  
+  IF input_data IS NULL THEN
+    SET is_valid = FALSE;
+  ELSE
+    IF DataTypes.check_required_fields(input_data) = FALSE THEN
+      SET is_valid = FALSE;
+    END IF;
+  END IF;
+  
+  RETURN is_valid;
+
+END validate_data;

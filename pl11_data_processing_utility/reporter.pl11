@@ -1,0 +1,16 @@
+PL11 MODULE DATA_REPORTER;
+
+IMPORTS: System, DataFormatter;
+
+PROCEDURE generate_report(processed_data POINTER TO RECORD, report_out POINTER TO RECORD) EXPORT;
+  DECLARE formatted_output CHARACTER(255);
+  
+  SET formatted_output = DataFormatter.format_record(processed_data);
+  
+  CALL System.open_output('report_output.txt', output_stream);
+  CALL System.write_line(output_stream, formatted_output);
+  CALL System.close_output(output_stream);
+  
+  SET report_out = output_stream;
+
+END generate_report;
