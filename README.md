@@ -174,3 +174,5 @@ MIT
 - Created/Updated module: `./moo_data_processing_utility` (See `./moo_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `rex_data_processing_utility` (See `rex_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `harbour_data_processing_utility` (See `harbour_data_processing_utility/README.md` for details)
