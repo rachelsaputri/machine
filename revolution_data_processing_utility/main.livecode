@@ -1,0 +1,32 @@
+```rev
+-- Revolution (LiveCode) Data Processing Utility
+
+local sData
+local sReport
+
+command processData pInputFile, pOutputFile
+   -- Step 1: Ingest Data
+   let sData = ingestData(pInputFile)
+   if sData is empty then
+      answer error "Failed to ingest data from:" && pInputFile
+      exit processData
+   end if
+
+   -- Step 2: Transform Data
+   let sData = transformData(sData)
+
+   -- Step 3: Validate Data
+   put validateData(sData) into sValidData
+
+   -- Step 4: Export Data
+   exportData sValidData, pOutputFile
+
+   -- Step 5: Generate Report
+   generateReport pInputFile, pOutputFile
+end processData
+
+function ingestData pFile
+   if not (there is a file pFile) then
+      return empty
+   end if
+   put url(
