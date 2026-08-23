@@ -1,0 +1,41 @@
+-- SETL Data Processing Utility - Validator
+-- Contains data validation rules and checks
+
+-- Validate a set of records
+-- Returns a subset of valid records
+validate_data := proc(data_set)
+    local valid_set, record;
+    valid_set := {};
+    
+    forall record in data_set do
+        if is_valid_record(record) then
+            valid_set := valid_set union {record};
+        end;
+    end;
+    
+    return valid_set;
+end;
+
+-- Check if a single record is valid
+-- Example: Non-empty strings are valid
+is_valid_record := proc(record)
+    if kind(record) = 'STRING then
+        return record /= "";
+    elsif kind(record) = 'TUPLE then
+        -- A tuple is valid if it has at least one non-empty element
+        local has_valid := false;
+        forall elem in record do
+            if kind(elem) = 'STRING then
+                if elem /= "" then
+                    has_valid := true;
+                end;
+            elsif kind(elem) /= 'NIL then
+                has_valid := true;
+            end;
+        end;
+        return has_valid;
+    else
+        -- For other types, consider them valid
+        return true;
+    end;
+end;

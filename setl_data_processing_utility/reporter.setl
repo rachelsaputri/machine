@@ -1,0 +1,49 @@
+-- SETL Data Processing Utility - Reporter
+-- Contains reporting and logging utilities
+
+-- Generate a summary report of processed data
+generate_report := proc(data_set, title)
+    local report, count, sorted_set, i;
+    
+    count := data_set#;
+    report := "\n";
+    report := report | "=" * 40 || "\n";
+    report := report | "Data Processing Report: " | title || "\n";
+    report := report | "=" * 40 || "\n";
+    report := report | "Total Records Processed: " | count || "\n";
+    report := report | "\n";
+    
+    -- Sort data for consistent reporting
+    sorted_set := sort(data_set);
+    
+    -- Display first 10 records as sample
+    i := 0;
+    forall item in sorted_set do
+        i := i + 1;
+        if i > 10 then
+            break;
+        end;
+        report := report | "  [" | i | "] " | item || "\n";
+    end;
+    
+    if count > 10 then
+        report := report | "  ... and " | (count - 10) | " more records\n";
+    end;
+    
+    report := report | "=" * 40 || "\n\n";
+    
+    return report;
+end;
+
+-- Log a message to standard output
+log_message := proc(message, level)
+    local prefix;
+    case level of
+        "INFO": prefix := "[INFO]";
+        "WARN": prefix := "[WARN]";
+        "ERROR": prefix := "[ERROR]";
+        otherwise: prefix := "[DEBUG]";
+    end;
+    
+    put(prefix | " " | message);
+end;

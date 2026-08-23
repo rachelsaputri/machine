@@ -1,0 +1,69 @@
+-- SETL Data Processing Utility - Processor
+-- Contains core transformation and processing logic
+
+-- Process a set of records
+-- Each record is expected to be a tuple or set
+process_data := proc(data_set)
+    local processed, record;
+    processed := {};
+    
+    forall record in data_set do
+        -- Example processing: normalize strings and trim whitespace
+        if kind(record) = 'TUPLE then
+            -- Process each element in the tuple
+            new_record := [];
+            for elem in record do
+                if kind(elem) = 'STRING then
+                    elem := trim(elem);
+                end;
+                new_record := new_record + [elem];
+            end;
+            processed := processed union {tuple(new_record)};
+        else
+            -- Pass through non-tuple data
+            processed := processed union {record};
+        end;
+    end;
+    
+    return processed;
+end;
+
+-- Read data from file
+read_data := proc(filename)
+    local f, line, lines_set, result_set;
+    result_set := {};
+    
+    f := open(filename, 'r');
+    if f = NIL then
+        return {};
+    end;
+    
+    loop
+        line := f.readline();
+        exit when line = NIL;
+        line := trim(line);
+        if line /= "" and not starts_with(line, '#') then
+            result_set := result_set union {line};
+        end;
+    end;
+    
+    close(f);
+    return result_set;
+end;
+
+-- Write data to file
+write_data := proc(data_set, filename)
+    local f, item;
+    
+    f := open(filename, 'w');
+    if f = NIL then
+        return false;
+    end;
+    
+    forall item in data_set do
+        f.writeline(item);
+    end;
+    
+    close(f);
+    return true;
+end;
