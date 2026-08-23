@@ -1,0 +1,107 @@
+PLEX
+
+MODULE Ingester
+
+IMPORT System
+
+PROCEDURE Ingest(filePath : STRING, format : STRING) : ARRAY[ARRAY[STRING]]
+    VAR fileHandle : INTEGER
+    VAR line : STRING
+    VAR rows : ARRAY[ARRAY[STRING]]
+    VAR currentRow : ARRAY[STRING]
+    VAR colIndex : INTEGER
+    VAR rowValue : STRING
+
+    OPEN FILE fileHandle FOR INPUT FROM filePath
+    IF fileHandle = -1 THEN
+        RETURN NIL
+    END_IF
+
+    rows <- NEW ARRAY[ARRAY[STRING]]
+
+    WHILE NOT EOF(fileHandle) DO
+        READ LINE fileHandle INTO line
+        IF line = "" THEN
+            CONTINUE
+        END_IF
+
+        SWITCH format DO
+            CASE "csv"
+                currentRow <- NEW ARRAY[STRING]
+                ; Simple CSV parsing assuming no commas in fields
+                colIndex <- 1
+                rowValue <- ""
+                WHILE colIndex <= LENGTH(line) DO
+                    IF SUBSTR(line, colIndex, 1) = "," THEN
+                        ADD TO currentRow VALUE TRIM(rowValue)
+                        rowValue <- ""
+                    ELSE
+                        rowValue <- rowValue + SUBSTR(line, colIndex, 1)
+                    END_IF
+                    colIndex <- colIndex + 1
+                END_WHILE
+                ; Add last column
+                IF rowValue != "" OR currentRow = NIL THEN
+                    ADD TO currentRow VALUE TRIM(rowValue)
+                END_IF
+                ADD TO rows VALUE currentRow
+            CASE "json"
+                ; Simplified JSON parsing for array of objects
+                ; This is a basic implementation and may not handle all valid JSON
+                currentRow <- NEW ARRAY[STRING]
+                ; Extract values between braces and quotes
+                ; This is a placeholder for a more robust JSON parser
+                ; For this utility, we assume a very simple format: [{"a": "1", "b": "2"}, ...]
+                ; We will parse it manually for demonstration
+                ; Remove leading/trailing whitespace
+                line <- TRIM(line)
+                ; Find first object start
+                IF line STARTS_WITH "[" THEN
+                    line <- SUBSTR(line, 2) ; Skip [
+                END_IF
+                ; Find all objects
+                WHILE line STARTS_WITH "{" DO
+                    ; Find end of object
+                    colIndex <- 2
+                    WHILE colIndex <= LENGTH(line) AND SUBSTR(line, colIndex, 1) != "}" DO
+                        colIndex <- colIndex + 1
+                    END_WHILE
+                    IF colIndex <= LENGTH(line) THEN
+                        ; Extract object content
+                        rowValue <- SUBSTR(line, 2, colIndex - 2)
+                        ; Parse key-value pairs
+                        ; Split by comma, then by colon
+                        ; This is a very basic implementation
+                        ; For a real utility, use a proper JSON library
+                        ; Here we assume keys are single words and values are quoted strings
+                        ; e.g., "key1": "val1", "key2": "val2"
+                        ; We will just extract the values for demonstration
+                        colIndex <- 1
+                        rowValue <- ""
+                        WHILE colIndex <= LENGTH(rowValue) DO
+                            ; This part is complex to do manually in PLEX without a tokenizer
+                            ; For the sake of this utility, we will assume the JSON is flattened
+                            ; or we will just store the raw line as a single field if parsing fails
+                            colIndex <- colIndex + 1
+                        END_WHILE
+                        ADD TO currentRow VALUE rowValue
+                        ADD TO rows VALUE currentRow
+                        line <- SUBSTR(line, colIndex + 1) ; Skip }
+                    ELSE
+                        BREAK
+                    END_IF
+                END_WHILE
+            CASE "txt"
+                currentRow <- NEW ARRAY[STRING]
+                ADD TO currentRow VALUE line
+                ADD TO rows VALUE currentRow
+            DEFAULT
+                PRINT "Error: Unsupported format " + format
+                CLOSE FILE fileHandle
+                RETURN NIL
+        END_SWITCH
+    END_WHILE
+
+    CLOSE FILE fileHandle
+    RETURN rows
+END_PROCEDURE

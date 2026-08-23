@@ -210,3 +210,5 @@ MIT
 - Created/Updated module: `pl11_data_processing_utility` (See `pl11_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `plankalkul_data_processing_utility` (See `plankalkul_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `plex_data_processing_utility` (See `plex_data_processing_utility/README.md` for details)
