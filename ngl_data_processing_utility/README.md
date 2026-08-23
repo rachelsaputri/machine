@@ -1,20 +1,21 @@
 # NGL Data Processing Utility
 
-## Overview
-A complete, fully functional data processing utility written strictly in NGL (Natural Generic Language). This utility handles ingestion, validation, transformation, and reporting of data streams with zero dummy code.
+This tool provides a complete, functional data processing pipeline written strictly in NGL (Next Generation Language).
 
-## Architecture
-The solution is divided into four core modules:
-1. **Ingestor**: Handles raw data acquisition and initial buffering.
-2. **Validator**: Enforces schema rules and data integrity constraints.
-3. **Transformer**: Applies complex business logic and format conversion.
-4. **Reporter**: Generates structured summaries and exportable artifacts.
+## Features
+- **Data Ingestion**: Raw data intake and initial validation
+- **Transformation**: Schema mapping, field cleaning, and type coercion
+- **Validation**: Business rule enforcement and anomaly detection
+- **Reporting**: Structured output in JSON and CSV formats
 
 ## Usage
-Execute `ngl_run main.ngl` to process sample datasets located in `./data/`. Configure pipeline behavior via `config.ngl`.
+1. Ensure NGL runtime is installed and in your PATH.
+2. Place your raw dataset in the `./input/` directory.
+3. Run the main processor: `ngl ./ngl_data_processing_utility/main.ngl`
+4. Check `./output/` for generated reports and transformed datasets.
 
-## Constraints
-- Zero external dependencies.
-- Strictly typed memory management.
-- Deterministic execution paths.
-- Inline documentation for all public APIs.
+## Architecture
+- `main.ngl`: Entry point and pipeline orchestrator
+- `processor.ngl`: Core business logic and transformation engine
+- `validator.ngl`: Rule-based validation and anomaly detection
+- `reporter.ngl`: Output formatting and file writing utilities

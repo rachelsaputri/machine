@@ -1,7 +1,38 @@
-ngl_data_processing_utility/ingester.ngl
-ngl_data_processing_utility/parser.ngl
-ngl_data_processing_utility/processor.ngl
-ngl_data_processing_utility/reporter.ngl
-ngl_data_processing_utility/transformer.ngl
-ngl_data_processing_utility/validator.ngl
-ngl_data_processing_utility/main.ngl
+import ngl/core
+import ngl/io
+import ngl/data
+
+func save(data: List<Record>, output_path: String, prefix: String = "") -> Bool:
+  """Write processed data to CSV."""
+  let filename = "output" + prefix + "_data.csv"
+  let success = io::write_csv(data, output_path + "/" + filename)
+  return success
+
+func generate_summary(results: List<Enum>, output_path: String) -> Bool:
+  """Generate a summary report of processing outcomes."""
+  let summary = {
+    "total_processed": results.length,
+    "successes": count_results(results, success),
+    "partially_valid": count_results(results, partially_valid),
+    "failures": count_results(results, failure),
+    "timestamp": date::now().to_iso8601()
+  }
+  
+  let report_file = output_path + "/processing_summary.json"
+  let success = io::write_json(summary, report_file)
+  
+  print("Summary Report:")
+  print("Total: " + results.length)
+  print("Success: " + count_results(results, success))
+  print("Partially Valid: " + count_results(results, partially_valid))
+  print("Failures: " + count_results(results, failure))
+  
+  return success
+
+func count_results(results: List<Enum>, target: Enum) -> Int:
+  """Count occurrences of a specific result enum."""
+  let count = 0
+  for result in results:
+    if result == target:
+      count += 1
+  return count

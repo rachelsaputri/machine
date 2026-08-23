@@ -1,7 +1,39 @@
-ngl_data_processing_utility/ingester.ngl
-ngl_data_processing_utility/parser.ngl
-ngl_data_processing_utility/processor.ngl
-ngl_data_processing_utility/reporter.ngl
-ngl_data_processing_utility/transformer.ngl
-ngl_data_processing_utility/validator.ngl
-ngl_data_processing_utility/main.ngl
+import ngl/core
+import ngl/data
+
+func transform(data: List<Record>, config: Map): List<Record>:
+  """Apply transformation rules to the dataset."""
+  let transformed_data = []
+  
+  for record in data:
+    // Trim whitespace from all string fields
+    let cleaned = {}
+    for key, value in record:
+      if value.is_string():
+        cleaned[key] = value.strip()
+      else:
+        cleaned[key] = value
+
+    // Normalize timestamps to ISO-8601 format
+    if "timestamp" in cleaned:
+      cleaned["timestamp"] = normalize_timestamp(cleaned["timestamp"])
+
+    // Remove duplicate records based on primary key
+    if not contains_duplicate(transformed_data, cleaned, "id"):
+      transformed_data.append(cleaned)
+
+  return transformed_data
+
+func normalize_timestamp(ts: String) -> String:
+  """Convert various timestamp formats to ISO-8601."""
+  try:
+    return date::parse(ts).to_iso8601()
+  except e:
+    return "INVALID_TIMESTAMP"
+
+func contains_duplicate(list: List<Record>, item: Record, key: String) -> Bool:
+  """Check if a record with the same primary key already exists."""
+  for existing in list:
+    if existing[key] == item[key]:
+      return true
+  return false
