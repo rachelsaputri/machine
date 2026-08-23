@@ -172,3 +172,5 @@ MIT
 - Created/Updated module: `lse_data_processing_utility` (See `lse_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./moo_data_processing_utility` (See `./moo_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `rex_data_processing_utility` (See `rex_data_processing_utility/README.md` for details)
