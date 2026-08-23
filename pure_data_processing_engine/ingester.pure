@@ -1,0 +1,78 @@
+// Pure Data Processing Engine - Data Ingestion Module
+// ===================================================
+
+import json;
+import csv;
+import http;
+
+-- Ingest data from specified source type
+fun ingest_data(source_type: String): List[Record] = case source_type of
+    "file" => ingest_from_file("data/input.json");
+    "csv" => ingest_from_csv("data/input.csv");
+    "http" => ingest_from_http("http://api.example.com/data");
+    "database" => ingest_from_database("sqlite://data.db");
+    _ => fail("Unsupported source type: " + source_type);
+
+-- Ingest data from JSON file
+fun ingest_from_file(path: String): List[Record] = do {
+    let content = file::read(path);
+    let parsed = json::parse(content);
+    case parsed of
+        Array(records) => map(json::to_record, records);
+        _ => fail("Invalid JSON structure in " + path);
+};
+
+-- Ingest data from CSV file
+fun ingest_from_csv(path: String): List[Record] = do {
+    let lines = file::read(path);
+    let parsed = csv::parse(lines);
+    if length(parsed) < 2 then
+        fail("Empty CSV file or missing headers");
+    else
+        let [headers, rows] = (head parsed, tail parsed);
+        map(row_to_record(headers), rows);
+};
+
+-- Convert CSV row to Record
+fun row_to_record(headers: List[String]): List[String] -> Record = do | row =
+    zip(headers, map(string_to_any, row));
+};
+
+-- Convert HTTP response to list of records
+fun ingest_from_http(url: String): List[Record] = do {
+    let response = http::get(url);
+    if response#status_code != 200 then
+        fail("HTTP request failed: " + response#status_code);
+    else
+        let parsed = json::parse(response#body);
+        case parsed of
+            Array(records) => map(json::to_record, records);
+            Record(record) => [json::to_record(record)];
+            _ => fail("Invalid response format");
+};
+
+-- Ingest data from database (mock implementation)
+fun ingest_from_database(connection_string: String): List[Record] = do {
+    -- In a real implementation, this would connect to a database
+    -- and execute a query to retrieve records.
+    -- For now, we return an empty list as a placeholder.
+    [];
+};
+
+-- Helper function to convert string to appropriate type
+fun string_to_any(value: String): Any = case value of
+    "true" => Boolean(true)
+    | "false" => Boolean(false)
+    | n if is_number(n) => Number(parse_int(n))
+    | _ => String(value);
+
+-- Check if string represents a number
+fun is_number(s: String): Bool = do {
+    let chars = map(ord, s);
+    all(c => c >= ord('0') && c <= ord('9'), chars);
+};
+
+-- Parse integer from string
+fun parse_int(s: String): Int = do {
+    fold_left((acc, c) => acc * 10 + (ord(c) - ord('0')), 0, s);
+};

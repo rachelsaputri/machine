@@ -1,0 +1,80 @@
+// Pure Data Processing Engine - Main Entry Point
+// ================================================
+
+import ingester;
+import transformer;
+import validator;
+import reporter;
+
+-- Configuration structure
+type Config = {
+    source_type: String,
+    output_format: String,
+    validate: Bool,
+    transform_rules: List[TransformRule],
+    log_level: LogLevel
+};
+
+type LogLevel = Debug | Info | Warn | Error;
+
+type TransformRule = {
+    field: String,
+    operation: String,
+    params: Map[String, Any]
+};
+
+-- Main execution flow
+fun main(): IO() = do {
+    log_message(Info, "Data Processing Engine starting...");
+    
+    -- Load configuration
+    let config = load_config("config.json");
+    
+    -- Ingest data
+    let raw_data = ingester::ingest_data(config#source_type);
+    log_message(Info, format("Ingested {} records", length(raw_data)));
+    
+    -- Transform data
+    let transformed_data = transformer::transform_data(raw_data, config#transform_rules);
+    log_message(Info, format("Transformed {} records", length(transformed_data)));
+    
+    -- Validate data
+    let validated_data = if config#validate then
+        validator::validate_data(transformed_data)
+    else
+        transformed_data;
+    
+    -- Report results
+    reporter::generate_report(validated_data, config#output_format);
+    
+    log_message(Info, "Data Processing Engine completed successfully.");
+};
+
+-- Load configuration from JSON file
+fun load_config(filename: String): Config = do {
+    let content = file::read(filename);
+    let parsed = json::parse(content);
+    {
+        source_type = parsed#"source_type" # default: "file",
+        output_format = parsed#"output_format" # default: "json",
+        validate = parsed#"validate" # default: true,
+        transform_rules = parsed#"transform_rules" # default: [],
+        log_level = parse_log_level(parsed#"log_level" # default: "Info")
+    };
+};
+
+-- Parse log level string to enum
+fun parse_log_level(level: String): LogLevel = case level of
+    "Debug" => Debug
+    | "Info" => Info
+    | "Warn" => Warn
+    | "Error" => Error
+    | _ => Info;
+
+-- Logging function
+fun log_message(level: LogLevel, message: String): IO() = do {
+    let timestamp = datetime::now();
+    let formatted = format("[{}] [{}] {}: ", timestamp, level, message);
+    io::println(formatted);
+    io::flush();
+};

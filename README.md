@@ -214,3 +214,5 @@ MIT
 - Created/Updated module: `plex_data_processing_utility` (See `plex_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `lustre_data_processing_utility` (See `lustre_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `pure_data_processing_engine` (See `pure_data_processing_engine/README.md` for details)
