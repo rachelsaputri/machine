@@ -1,0 +1,37 @@
+# MASM Data Processing Utility
+
+A complete, functional MASM (Microsoft Assembly x86) utility for processing structured data.
+
+## Features
+- Read text-based structured data (CSV/TSV)
+- Parse fields and validate format
+- Transform data (uppercase, trim, numeric validation)
+- Export cleaned data
+
+## Usage
+- Compile using MASM (ml.exe) and Linker (link.exe)
+- Run the executable with input file path as argument (if implemented, or hardcoded for demo)
+
+## Files
+- main.asm: Entry point and control logic
+- processor.asm: Core processing routines
+- parser.asm: Data parsing logic
+- validator.asm: Validation checks
+- transformer.asm: Data transformation routines
+- reporter.asm: Output generation
+
+## Dependencies
+- MASM (ml.exe)
+- Microsoft Linker (link.exe)
+- Windows API (Kernel32.dll, User32.dll)
+
+## Build Instructions
+```bash
+ml /c /coff main.asm
+ml /c /coff processor.asm
+ml /c /coff parser.asm
+ml /c /coff validator.asm
+ml /c /coff transformer.asm
+ml /c /coff reporter.asm
+link /SUBSYSTEM:CONSOLE main.obj processor.obj parser.obj validator.obj transformer.obj reporter.obj
+```
