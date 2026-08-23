@@ -1,28 +1,23 @@
 # Godiva Data Processing Utility
 
-A robust, modular data processing utility written in Godiva. Designed for ingesting, validating, transforming, and reporting on structured data streams.
+A robust, high-performance data processing utility written in Godiva. This tool is designed for efficient data ingestion, transformation, validation, and reporting in compliance and security-focused environments.
 
 ## Features
-
-- **Modular Architecture**: Separation of concerns for ingestion, validation, transformation, and reporting.
-- **Type Safety**: Leverages Godiva's type system to ensure data integrity during processing.
-- **Extensible**: Easy to add new validation rules or transformation stages.
-- **Error Handling**: Comprehensive error logging and reporting for failed records.
-
-## File Structure
-
-- `main.god`: Entry point and orchestration logic.
-- `data_processor.god`: Core data handling and processing engine.
-- `validator.god`: Data validation rules and checks.
-- `transformer.god`: Data transformation and normalization logic.
-- `reporter.god`: Output generation and reporting.
+- **Ingestion**: Parse raw data from various sources.
+- **Validation**: Ensure data integrity against defined schemas.
+- **Transformation**: Convert and normalize data structures.
+- **Reporting**: Generate structured reports on data quality and status.
 
 ## Usage
+Compile the main module:
+```bash
+godc main.god -o godiva_processor
+```
 
-1. Compile the project using the Godiva compiler.
-2. Configure input data sources in the configuration block.
-3. Run the utility to process the data pipeline.
+Run the processor:
+```bash
+./godiva_processor input_data.godiva
+```
 
 ## License
-
 MIT

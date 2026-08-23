@@ -204,3 +204,5 @@ MIT
 - Created/Updated module: `xl_data_processing_utility` (See `xl_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `oz_data_processing_utility` (See `oz_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `godiva_data_processing_utility` (See `godiva_data_processing_utility/README.md` for details)
