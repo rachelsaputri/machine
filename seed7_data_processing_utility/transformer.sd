@@ -1,0 +1,10 @@
+const func DATA: transformData(in data: DATA) is func
+  local
+    var newData: DATA is DATA_VALUE_INIT;
+  begin
+    // Placeholder for transformation logic
+    // Apply business rules, calculations, or format changes
+    logData("Transforming data...");
+    newData := data;
+    return newData;
+  end func;

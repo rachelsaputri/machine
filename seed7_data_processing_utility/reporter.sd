@@ -1,0 +1,16 @@
+const func REPORT: generateReport(in data: DATA) is func
+  local
+    var report: REPORT is REPORT_VALUE_INIT;
+  begin
+    // Placeholder for report generation logic
+    logData("Generating report...");
+    report := REPORT_VALUE_INIT;
+    return report;
+  end func;
+
+const proc: printReport(in report: REPORT) is func
+  local
+  begin
+    // Placeholder for report printing logic
+    logData("Printing report...");
+  end func;

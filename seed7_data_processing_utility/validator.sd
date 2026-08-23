@@ -1,0 +1,10 @@
+const func boolean: validateData(in data: DATA) is func
+  local
+    var isValid: boolean is TRUE;
+  begin
+    // Placeholder for validation logic
+    // Check for null values, correct types, etc.
+    logData("Validating data...");
+    isValid := TRUE;
+    return isValid;
+  end func;

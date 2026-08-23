@@ -1,0 +1,26 @@
+const proc: main is func
+  local
+    var data: DATA is DATA_VALUE_INIT;
+    var report: REPORT is REPORT_VALUE_INIT;
+  begin
+    logData("Starting data processing utility...");
+    
+    // Ingest data
+    data := ingestData();
+    
+    // Validate data
+    if validateData(data) then
+      // Transform data
+      data := transformData(data);
+      
+      // Generate report
+      report := generateReport(data);
+      
+      // Output report
+      printReport(report);
+    else
+      logError("Data validation failed.");
+    end if;
+    
+    logData("Data processing complete.");
+  end func;

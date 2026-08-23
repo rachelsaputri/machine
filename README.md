@@ -232,3 +232,5 @@ MIT
 - Created/Updated module: `newlisp_data_processing_utility` (See `newlisp_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `scratch_data_processing_utility` (See `scratch_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `seed7_data_processing_utility` (See `seed7_data_processing_utility/README.md` for details)
