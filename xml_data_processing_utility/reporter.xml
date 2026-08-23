@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reporter>
+    <description>Generates structured XML reports from processed data.</description>
+
+    <template>
+        <path>./templates/report_template.xml</path>
+        <variables>
+            <var name="process_timestamp">generate_timestamp()</var>
+            <var name="config_version">./metadata/version</var>
+            <var name="status">pipeline_status</var>
+        </variables>
+    </template>
+
+    <sections>
+        <section name="summary">
+            <title>Processing Summary</title>
+            <metrics>
+                <metric name="records_processed">count(//record)</metric>
+                <metric name="errors_found">count(//error)</metric>
+                <metric name="warnings">count(//warning)</metric>
+            </metrics>
+        </section>
+        <section name="details">
+            <title>Detailed Records</title>
+            <content>copy(//record)</content>
+        </section>
+        <section name="errors">
+            <title>Validation Errors</title>
+            <content>copy(//error)</content>
+        </section>
+    </sections>
+
+    <formatting>
+        <pretty_print>true</pretty_print>
+        <line_length>80</line_length>
+        <encoding>UTF-8</encoding>
+    </formatting>
+
+    <delivery>
+        <method>file</method>
+        <path>./output/final_report.xml</path>
+        <backup_previous>true</backup_previous>
+    </delivery>
+</reporter>

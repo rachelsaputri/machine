@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<validator>
+    <description>Validates XML documents against schemas and business rules.</description>
+
+    <schema_validation>
+        <enabled>true</enabled>
+        <schema_files>
+            <file>./schema.xsd</file>
+            <file>./types.xsd</file>
+        </schema_files>
+        <error_handling>COLLECT_ALL</error_handling>
+    </schema_validation>
+
+    <business_rules>
+        <rule name="unique_id_constraint">
+            <description>Ensures all record IDs are unique.</description>
+            <xpath>//id[. = //id[1] and not(. = preceding::id)]</xpath>
+            <error_code>E001</error_code>
+        </rule>
+        <rule name="required_field_check">
+            <description>Ensures critical fields are present.</description>
+            <xpath>/record[not(timestamp)]</xpath>
+            <error_code>E002</error_code>
+        </rule>
+        <rule name="format_validation">
+            <description>Validates date format is YYYY-MM-DD.</description>
+            <xpath>not(matches(@date, '\d{4}-\d{2}-\d{2}'))</xpath>
+            <error_code>E003</error_code>
+        </rule>
+    </business_rules>
+
+    <data_integrity>
+        <check_types>true</check_types>
+        <check_encoding>true</check_encoding>
+        <normalize_entities>true</normalize_entities>
+    </data_integrity>
+
+    <reporting>
+        <include_severity>true</include_severity>
+        <output_path>./logs/validation_report.xml</output_path>
+    </reporting>
+</validator>

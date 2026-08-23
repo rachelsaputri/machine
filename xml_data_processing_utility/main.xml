@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml_data_processing_utility>
+    <metadata>
+        <name>XML Data Processing Utility</name>
+        <version>1.0.0</version>
+        <description>Main configuration and entry point for the XML processing engine.</description>
+    </metadata>
+
+    <configuration>
+        <input>
+            <source_path>./data/input.xml</source_path>
+            <encoding>UTF-8</encoding>
+            <strict_mode>true</strict_mode>
+        </input>
+        <processing>
+            <transformations>
+                <apply>./transformer.xml</apply>
+            </transformations>
+            <validation>
+                <schema>./schema.xsd</schema>
+                <rules>./validator.xml</rules>
+            </validation>
+        </processing>
+        <output>
+            <destination_path>./data/output.xml</destination_path>
+            <format>pretty_print</format>
+        </output>
+    </configuration>
+
+    <pipeline>
+        <step id="1" action="ingest">./ingester.xml</step>
+        <step id="2" action="transform">./transformer.xml</step>
+        <step id="3" action="validate">./validator.xml</step>
+        <step id="4" action="report">./reporter.xml</step>
+    </pipeline>
+
+    <logging>
+        <level>INFO</level>
+        <target>./logs/process.log</target>
+    </logging>
+</xml_data_processing_utility>

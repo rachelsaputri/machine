@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformer>
+    <description>Applies XSLT transformations and XPath queries to manipulate data structure and content.</description>
+
+    <xslt_engines>
+        <engine name="standard">
+            <path>./transforms/standard.xsl</path>
+            <priority>1</priority>
+        </engine>
+        <engine name="custom_business_logic">
+            <path>./transforms/business_rules.xsl</path>
+            <priority>2</priority>
+        </engine>
+    </xslt_engines>
+
+    <xpath_queries>
+        <query name="extract_ids">
+            <expression>//id</expression>
+            <output_variable>id_list</output_variable>
+        </query>
+        <query name="filter_active">
+            <expression>//record[@status='active']</expression>
+            <output_variable>active_records</output_variable>
+        </query>
+    </xpath_queries>
+
+    <manipulation_rules>
+        <rule name="rename_namespace">
+            <old_namespace>http://old.namespace.com</old_namespace>
+            <new_namespace>http://new.namespace.com</new_namespace>
+            <scope>ALL</scope>
+        </rule>
+        <rule name="strip_metadata">
+            <element>metadata</element>
+            <action>REMOVE</action>
+        </rule>
+    </manipulation_rules>
+
+    <output_preparation>
+        <indentation>2</indentation>
+        <xml_declaration>true</xml_declaration>
+    </output_preparation>
+</transformer>

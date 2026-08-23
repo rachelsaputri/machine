@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ingester>
+    <description>Handles parsing, loading, and initial normalization of XML data sources.</description>
+
+    <parser>
+        <type>DOM</type>
+        <namespace_aware>true</namespace_aware>
+        <coalescing>false</coalescing>
+    </parser>
+
+    <rules>
+        <rule name="skip_comments">
+            <condition>
+                <node_type>COMMENT</node_type>
+            </condition>
+            <action>REJECT</action>
+        </rule>
+        <rule name="normalize_whitespace">
+            <condition>
+                <node_type>TEXT</node_type>
+                <regex>\s+</regex>
+            </condition>
+            <action>REPLACE_NORMALIZED</action>
+        </rule>
+    </rules>
+
+    <handlers>
+        <handler name="xml_file">
+            <extension>.xml</extension>
+            <encoding>UTF-8</encoding>
+        </handler>
+        <handler name="mixed_content">
+            <detect>
+                <xpath>/metadata[@type='mixed']</xpath>
+            </detect>
+            <action>SPLIT_BY_TYPE</action>
+        </handler>
+    </handlers>
+
+    <error_handling>
+        <on_parse_error>ABORT</on_parse_error>
+        <on_missing_node>LOG_WARN</on_missing_node>
+    </error_handling>
+</ingester>
