@@ -1,0 +1,99 @@
+/*
+  Maxima Data Processing Utility - Reporting Module
+  Description: Generates statistical summaries and audit logs.
+*/
+
+/*
+  Function: generate_statistics
+  Description: Calculates basic descriptive statistics for a matrix.
+  Arguments:
+    - mat: A Maxima matrix.
+  Returns:
+    - A list of statistics.
+*/
+generate_statistics(mat) := block(
+    [m, n, vals, mean, median, min_v, max_v, std_dev, variance],
+    m : rows(mat),
+    n : cols(mat),
+    vals : flatten(mat),
+    
+    if length(vals) = 0 then (
+        ["Error: Empty dataset"]
+    ) else (
+        mean : sum(vals) / length(vals),
+        min_v : min(vals),
+        max_v : max(vals),
+        variance : sum((vals[i] - mean)^2, i, 1, length(vals)) / length(vals),
+        std_dev : sqrt(variance),
+        
+        /* Median calculation */
+        sorted_vals : sort(vals, lessp),
+        median : if oddp(length(vals)) then 
+            sorted_vals[floor(length(vals)/2) + 1] 
+        else 
+            (sorted_vals[length(vals)/2] + sorted_vals[length(vals)/2 + 1]) / 2,
+        
+        [
+            "Dimensions: " + string(m) + "x" + string(n),
+            "Total Elements: " + string(length(vals)),
+            "Mean: " + string(rat(mean)),
+            "Median: " + string(rat(median)),
+            "Min: " + string(rat(min_v)),
+            "Max: " + string(rat(max_v)),
+            "Variance: " + string(rat(variance)),
+            "Std Dev: " + string(rat(std_dev))
+        ]
+    )
+);
+
+/*
+  Function: log_audit_entry
+  Description: Logs an audit entry to a file.
+  Arguments:
+    - entry: String describing the event.
+    - filename: Target log file.
+*/
+log_audit_entry(entry, filename) := block(
+    [f],
+    f : open_append(filename),
+    writef(f, "%s\n", timestamp()),
+    writef(f, "Entry: %s\n", entry),
+    writef(f, "---\n"),
+    close(f)
+);
+
+/*
+  Function: generate_full_report
+  Description: Generates a comprehensive report including validation and stats.
+  Arguments:
+    - mat: A Maxima matrix.
+    - filename: Optional output file name.
+  Returns:
+    - Report as a list of strings.
+*/
+generate_full_report(mat, filename : "") := block(
+    [report_lines, stat_lines, valid_result, errors],
+    report_lines : ["=== Data Processing Report ==="],
+    
+    /* Validation */
+    valid_result : validate_data(mat),
+    report_lines : append(report_lines, ["Validation Status: " + string(valid_result[1])]),
+    if not valid_result[1] then (
+        report_lines : append(report_lines, ["Errors: " + string(valid_result[2])])
+    ),
+    
+    /* Statistics */
+    stat_lines : generate_statistics(mat),
+    report_lines : append(report_lines, stat_lines),
+    
+    /* Output to file if requested */
+    if filename # "" then (
+        f : open_output(filename),
+        for line in report_lines do (
+            printline(f, line)
+        ),
+        close(f)
+    ),
+    
+    report_lines
+);

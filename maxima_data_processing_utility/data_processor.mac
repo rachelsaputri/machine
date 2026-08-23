@@ -1,0 +1,85 @@
+/*
+  Maxima Data Processing Utility - Main Entry Point
+  Author: Autonomous AI Polyglot Software Engineer
+  Date: 2024-06-01
+  Description: Orchestrates the data processing pipeline.
+*/
+
+/* Load sub-modules */
+load("maxima_data_processing_utility/ingestor.mac");
+load("maxima_data_processing_utility/transformer.mac");
+load("maxima_data_processing_utility/validator.mac");
+load("maxima_data_processing_utility/reporter.mac");
+load("maxima_data_processing_utility/exporter.mac");
+
+/*
+  Function: process_pipeline
+  Description: Executes the full data processing pipeline on a given dataset.
+  Arguments:
+    - data: A Maxima matrix or list of lists representing the dataset.
+    - options: An associative list of processing options (e.g., normalize, validate).
+  Returns:
+    - A list containing the processed data and the report summary.
+*/
+process_pipeline(data, options) := block(
+    [result, report, status, errors],
+    
+    /* Step 1: Validation */
+    if member('validate, options) then (
+        status : validate_data(data),
+        if not status[1] then (
+            errors : status[2],
+            print("Validation Errors: ", errors),
+            return(false)
+        )
+    ),
+
+    /* Step 2: Transformation */
+    if member('transform, options) then (
+        result : normalize_matrix(data),
+        print("Data normalized successfully.")
+    ) else (
+        result : data
+    ),
+
+    /* Step 3: Reporting */
+    report : generate_statistics(result),
+    print("\nProcessing Report:"),
+    print(report),
+
+    /* Step 4: Export (Optional) */
+    if member('export, options) then (
+        /* Default export to CSV */
+        export_to_csv(result, "processed_output.csv")
+    ),
+
+    /* Return Results */
+    [result, report]
+);
+
+/*
+  Function: run_example
+  Description: Runs a self-contained example to demonstrate functionality.
+*/
+run_example() := block(
+    [sample_data, res],
+    
+    /* Create sample data with some noise */
+    sample_data : matrix(
+        [10, 20, 30],
+        [15, 25, 35],
+        [100, 200, 300]  /* Outlier */
+    ),
+    
+    print("Original Data:"),
+    display(sample_data),
+    
+    /* Process with validation and transformation */
+    res : process_pipeline(sample_data, [validate, transform]),
+    
+    print("\nFinal Result:"),
+    display(res[1])
+);
+
+/* Execute example if loaded directly */
+run_example();

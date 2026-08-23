@@ -1,0 +1,110 @@
+/*
+  Maxima Data Processing Utility - Data Transformation Module
+  Description: Applies mathematical transformations to datasets.
+*/
+
+/*
+  Function: normalize_matrix
+  Description: Min-Max Normalization of a matrix to [0, 1] range.
+  Arguments:
+    - mat: A Maxima matrix.
+  Returns:
+    - A new normalized matrix.
+*/
+normalize_matrix(mat) := block(
+    [m, n, min_val, max_val, norm_mat, i, j],
+    m : rows(mat),
+    n : cols(mat),
+    min_val : min(flatten(mat)),
+    max_val : max(flatten(mat)),
+    norm_mat : makematrix(m, n),
+    
+    if max_val = min_val then (
+        /* Handle constant matrix case */
+        for i : 1 thru m do (
+            for j : 1 thru n do (
+                norm_mat[i][j] : 0
+            )
+        )
+    ) else (
+        for i : 1 thru m do (
+            for j : 1 thru n do (
+                norm_mat[i][j] : (mat[i][j] - min_val) / (max_val - min_val)
+            )
+        )
+    ),
+    norm_mat
+);
+
+/*
+  Function: z_score_normalize
+  Description: Z-Score Standardization (mean 0, std dev 1).
+  Arguments:
+    - mat: A Maxima matrix.
+  Returns:
+    - A standardized matrix.
+*/
+z_score_normalize(mat) := block(
+    [m, n, mean_val, std_val, z_mat, i, j, vals],
+    m : rows(mat),
+    n : cols(mat),
+    vals : flatten(mat),
+    mean_val : sum(vals) / length(vals),
+    
+    if length(vals) > 1 then (
+        std_val : sqrt(sum((vals[i] - mean_val)^2, i, 1, length(vals)) / (length(vals) - 1))
+    ) else (
+        std_val : 0
+    ),
+    
+    z_mat : makematrix(m, n),
+    
+    if std_val = 0 then (
+        for i : 1 thru m do (
+            for j : 1 thru n do (
+                z_mat[i][j] : 0
+            )
+        )
+    ) else (
+        for i : 1 thru m do (
+            for j : 1 thru n do (
+                z_mat[i][j] : (mat[i][j] - mean_val) / std_val
+            )
+        )
+    ),
+    z_mat
+);
+
+/*
+  Function: filter_outliers
+  Description: Removes rows with values exceeding a threshold (standard deviations).
+  Arguments:
+    - mat: A Maxima matrix.
+    - threshold: Number of standard deviations (default 2).
+  Returns:
+    - A filtered matrix (list of lists).
+*/
+filter_outliers(mat, threshold : 2) := block(
+    [z_mat, filtered_data, i, j, row_valid, row_list],
+    z_mat : z_score_normalize(mat),
+    filtered_data : [],
+    
+    for i : 1 thru rows(mat) do (
+        row_valid : true,
+        for j : 1 thru cols(mat) do (
+            if abs(z_mat[i][j]) > threshold then (
+                row_valid : false
+            )
+        ),
+        if row_valid then (
+            row_list : makelist(mat[i][j], j, 1, cols(mat)),
+            filtered_data : append(filtered_data, [row_list])
+        )
+    ),
+    /* Convert list of lists back to matrix if possible, else return list */
+    if length(filtered_data) > 0 then makematrix(rows(mat), cols(mat), 
+        for i : 1 thru rows(filtered_data) 
+        do for j : 1 thru cols(filtered_data[i]) 
+        do filtered_data[i][j] : filtered_data[i][j])
+    else []
+);
