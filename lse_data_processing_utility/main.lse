@@ -1,0 +1,35 @@
+// LSE Data Processing Utility - Main Module
+// Entry point for the LSE data processing pipeline
+
+import ./ingester
+import ./transformer
+import ./validator
+import ./reporter
+
+func main(args) {
+    let input_path = args[0] or "input.csv"
+    let output_path = args[1] or "output.csv"
+    
+    log("Starting LSE Data Processing Utility")
+    
+    // Ingest data
+    let data = ingester::load(input_path)
+    log("Data ingested: " + data.length + " records")
+    
+    // Validate data
+    if !validator::validate(data) {
+        log("Validation failed. Aborting.")
+        exit(1)
+    }
+    log("Validation passed.")
+    
+    // Transform data
+    let transformed = transformer::process(data)
+    log("Data transformed successfully.")
+    
+    // Report and save
+    reporter::save(transformed, output_path)
+    log("Results saved to " + output_path)
+    
+    log("Processing complete.")
+}

@@ -1,0 +1,45 @@
+// LSE Data Processing Utility - Data Ingestor Module
+// Handles loading data from various sources
+
+struct DataRecord {
+    id: int
+    timestamp: string
+    value: float
+    category: string
+}
+
+func load(input_path) -> [DataRecord] {
+    let file = open_file(input_path, "r")
+    if file == null {
+        error("Failed to open file: " + input_path)
+        return []
+    }
+    
+    let records = []
+    let line_count = 0
+    
+    for line in file.read_lines() {
+        line_count += 1
+        if line_count == 1 {
+            // Skip header
+            continue
+        }
+        
+        let fields = split(line, ",")
+        if fields.length < 4 {
+            warn("Skipping malformed line: " + line_count)
+            continue
+        }
+        
+        let record = DataRecord {
+            id = int(fields[0]),
+            timestamp = fields[1],
+            value = float(fields[2]),
+            category = fields[3]
+        }
+        records.append(record)
+    }
+    
+    close(file)
+    return records
+}

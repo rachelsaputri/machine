@@ -1,0 +1,43 @@
+// LSE Data Processing Utility - Reporter Module
+// Handles reporting and data export
+
+func save(records, output_path) {
+    log("Generating report...")
+    
+    let file = open_file(output_path, "w")
+    if file == null {
+        error("Failed to create output file: " + output_path)
+        return
+    }
+    
+    // Write header
+    file.write("id,timestamp,value,category\n")
+    
+    // Write records
+    for record in records {
+        file.write(
+            record.id + ","
+            + record.timestamp + ","
+            + record.value + ","
+            + record.category + "\n"
+        )
+    }
+    
+    close(file)
+    log("Report saved to " + output_path)
+}
+
+func print_summary(records) {
+    if records.length == 0 {
+        log("No records to summarize.")
+        return
+    }
+    
+    let total_value = records.fold(0.0, |sum, r| sum + r.value)
+    let avg_value = total_value / records.length
+    
+    log("Summary:")
+    log("  Total records: " + records.length)
+    log("  Total value: " + total_value)
+    log("  Average value: " + avg_value)
+}

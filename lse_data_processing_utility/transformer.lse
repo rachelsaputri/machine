@@ -1,0 +1,53 @@
+// LSE Data Processing Utility - Data Transformer Module
+// Handles data transformation and enrichment
+
+func normalize(records) -> [DataRecord] {
+    let result = []
+    
+    for record in records {
+        let normalized = record.clone()
+        
+        // Normalize category to lowercase
+        normalized.category = record.category.lowercase()
+        
+        // Clamp values to valid range
+        if normalized.value < 0.0 {
+            normalized.value = 0.0
+        } else if normalized.value > 1000.0 {
+            normalized.value = 1000.0
+        }
+        
+        result.append(normalized)
+    }
+    
+    return result
+}
+
+func aggregate_by_category(records) -> [(string, float)] {
+    let groups = {}
+    
+    for record in records {
+        let cat = record.category
+        let current_sum = groups.get(cat, 0.0)
+        groups[cat] = current_sum + record.value
+    }
+    
+    let result = []
+    for (category, total) in groups {
+        result.append((category, total))
+    }
+    
+    return result
+}
+
+func process(records) -> [DataRecord] {
+    log("Running transformations...")
+    
+    // Normalize records
+    let normalized = normalize(records)
+    log("Normalization complete.")
+    
+    // Additional transformations can be added here
+    
+    return normalized
+}

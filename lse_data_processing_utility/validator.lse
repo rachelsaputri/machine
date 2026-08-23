@@ -1,0 +1,44 @@
+// LSE Data Processing Utility - Data Validator Module
+// Handles data validation and quality checks
+
+func validate(records) -> bool {
+    log("Running validation checks...")
+    
+    if records.length == 0 {
+        warn("No records to validate.")
+        return false
+    }
+    
+    for (i, record) in enumerate(records) {
+        if !validate_record(record, i) {
+            return false
+        }
+    }
+    
+    log("All records passed validation.")
+    return true
+}
+
+func validate_record(record, index) -> bool {
+    if record.id <= 0 {
+        error("Invalid ID at index " + index)
+        return false
+    }
+    
+    if record.timestamp == "" {
+        error("Empty timestamp at index " + index)
+        return false
+    }
+    
+    if record.category == "" {
+        error("Empty category at index " + index)
+        return false
+    }
+    
+    if record.value < 0.0 || record.value > 1000.0 {
+        error("Value out of range at index " + index)
+        return false
+    }
+    
+    return true
+}
