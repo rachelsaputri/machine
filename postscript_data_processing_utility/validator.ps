@@ -1,0 +1,15 @@
+% PostScript Data Processing Utility - Validator Module
+% Handles data validation.
+
+/validator {
+  % Placeholder for validation logic
+  % Expects validated data to be on the stack
+  current_data get 
+  dup length 0 gt { 
+    % Check if data is not empty
+    % Pass
+  } { 
+    (Error: Data is empty) =
+    (Aborting pipeline) =
+  } ifelse
+} def

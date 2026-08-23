@@ -1,0 +1,17 @@
+% PostScript Data Processing Utility - Transformer Module
+% Handles data transformation.
+
+/transformer {
+  % Placeholder for transformation logic
+  % Expects transformed data to be on the stack
+  current_data dup 
+  0 get 
+  length 
+  2 mod 0 eq { 
+    % Example: Filter even length strings
+    dup 
+  } { 
+    pop 
+    current_data get 
+  } ifelse
+} def

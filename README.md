@@ -234,3 +234,5 @@ MIT
 - Created/Updated module: `scratch_data_processing_utility` (See `scratch_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `seed7_data_processing_utility` (See `seed7_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `postscript_data_processing_utility` (See `postscript_data_processing_utility/README.md` for details)

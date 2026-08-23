@@ -1,0 +1,20 @@
+% PostScript Data Processing Utility - Main Module
+% Entry point for the data processing pipeline.
+
+% Load dependencies
+/ingester load def
+/transformer load def
+/validator load def
+/reporter load def
+
+% Initialize data storage
+data 0 get dup length string copy /current_data exch def
+
+% Execute pipeline
+current_data 
+  ingester process 
+  transformer apply 
+  validator check 
+  reporter output 
+
+currentstack pop
