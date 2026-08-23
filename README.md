@@ -192,3 +192,5 @@ MIT
 - Created/Updated module: `ngl_data_processing_utility` (See `ngl_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `txl_compliance_transformer` (See `txl_compliance_transformer/README.md` for details)
+
+- Created/Updated module: `nial_compliance_transformation_tool` (See `nial_compliance_transformation_tool/README.md` for details)

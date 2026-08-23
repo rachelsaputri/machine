@@ -1,0 +1,34 @@
+NB> Ingest compliance events from standard input or file arguments.
+NB> Outputs a list of parsed event records.
+
+DEFINE
+  raw_input :-> GETLINES;
+  raw_events :-> SCAN [WHITESPACE] raw_input;
+  raw_events :-> FILTER NOT EMPTY raw_events;
+  parsed_events :-> MAP PARSE_RECORD raw_events;
+ENDDEFINE
+
+PARSE_RECORD :-> FUNCTION [record]
+  DEFINE
+    parts :-> SCAN [':'] record;
+    IF LENGTH parts < 3 THEN
+      FAIL :-> 'Invalid event format'
+    ELSE
+      id :-> parts [0];
+      source :-> parts [1];
+      payload :-> SUBSTRING (LENGTH id + LENGTH source + 2) FROM record;
+      [id, source, payload]
+    END
+  END
+END
+
+MAIN :-> DEFINE
+  args :-> GETARGUMENTS;
+  IF LENGTH args > 0 THEN
+    file_path :-> args [0];
+    raw_input :-> READFILE file_path
+  ELSE
+    raw_input :-> GETLINES
+  END;
+  parsed_events
+END

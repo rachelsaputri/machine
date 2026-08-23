@@ -1,0 +1,57 @@
+NB> Normalize parsed events into a canonical compliance schema.
+NB> Schema: [id, source, severity, category, timestamp, message]
+
+DEFINE
+  normalized_events :-> MAP NORMALIZE_RECORD parsed_events
+ENDDEFINE
+
+NORMALIZE_RECORD :-> FUNCTION [record]
+  DEFINE
+    id :-> record [0];
+    source :-> record [1];
+    payload :-> record [2];
+    
+    severity :-> MAP_SEVERITY source;
+    category :-> MAP_CATEGORY payload;
+    timestamp :-> GENERATE_TIMESTAMP;
+    message :-> EXTRACT_MESSAGE payload;
+    
+    [id, source, severity, category, timestamp, message]
+  END
+END
+
+MAP_SEVERITY :-> FUNCTION [source]
+  DEFINE
+    CASE source
+      WHEN 'CRITICAL' THEN 5
+      WHEN 'WARNING' THEN 3
+      WHEN 'INFO' THEN 1
+      ELSE 2
+    END
+  END
+END
+
+MAP_CATEGORY :-> FUNCTION [payload]
+  DEFINE
+    CASE payload
+      WHEN MATCH 'ACCESS' THEN 'AUTHORIZATION'
+      WHEN MATCH 'CONFIG' THEN 'SYSTEM_CONFIGURATION'
+      WHEN MATCH 'DATA' THEN 'INTEGRITY'
+      ELSE 'GENERAL'
+    END
+  END
+END
+
+GENERATE_TIMESTAMP :-> FUNCTION [NULL]
+  DEFINE
+    NOW :-> GETTIME;
+    FORMAT ISO8601 NOW
+  END
+END
+
+EXTRACT_MESSAGE :-> FUNCTION [payload]
+  DEFINE
+    message :-> TRIM payload;
+    IF LENGTH message = 0 THEN 'No message provided' ELSE message END
+  END
+END
