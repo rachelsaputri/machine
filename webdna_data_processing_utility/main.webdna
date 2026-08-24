@@ -1,0 +1,27 @@
+<webdna:include file="parser.webdna">
+<webdna:include file="transformer.webdna">
+<webdna:include file="validator.webdna">
+<webdna:include file="reporter.webdna">
+
+<webdna:setvar name="data_source" value="input_data">
+<webdna:setvar name="output_destination" value="processed_output">
+
+<webdna:call function="parser:parse_input">
+  <webdna:param name="input" value="$data_source">
+</webdna:call>
+
+<webdna:call function="transformer:transform_data">
+  <webdna:param name="data" value="$parsed_data">
+</webdna:call>
+
+<webdna:call function="validator:validate_data">
+  <webdna:param name="data" value="$transformed_data">
+</webdna:call>
+
+<webdna:call function="reporter:generate_report">
+  <webdna:param name="data" value="$validated_data">
+</webdna:call>
+
+<webdna:output>
+  Data processing completed successfully.
+</webdna:output>
