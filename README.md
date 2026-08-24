@@ -258,3 +258,5 @@ MIT
 - Created/Updated module: `tex_data_processing_utility` (See `tex_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `stackless_data_processing_engine` (See `stackless_data_processing_engine/README.md` for details)
+
+- Created/Updated module: `d_data_processing_utility` (See `d_data_processing_utility/README.md` for details)
