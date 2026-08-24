@@ -1,0 +1,32 @@
+// Reporter Module for Alice Data Processing Utility
+
+function reportResults(records) {
+    let output = "Processed Records:\n";
+    
+    for each record in records {
+        output = output + formatRecord(record) + "\n";
+    }
+    
+    printOutput(output);
+}
+
+function formatRecord(record) {
+    return format("Name: %s, Age: %d, City: %s", record.name, record.age, record.city);
+}
+
+function printOutput(text) {
+    // Simulate printing to standard output
+    print(text);
+}
+
+function format(template, args...) {
+    let result = template;
+    for each i from 0 to length(args) - 1 {
+        result = replaceFirst(result, "%s", toString(args[i]));
+    }
+    return result;
+}
+
+function toString(value) {
+    return convertToString(value);
+}
