@@ -306,3 +306,5 @@ MIT
 - Created/Updated module: `clist_data_processing_utility` (See `clist_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `assembly_data_processing_utility` (See `assembly_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `obj_rexx_data_processing_utility` (See `obj_rexx_data_processing_utility/README.md` for details)
