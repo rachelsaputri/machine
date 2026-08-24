@@ -270,3 +270,5 @@ MIT
 - Created/Updated module: `ttxl_source_code_structure_analyzer` (See `ttxl_source_code_structure_analyzer/README.md` for details)
 
 - Created/Updated module: `ts_dependency_compliance_engine` (See `ts_dependency_compliance_engine/README.md` for details)
+
+- Created/Updated module: `microscript_compliance_policy_verifier` (See `microscript_compliance_policy_verifier/README.md` for details)

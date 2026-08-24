@@ -1,0 +1,4 @@
+POLICY SEC-001: Password Complexity Enabled: MEDIUM: conditions: password_length==12:password_special_chars>=3
+POLICY SEC-002: Firewall Active: HIGH: conditions: firewall_status==running:firewall_log_level==verbose
+POLICY SEC-003: Backup Schedule Adherence: MEDIUM: conditions: backup_interval<=24:backup_verification==true
+POLICY SEC-004: Access Control List Integrity: HIGH: conditions: acl_entries_count>=5:acl_last_modified_contains_2024
