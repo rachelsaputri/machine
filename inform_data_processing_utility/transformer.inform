@@ -1,0 +1,99 @@
+! Transformer module for Inform Data Processing Utility
+
+! Transform validated data according to rules
+define transform_data(data_list)
+    list<DataRecord> result = empty_list()
+    
+    for each record in data_list
+        if not record.is_valid
+            continue
+        end if
+        
+        DataRecord transformed_record = apply_transformations(record)
+        add_to_list(result, transformed_record)
+    end for
+    
+    return result
+end define
+
+! Apply individual transformations to a record
+define apply_transformations(record)
+    DataRecord transformed = new record
+    transformed.id = record.id
+    transformed.fields = new map
+    transformed.is_valid = record.is_valid
+    transformed.errors = record.errors
+    
+    ! Transform each field
+    for each field_name, field_value in record.fields
+        transformed.fields[field_name] = apply_field_transform(field_name, field_value)
+    end for
+    
+    ! Apply record-level transformations
+    transformed = apply_record_transformations(transformed)
+    
+    return transformed
+end define
+
+! Transform individual fields
+define apply_field_transform(field_name, field_value)
+    ! Trim whitespace
+    field_value = trim(field_value)
+    
+    ! Handle special field types
+    if field_name contains "date"
+        field_value = normalize_date(field_value)
+    else if field_name contains "number" or field_name contains "amount"
+        field_value = format_number(field_value)
+    else if field_name contains "email"
+        field_value = normalize_email(field_value)
+    end if
+    
+    return field_value
+end define
+
+! Apply record-level transformations
+define apply_record_transformations(record)
+    ! Add processing timestamp
+    record.fields["processed_at"] = get_current_timestamp()
+    
+    ! Generate processing hash
+    record.fields["processing_hash"] = generate_hash(record)
+    
+    return record
+end define
+
+! Helper functions for transformations
+define normalize_date(date_string)
+    ! Convert various date formats to ISO 8601
+    ! Simplified implementation
+    if contains(date_string, "/")
+        date_string = replace(date_string, "/", "-")
+    end if
+    return date_string
+end define
+
+define format_number(number_string)
+    ! Format numeric strings consistently
+    number_string = trim(number_string)
+    
+    ! Remove currency symbols and commas
+    number_string = replace(number_string, "$", "")
+    number_string = replace(number_string, ",", "")
+    
+    return number_string
+end define
+
+define normalize_email(email_string)
+    ! Normalize email addresses to lowercase
+    return to_lower(email_string)
+end define
+
+define generate_hash(record)
+    ! Generate a simple hash of the record data
+    string data = record.id
+    for each field_name, field_value in record.fields
+        data = data + field_name + field_value
+    end for
+    return simple_hash(data)
+end define

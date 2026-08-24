@@ -1,0 +1,78 @@
+! Reporter module for Inform Data Processing Utility
+
+! Generate comprehensive reports
+define generate_report(data_list)
+    ! Create report structure
+    map<string, dynamic> report = new map
+    report["generation_time"] = get_current_timestamp()
+    report["total_records"] = length(data_list)
+    report["valid_records"] = count(data_list, is_valid)
+    report["invalid_records"] = length(data_list) - count(data_list, is_valid)
+    report["data_summary"] = calculate_summary(data_list)
+    
+    ! Write report to file
+    write_report_file(output_path + "/report.json", report)
+    
+    ! Print summary
+    print_report_summary(report)
+end define
+
+! Calculate data summary statistics
+define calculate_summary(data_list)
+    map<string, dynamic> summary = new map
+    
+    ! Count field occurrences
+    map<string, integer> field_counts = new map
+    for each record in data_list
+        for each field_name in record.fields
+            if field_counts contains field_name
+                field_counts[field_name] = field_counts[field_name] + 1
+            else
+                field_counts[field_name] = 1
+            end if
+        end for
+    end for
+    summary["field_occurrences"] = field_counts
+    
+    ! Calculate field value distributions for numeric fields
+    map<string, map<string, integer>> value_distributions = new map
+    for each record in data_list
+        for each field_name, field_value in record.fields
+            if is_numeric_field(field_name)
+                if value_distributions contains field_name
+                    value_distributions[field_name][field_value] = value_distributions[field_name][field_value] + 1
+                else
+                    value_distributions[field_name] = new map
+                    value_distributions[field_name][field_value] = 1
+                end if
+            end if
+        end for
+    end for
+    summary["value_distributions"] = value_distributions
+    
+    return summary
+end define
+
+! Check if field is numeric
+define is_numeric_field(field_name)
+    if contains(field_name, "number") or contains(field_name, "amount") or contains(field_name, "count")
+        return true
+    end if
+    return false
+end define
+
+! Write report to JSON file
+define write_report_file(file_path, report_data)
+    string json_content = serialize_to_json(report_data)
+    write_file(file_path, [json_content])
+end define
+
+! Print report summary to console
+define print_report_summary(report)
+    print("\n=== DATA PROCESSING REPORT ===")
+    print("Generation Time: " + report["generation_time"])
+    print("Total Records: " + to_string(report["total_records"]))
+    print("Valid Records: " + to_string(report["valid_records"]))
+    print("Invalid Records: " + to_string(report["invalid_records"]))
+    print("================================")
+end define

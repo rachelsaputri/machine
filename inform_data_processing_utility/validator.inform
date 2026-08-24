@@ -1,0 +1,82 @@
+! Validator module for Inform Data Processing Utility
+
+! Validate data records according to rules
+define validate_data(data_list)
+    list<DataRecord> result = empty_list()
+    
+    for each record in data_list
+        if validate_record(record)
+            add_to_list(result, record)
+        end if
+    end for
+    
+    return result
+end define
+
+! Validate a single record
+define validate_record(record)
+    boolean is_valid = true
+    list<string> errors = empty_list()
+    
+    ! Check required fields
+    if record.fields contains "required_field_name"
+        if record.fields["required_field_name"] is empty or record.fields["required_field_name"] contains "null"
+            add_to_list(errors, "Missing required field")
+            is_valid = false
+        end if
+    end if
+    
+    ! Validate field formats
+    if record.fields contains "email"
+        if not is_valid_email(record.fields["email"])
+            add_to_list(errors, "Invalid email format")
+            is_valid = false
+        end if
+    end if
+    
+    ! Validate numeric fields
+    if record.fields contains "amount"
+        if not is_valid_number(record.fields["amount"])
+            add_to_list(errors, "Invalid numeric format")
+            is_valid = false
+        end if
+    end if
+    
+    ! Check for null or empty values in critical fields
+    for each field_name, field_value in record.fields
+        if field_value is empty and is_critical_field(field_name)
+            add_to_list(errors, "Critical field '" + field_name + "' is empty")
+            is_valid = false
+        end if
+    end for
+    
+    ! Update record validation status
+    record.is_valid = is_valid
+    record.errors = errors
+    
+    return is_valid
+end define
+
+! Validate email format
+define is_valid_email(email)
+    ! Simple email validation regex pattern
+    if matches_pattern(email, "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
+        return true
+    end if
+    return false
+end define
+
+! Validate numeric format
+define is_valid_number(value)
+    ! Check if value is a valid number
+    if matches_pattern(value, "^-?[0-9]+(\\.[0-9]+)?$")
+        return true
+    end if
+    return false
+end define
+
+! Check if field is critical
+define is_critical_field(field_name)
+    list<string> critical_fields = ["id", "name", "type", "status"]
+    return contains(critical_fields, field_name)
+end define

@@ -342,3 +342,5 @@ MIT
 - Created/Updated module: `./awk_data_processing_utility` (See `./awk_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `batch_data_processing_utility` (See `batch_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `inform_data_processing_utility` (See `inform_data_processing_utility/README.md` for details)

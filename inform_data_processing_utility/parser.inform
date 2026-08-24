@@ -1,0 +1,63 @@
+! Parser module for Inform Data Processing Utility
+
+! Parse CSV-style data into structured records
+define parse_data(raw_data_list)
+    list<DataRecord> result = empty_list()
+    
+    for each line in raw_data_list
+        ! Skip empty lines and comments
+        if line is empty or startswith(line, "#")
+            continue
+        end if
+        
+        ! Parse CSV fields
+        list<string> fields = split_csv_line(line)
+        
+        if length(fields) >= 2
+            DataRecord record = new record
+            record.id = fields[0]
+            record.fields = parse_fields(fields)
+            record.is_valid = true
+            record.errors = empty_list()
+            
+            add_to_list(result, record)
+        end if
+    end for
+    
+    return result
+end define
+
+! Split a CSV line into fields, handling quoted values
+define split_csv_line(line)
+    list<string> fields = empty_list()
+    string current_field = ""
+    boolean in_quotes = false
+    
+    for each char in line
+        if char == '"'
+            in_quotes = not in_quotes
+        else if char == ',' and not in_quotes
+            add_to_list(fields, current_field)
+            current_field = ""
+        else
+            current_field = current_field + char
+        end if
+    end for
+    
+    add_to_list(fields, current_field)
+    return fields
+end define
+
+! Parse individual fields into a map
+define parse_fields(field_list)
+    map<string, string> field_map = new map
+    
+    for each field in field_list
+        list<string> parts = split(field, "=")
+        if length(parts) == 2
+            field_map[parts[0]] = parts[1]
+        end if
+    end for
+    
+    return field_map
+end define
