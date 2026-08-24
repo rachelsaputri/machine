@@ -1,0 +1,7 @@
+{
+    "batch_size": 1000,
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "skip_empty_lines": true,
+    "max_file_size_mb": 100
+}

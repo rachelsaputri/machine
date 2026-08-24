@@ -1,0 +1,11 @@
+{
+    "required_fields": ["id", "email", "status"],
+    "types": {
+        "id": "int",
+        "email": "email",
+        "status": "string"
+    },
+    "custom_rules": {
+        "status_in": ["pending", "active", "completed"]
+    }
+}

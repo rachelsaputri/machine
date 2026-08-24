@@ -1,0 +1,129 @@
+// Data Ingestion Module for Subtext Data Processing Utility
+// Handles reading raw data from various sources (files, streams) and parsing it into internal records
+
+import System;
+import Collections;
+import IO;
+
+namespace DataProcessing
+{
+    class Ingestor
+    {
+        private Dictionary config;
+
+        constructor(Dictionary config)
+        {
+            this.config = config;
+        }
+
+        public List<Record> ingest(string inputPath)
+        {
+            var records = new List<Record>();
+            var lines = IO.File.ReadAllLines(inputPath);
+            var header = null;
+            
+            // Determine if file is CSV-like (comma separated) or JSON lines
+            var isJsonLine = inputPath.EndsWith(".jsonl");
+            
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var line = lines[i].Trim();
+                if (string.IsNullOrEmpty(line)) continue;
+                
+                Record record;
+                
+                if (isJsonLine)
+                {
+                    record = this.parseJsonLine(line);
+                }
+                else
+                {
+                    // Assuming CSV format for general utility
+                    record = this.parseCsvLine(line, i == 0 ? header : null);
+                    if (i == 0)
+                    {
+                        header = record.ToDictionary(); // Use header keys
+                        continue;
+                    }
+                }
+                
+                records.Add(record);
+            }
+            
+            return records;
+        }
+
+        private Record parseCsvLine(string line, Dictionary header)
+        {
+            var fields = line.Split(',');
+            var data = new Dictionary();
+            
+            if (header != null)
+            {
+                // Map fields to known keys
+                for (int i = 0; i < header.Count; i++)
+                {
+                    var key = header[i];
+                    if (i < fields.Length)
+                    {
+                        data[key] = fields[i].Trim();
+                    }
+                    else
+                    {
+                        data[key] = "";
+                    }
+                }
+            }
+            else
+            {
+                // If no header, assign generic keys
+                for (int i = 0; i < fields.Length; i++)
+                {
+                    data["field_" + i] = fields[i].Trim();
+                }
+            }
+            
+            return new Record(data);
+        }
+
+        private Record parseJsonLine(string line)
+        {
+            try
+            {
+                var data = JSON.Parser.Parse(line);
+                return new Record(data);
+            }
+            catch (Exception e)
+            {
+                // Log error and skip malformed JSON line
+                // In production, this would go to a dedicated error log
+                Console.WriteLine("Failed to parse JSON line: " + e.Message);
+                return new Record(new Dictionary());
+            }
+        }
+    }
+
+    class Record
+    {
+        public Dictionary Data { get; }
+
+        constructor(Dictionary data)
+        {
+            this.Data = data;
+        }
+
+        public string GetField(string key)
+        {
+            if (this.Data.ContainsKey(key))
+            {
+                return this.Data[key].ToString();
+            }
+            return null;
+        }
+
+        public Dictionary ToDictionary()
+        {
+            return new Dictionary(this.Data);
+        }
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "format": "csv",
+    "delimiter": ",",
+    "quote_char": "\"",
+    "include_header": true,
+    "output_dir": "./output"
+}

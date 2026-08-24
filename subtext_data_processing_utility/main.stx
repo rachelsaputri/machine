@@ -1,0 +1,130 @@
+// Main Entry Point for Subtext Data Processing Utility
+// Orchestrates the data processing pipeline: Ingest -> Validate -> Transform -> Report
+
+import System;
+import Collections;
+import Logging;
+import IO;
+
+import "ingester.stx";
+import "validator.stx";
+import "transformer.stx";
+import "reporter.stx";
+
+namespace DataProcessing
+{
+    class PipelineOrchestrator
+    {
+        private Logger logger;
+        private Ingestor ingester;
+        private Validator validator;
+        private Transformer transformer;
+        private Reporter reporter;
+
+        constructor(string configPath)
+        {
+            this.logger = new Logger("PipelineOrchestrator");
+            
+            // Load configuration
+            var config = this.loadConfig(configPath);
+            
+            // Initialize components with configuration
+            this.ingester = new Ingestor(config["ingestion"]);
+            this.validator = new Validator(config["validation"]);
+            this.transformer = new Transformer(config["transformation"]);
+            this.reporter = new Reporter(config["reporting"]);
+        }
+
+        private Dictionary loadConfig(string configPath)
+        {
+            try
+            {
+                var content = IO.File.ReadAllText(configPath);
+                return JSON.Parser.Parse(content);
+            }
+            catch (Exception e)
+            {
+                this.logger.Error("Failed to load configuration: " + e.Message);
+                throw new InvalidOperationException("Configuration file is invalid or missing.");
+            }
+        }
+
+        public ProcessResult runPipeline(string inputPath, string outputPath)
+        {
+            this.logger.Info("Starting data processing pipeline...");
+            
+            // Stage 1: Ingestion
+            var rawData = this.ingester.ingest(inputPath);
+            this.logger.Info("Ingested " + rawData.Count + " records.");
+            
+            if (rawData.Count == 0)
+            {
+                this.logger.Warn("No data to process.");
+                return new ProcessResult(0, 0, 0);
+            }
+
+            // Stage 2: Validation
+            var validatedData = this.validator.validate(rawData);
+            var failedCount = rawData.Count - validatedData.Count;
+            this.logger.Info("Validation complete. Valid: " + validatedData.Count + ", Failed: " + failedCount);
+            
+            if (validatedData.Count == 0)
+            {
+                this.logger.Error("No valid data remaining after validation.");
+                return new ProcessResult(0, failedCount, 0);
+            }
+
+            // Stage 3: Transformation
+            var transformedData = this.transformer.transform(validatedData);
+            this.logger.Info("Transformation complete.");
+
+            // Stage 4: Reporting
+            this.reporter.export(transformedData, outputPath);
+            this.logger.Info("Data exported successfully to " + outputPath);
+            
+            return new ProcessResult(validatedData.Count, failedCount, transformedData.Count);
+        }
+
+        static void Main(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Usage: subtext main.stx [config_path] [input_path] [output_path]");
+                return;
+            }
+
+            var configPath = args[0];
+            var inputPath = args[1];
+            var outputPath = args.Length > 2 ? args[2] : "output.csv";
+
+            try
+            {
+                var orchestrator = new PipelineOrchestrator(configPath);
+                var result = orchestrator.runPipeline(inputPath, outputPath);
+                
+                Console.WriteLine("Pipeline completed successfully.");
+                Console.WriteLine("Records Processed: " + result.ProcessedCount);
+                Console.WriteLine("Records Failed: " + result.FailedCount);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Pipeline failed: " + e.Message);
+                // In a real system, this would log to a file
+            }
+        }
+    }
+
+    class ProcessResult
+    {
+        public int ProcessedCount { get; }
+        public int FailedCount { get; }
+        public int OutputCount { get; }
+
+        constructor(int processed, int failed, int output)
+        {
+            this.ProcessedCount = processed;
+            this.FailedCount = failed;
+            this.OutputCount = output;
+        }
+    }
+}
