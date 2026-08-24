@@ -252,3 +252,5 @@ MIT
 - Created/Updated module: `napier88_data_processing_utility` (See `napier88_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `tacl_data_processing_utility` (See `tacl_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `./metacard_data_processing_utility` (See `./metacard_data_processing_utility/README.md` for details)
