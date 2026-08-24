@@ -1,0 +1,20 @@
+[
+  {
+    "id": "POL-001",
+    "name": "No Missing Imports",
+    "condition": "node.status === 'active'",
+    "severity": "critical"
+  },
+  {
+    "id": "POL-002",
+    "name": "Maximum Dependency Depth",
+    "condition": "node.imports.length <= 15",
+    "severity": "high"
+  },
+  {
+    "id": "POL-003",
+    "name": "Required Export Signature",
+    "condition": "node.exports.length > 0",
+    "severity": "medium"
+  }
+]
