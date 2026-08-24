@@ -1,0 +1,20 @@
+BEGIN
+   COMMENT Main entry point for the ALGOL W Data Processing Utility; 
+   INTEGER record_count;
+   BOOLEAN processing_complete;
+   
+   COMMENT Initialize the processing engine; 
+   record_count := 0;
+   processing_complete := FALSE;
+   
+   COMMENT Run the main processing loop; 
+   REPEAT
+      CALL process_next_record(record_count);
+      processing_complete := record_count >= 1000; COMMENT Example limit for demo; 
+   UNTIL processing_complete;
+   
+   COMMENT Generate final report; 
+   CALL generate_summary_report(record_count);
+   
+   PRINT("Processing complete. Total records: ", record_count);
+END

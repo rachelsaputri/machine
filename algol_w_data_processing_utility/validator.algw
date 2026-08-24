@@ -1,0 +1,21 @@
+COMMENT Validator module for ALGOL W Data Processing Utility; 
+
+PROCEDURE validate_record(value INTEGER) RESULT(is_valid BOOLEAN);
+   BEGIN
+      is_valid := value >= 0 AND value <= 10000;
+   END validate_record;
+
+PROCEDURE check_data_integrity(data ARRAY OF INTEGER, count INTEGER) RESULT(errors INTEGER);
+   BEGIN
+      INTEGER i, error_count;
+      error_count := 0;
+      FOR i := 1 STEP 1 UNTIL count DO
+         BEGIN
+            IF NOT validate_record(data[i]) THEN
+               BEGIN
+                  error_count := error_count + 1;
+                  PRINT("Invalid record at index ", i, ": ", data[i]);
+               END;
+         END;
+      errors := error_count;
+   END check_data_integrity;

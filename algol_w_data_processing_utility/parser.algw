@@ -1,0 +1,30 @@
+COMMENT Parser module for ALGOL W Data Processing Utility; 
+
+PROCEDURE parse_line(line_string ARRAY OF STRING, fields ARRAY OF INTEGER);
+   BEGIN
+      INTEGER i, field_index;
+      field_index := 1;
+      FOR i := 1 STEP 1 UNTIL LENGTH(line_string) DO
+         BEGIN
+            IF line_string[i] = ',' THEN
+               field_index := field_index + 1
+            ELSE
+               BEGIN
+                  IF field_index <= 10 THEN
+                     fields[field_index] := fields[field_index] * 10 + (ASCII(line_string[i]) - ASCII('0'));
+               END;
+         END;
+   END parse_line;
+
+PROCEDURE read_input_data;
+   BEGIN
+      STRING line;
+      ARRAY fields(1:10) OF INTEGER;
+      
+      WHILE NOT EOF() DO
+         BEGIN
+            READLINE(line);
+            IF LENGTH(line) > 0 THEN
+               CALL parse_line(line, fields);
+         END;
+   END read_input_data;

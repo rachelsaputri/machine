@@ -1,0 +1,17 @@
+COMMENT Reporter module for ALGOL W Data Processing Utility; 
+
+PROCEDURE generate_summary_report(total_records INTEGER);
+   BEGIN
+      PRINT("--- Data Processing Report ---");
+      PRINT("Total records processed: ", total_records);
+      PRINT("Status: SUCCESS");
+      PRINT("------------------------------");
+   END generate_summary_report;
+
+PROCEDURE print_error_report(error_count INTEGER, total_records INTEGER);
+   BEGIN
+      PRINT("--- Error Report ---");
+      PRINT("Errors found: ", error_count);
+      PRINT("Total records: ", total_records);
+      PRINT("----------------------");
+   END print_error_report;

@@ -1,0 +1,15 @@
+COMMENT Transformer module for ALGOL W Data Processing Utility; 
+
+PROCEDURE transform_record(input_val INTEGER) RESULT(output_val INTEGER);
+   BEGIN
+      output_val := input_val * 2 + 10; COMMENT Simple transformation logic; 
+   END transform_record;
+
+PROCEDURE process_batch(records ARRAY OF INTEGER, count INTEGER);
+   BEGIN
+      INTEGER i;
+      FOR i := 1 STEP 1 UNTIL count DO
+         BEGIN
+            records[i] := transform_record(records[i]);
+         END;
+   END process_batch;
