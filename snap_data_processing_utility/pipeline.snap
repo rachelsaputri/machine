@@ -1,66 +1,37 @@
-when green flag clicked
-clear
-set [input v] data to [10, 20, 30, null, 40, "invalid", 50]
-set [output v] data to []
-set [validation report v] data to []
-set [audit log v] data to []
+;; pipeline.snap - Data Ingestion and Transformation Logic
 
-// Step 1: Filter Nulls
-ask [Filtering nulls...] and wait
-set [filtered v] data to []
-repeat (length of [input v] data)
-    set [current v] to (item (count) of [input v] data)
-    if <(current) > <>> then
-        add (current) to [filtered v] data
-        add (join "Validated: " (current)) to [audit log v]
-    else
-        add (join "Filtered null: " (count)) to [audit log v]
-    end
-end
-set [current v] data to [filtered v]
+;; Ingest Data Block
+(define ingest-data (url))
+  (set raw-data to (call HTTP-GET (url)))
+  (report raw-data)
 
-// Step 2: Validate
-ask [Validating data...] and wait
-set [errors v] data to []
-repeat (length of [current v] data)
-    set [val v] to (item (count) of [current v] data)
-    if <(val) = <>> then
-        add (join "Null value at index: " (count)) to [errors v]
-        add (join "Validation Error: " (count)) to [audit log v]
-    else
-        if <<(val) = (number of (val))>> and <(val) < <1>> then
-            add (join "Invalid positive integer at index: " (count)) to [errors v]
-            add (join "Validation Error: " (count)) to [audit log v]
-        end
-    end
-end
+;; Filter Nulls Helper
+(define filter-nulls (data-list))
+  (set clean-data to (empty-list))
+  (for each (item) in (data-list))
+    (if (not (is-null? (item))))
+      (append-to-list (clean-data) (item))
+    )
+  (report clean-data)
 
-// Step 3: Calculate Stats
-ask [Calculating stats...] and wait
-set [sum v] to 0
-set [count v] to 0
-set [max v] to -999999
-set [min v] to 999999
-repeat (length of [current v] data)
-    set [num v] to (item (count) of [current v] data)
-    if <<(num) = (number of (num))>> and <(num) > <0>> then
-        set [sum v] to ((sum) + (num))
-        set [count v] to ((count) + 1)
-        if <(num) > <(max)> then set [max v] to (num)
-        if <(num) < <(min)> then set [min v] to (num)
-    end
-end
-if <(count) > <0>> then
-    set [mean v] to ((sum) / (count))
-else
-    set [mean v] to 0
-end
-set [stats v] to (join "Mean: " (mean) join " Max: " (max) join " Min: " (min))
+;; Validate Data Helper
+(define validate-data (data-list))
+  (set valid-data to (empty-list))
+  (for each (item) in (data-list))
+    (if (passes-schema-check? (item)))
+      (append-to-list (valid-data) (item))
+    )
+  (report valid-data)
 
-// Step 4: Generate Report
-ask [Generating report...] and wait
-set [report v] to (join "\n--- Data Processing Report ---\nProcessed Data: " (current v) join "\nStatistics: " (stats v) join "\nValidation Errors: " (errors v) join "\nAudit Log: " (audit log v))
-say (join "Processing Complete. See report for details.")) for (2) secs
-set [output v] data to [current v]
-set [validation report v] data to [errors v]
-set [report v] to [report v]
+;; Transform Data Helper
+(define transform-data (data-list))
+  (set transformed to (empty-list))
+  (for each (item) in (data-list))
+    (append-to-list (transformed) (apply-transforms (item)))
+  (report transformed)
+
+;; Apply Transforms Helper
+(define apply-transforms (record))
+  (set record.timestamp to (get-current-time))
+  (set record.status to "processed")
+  (report record)

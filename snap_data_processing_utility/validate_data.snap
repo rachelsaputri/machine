@@ -1,18 +1,31 @@
-when green flag clicked
-clear
-set [errors v] data to []
-set [audit log v] data to []
-repeat (length of [input v] data)
-    set [current v] to (item (count) of [input v] data)
-    if <(current) = <>> then
-        add (join "Null value at index: " (count)) to [errors v]
-        add (join "Error: " (count)) to [audit log v]
+;; validate_data.snap - Validation Logic
+
+;; Check Schema Compliance
+(define passes-schema-check? (record))
+  (if (has-key? (record) "id")
+    (if (has-key? (record) "value"))
+      (if (is-numeric? (value-of (record "value"))))
+        (report true)
+      else
+        (report false)
+      )
     else
-        if <<(current) = (number of (current))>> and <(current) < <1>> then
-            add (join "Invalid positive integer at index: " (count)) to [errors v]
-            add (join "Error: " (count)) to [audit log v]
-        end
-    end
-end
-set [validation report v] data to [errors v]
-report [errors v] data
+      (report false)
+    )
+  else
+    (report false)
+  )
+
+;; Is Numeric Check
+(define is-numeric? (value))
+  (if (is (type-of (value)) equal-to "number"))
+    (report true)
+  else
+    (report false)
+  )
+
+;; Report Validation Errors
+(define report-errors (failed-items))
+  (for each (item) in (failed-items))
+    (print "Validation Failed for item: " (item))
+  )

@@ -1,15 +1,26 @@
-when green flag clicked
-clear
-set [filtered v] data to []
-set [audit log v] data to []
-repeat (length of [input v] data)
-    set [current v] to (item (count) of [input v] data)
-    if <(current) > <>> then
-        add (current) to [filtered v] data
-        add (join "Validated: " (current)) to [audit log v]
-    else
-        add (join "Filtered null: " (count)) to [audit log v]
-    end
-end
-set [output v] data to [filtered v] data
-report [filtered v] data
+;; filter_nulls.snap - Data Cleansing Logic
+
+;; Check if value is null
+(define is-null? (value))
+  (if (is (value) equal-to (empty)))
+    (report true)
+  else
+    (report false)
+  )
+
+;; Remove Nulls from List
+(define remove-nulls (list))
+  (set result to (empty-list))
+  (for each (x) in (list))
+    (if (not (is-null? (x))))
+      (append-to-list (result) (x))
+    )
+  (report result)
+
+;; Sanitize String Fields
+(define sanitize-string (str))
+  (if (is (str) equal-to (null)))
+    (report "")
+  else
+    (report (trim (str)))
+  )

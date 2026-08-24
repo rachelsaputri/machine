@@ -1,19 +1,26 @@
-# Data Processing Utility
+# Snap! Data Processing Utility
 
-## Overview
-This utility is designed to perform essential data processing tasks including data ingestion, transformation, validation, and reporting.
+A modular data processing pipeline built using Snap!, a block-based visual programming language. This utility ingests, transforms, validates, and reports on data streams using visual block logic.
 
 ## Features
-- **Data Ingestion**: Read data from JSON and CSV sources.
-- **Data Transformation**: Filter records, calculate statistics (mean, max, min), and rename columns.
-- **Data Validation**: Check for null values, verify data types, and ensure value ranges.
-- **Reporting**: Generate human-readable reports of the processed data and audit logs.
+- Visual Drag-and-Drop Logic
+- Data Ingestion from JSON/CSV
+- Data Transformation & Filtering
+- Validation & Error Handling
+- Report Generation
 
 ## Usage
-1. Open the Snap! project file.
-2. Define your input data using the 'input data' list.
-3. Run the 'Start Processing' block to begin the pipeline.
-4. View the results in the 'output data' list and the 'report' sprite's stage.
+1. Open the `main.sb3` file in the Snap! IDE.
+2. Run the `Start Pipeline` procedure.
+3. Monitor the `Status Log` sprite for progress.
+4. Check the `DataReporter` sprite for final outputs.
+
+## Structure
+- `main.sb3`: The main project file containing all sprite logic and extensions.
+- `calculate_stats.snap`: Helper blocks for statistical calculations.
+- `filter_nulls.snap`: Helper blocks for data cleansing.
+- `pipeline.snap`: Core processing logic for ingestion and transformation.
+- `validate_data.snap`: Helper blocks for data validation.
 
 ## License
-MIT
+MIT License

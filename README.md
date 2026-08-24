@@ -310,3 +310,5 @@ MIT
 - Created/Updated module: `obj_rexx_data_processing_utility` (See `obj_rexx_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./z_notation_data_processing_utility` (See `./z_notation_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `snap_data_processing_utility` (See `snap_data_processing_utility/README.md` for details)
