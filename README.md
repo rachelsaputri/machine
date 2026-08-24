@@ -292,3 +292,5 @@ MIT
 - Created/Updated module: `visual_prolog_data_processor` (See `visual_prolog_data_processor/README.md` for details)
 
 - Created/Updated module: `./vvvv_data_processing_utility` (See `./vvvv_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `objc_data_processing_utility` (See `objc_data_processing_utility/README.md` for details)
