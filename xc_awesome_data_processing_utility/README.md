@@ -1,36 +1,38 @@
-# XC Awesome Data Processing Utility
+# XC Awesome Data Processor
 
-A complete, production-ready data processing utility written in XC. This tool is designed to ingest, transform, validate, and export data records using a modular pipeline architecture.
+## Overview
+The XC Awesome Data Processor is a modular, high-performance data processing utility written in the XC programming language. It is designed to handle data ingestion, transformation, validation, and reporting within a streamlined pipeline architecture.
 
 ## Features
-- **Robust Data Ingestion**: Supports reading from standard input and CSV/JSON formatted files.
-- **Flexible Transformation**: Provides built-in transformers for data sanitization, type casting, and normalization.
-- **Strict Validation**: Validates records against configurable schemas and business rules.
-- **Efficient Export**: Outputs processed data to CSV, JSON, or standard output.
-- **CLI Interface**: Command-line arguments for easy configuration and execution.
+- **Modular Pipeline**: Distinct components for ingestion, validation, transformation, and reporting.
+- **XC Native**: Written in XC for efficient execution and type safety.
+- **Extensible**: Easy to add new transformation rules or validation constraints.
+- **Configurable**: Supports external configuration for pipeline parameters.
 
-## Prerequisites
-- An XC compiler (e.g., XC Compiler by Green Hills Software or compatible XC toolchain).
-- XC standard libraries.
+## Directory Structure
+- `main.xc`: Entry point and pipeline orchestration.
+- `pipeline.xc`: Core pipeline logic and execution engine.
+- `stages/`: Directory containing specific pipeline stages:
+  - `ingester.xc`: Data ingestion logic.
+  - `validator.xc`: Data validation logic.
+  - `transformer.xc`: Data transformation logic.
+  - `reporter.xc`: Data reporting and output logic.
 
 ## Usage
+1. Compile the project using the XC compiler.
+2. Run the executable with optional configuration arguments.
 
-### Compile
 ```bash
-xc -o data_processor main.xc
+xcomp main.xc pipeline.xc stages/*.xco
+./xc_awesome_data_processor --config config.xc
 ```
 
-### Run
-```bash
-./data_processor --input ./data/sample.csv --format csv --output ./output/report.csv
-```
-
-### Arguments
-- `--input`: Path to the input file (stdin if omitted).
-- `--format`: Input data format (`csv`, `json`, `txt`).
-- `--output`: Path to the output file (stdout if omitted).
-- `--transform`: Comma-separated list of transformations to apply (`sanitize`, `trim`, `uppercase`).
-- `--validate`: Enable strict validation.
+## Configuration
+The `config.xc` file allows users to define:
+- Input data source path
+- Output destination
+- Validation rules
+- Transformation functions
 
 ## License
 MIT License
