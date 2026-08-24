@@ -338,3 +338,5 @@ MIT
 - Created/Updated module: `bitc_data_processing_utility` (See `bitc_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `rapira_data_processing_utility` (See `rapira_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `./awk_data_processing_utility` (See `./awk_data_processing_utility/README.md` for details)
