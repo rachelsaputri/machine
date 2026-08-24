@@ -1,17 +1,19 @@
 # Clarion Data Processing Utility
 
-This is a comprehensive data processing utility built using the Clarion programming language.
+This module provides a robust data processing utility framework written in Clarion. It includes components for ingesting, validating, transforming, and reporting data.
 
-## Features
+## Components
 
-- Data Ingestion
-- Data Transformation
-- Data Validation
-- Data Export
+1. **`main.clw`**: Entry point for the data processing pipeline.
+2. **`DataIngestor.clw`**: Handles data ingestion from various sources.
+3. **`DataValidator.clw`**: Validates data against predefined rules.
+4. **`DataTransformer.clw`**: Transforms data into the desired format.
+5. **`DataReporter.clw`**: Generates reports on the processed data.
 
-## Files
+## Usage
 
-- `clarion_data_processing_utility.clw`: Main application logic
-- `clarion_data_processing_utility.clw`: Helper functions
-- `clarion_data_processing_utility.clw`: Data types
-- `clarion_data_processing_utility.clw`: Report generation
+To use this utility, compile the Clarion files and link them into your application. Ensure that the necessary Clarion runtime libraries are available.
+
+## License
+
+This project is licensed under the MIT License.

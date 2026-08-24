@@ -322,3 +322,5 @@ MIT
 - Created/Updated module: `racket_data_processing_utility` (See `racket_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `alice_data_processing_utility` (See `alice_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `clarion_data_processing_utility` (See `clarion_data_processing_utility/README.md` for details)
