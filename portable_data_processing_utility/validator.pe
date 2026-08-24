@@ -1,0 +1,32 @@
+// validator.pe
+// Filters out invalid records (e.g., negative values)
+
+INCLUDE 'data_types.pe'
+
+PROCEDURE ValidateData(&source_array DATA_RECORD_ARRAY, &target_array DATA_RECORD_ARRAY)
+  DECLARATIONS
+    i INTEGER
+    current_record DATA_RECORD
+    is_valid BOOLEAN
+
+  INITIALIZE
+    FOR i FROM 0 TO &source_array.count - 1 DO
+      current_record := &source_array.Get(i)
+      is_valid := TRUE
+
+      // Simple Validation Rule: Value must be non-negative
+      IF current_record.value < 0 THEN
+        is_valid := FALSE
+      END IF
+
+      // Simple Validation Rule: Name must not be empty
+      IF current_record.name = "" THEN
+        is_valid := FALSE
+      END IF
+
+      IF is_valid THEN
+        Call &target_array.Add(current_record)
+      END IF
+    END FOR
+
+END PROCEDURE

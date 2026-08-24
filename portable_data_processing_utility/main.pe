@@ -1,0 +1,37 @@
+PROGRAM main
+  INCLUDE 'data_types.pe'
+  INCLUDE 'ingester.pe'
+  INCLUDE 'validator.pe'
+  INCLUDE 'transformer.pe'
+  INCLUDE 'reporter.pe'
+
+  PROCEDURE Main()
+    DECLARATIONS
+      input_data DATA_RECORD_ARRAY
+      validated_data DATA_RECORD_ARRAY
+      processed_data DATA_RECORD_ARRAY
+    
+    INITIALIZE
+      input_data := NEW DATA_RECORD_ARRAY()
+      validated_data := NEW DATA_RECORD_ARRAY()
+      processed_data := NEW DATA_RECORD_ARRAY()
+
+    LOGIC
+      // 1. Ingest Data
+      Call IngestData(input_data)
+      Print "Ingestion Complete. Records: " + input_data.Count
+
+      // 2. Validate Data
+      Call ValidateData(input_data, validated_data)
+      Print "Validation Complete. Valid Records: " + validated_data.Count
+
+      // 3. Transform Data
+      Call TransformData(validated_data, processed_data)
+      Print "Transformation Complete. Processed Records: " + processed_data.Count
+
+      // 4. Report Results
+      Call GenerateReport(processed_data)
+
+    END Main
+
+END PROGRAM

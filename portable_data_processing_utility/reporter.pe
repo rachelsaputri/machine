@@ -1,0 +1,25 @@
+// reporter.pe
+// Outputs the final processed data to the console
+
+INCLUDE 'data_types.pe'
+
+PROCEDURE GenerateReport(&source_array DATA_RECORD_ARRAY)
+  DECLARATIONS
+    i INTEGER
+    current_record DATA_RECORD
+
+  INITIALIZE
+    Print "--- Data Processing Report ---"
+    Print "Total Processed Records: " + &source_array.count
+    Print "-------------------------------"
+
+    FOR i FROM 0 TO &source_array.count - 1 DO
+      current_record := &source_array.Get(i)
+      Print "Record " + (i + 1) + ":"
+      Print "  ID: " + current_record.id
+      Print "  Name: " + current_record.name
+      Print "  Value: " + current_record.value
+      Print ""
+    END FOR
+
+END PROCEDURE

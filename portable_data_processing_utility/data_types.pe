@@ -1,0 +1,27 @@
+// data_types.pe
+// Defines the core structures for the data processing pipeline
+
+TYPE DATA_RECORD
+  FIELD id INTEGER
+  FIELD name STRING
+  FIELD value FLOAT
+END TYPE
+
+TYPE DATA_RECORD_ARRAY
+  FIELD count INTEGER
+  FIELD records DATA_RECORD[100] // Fixed size for simplicity in PortablE
+  
+  FUNCTION Add(record DATA_RECORD) INTEGER
+    IF count < 100 THEN
+      records[count] := record
+      count := count + 1
+      RETURN count
+    ELSE
+      RETURN -1 // Array full
+    END IF
+  END FUNCTION
+
+  FUNCTION Get(index INTEGER) DATA_RECORD
+    RETURN records[index]
+  END FUNCTION
+END TYPE

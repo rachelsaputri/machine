@@ -296,3 +296,5 @@ MIT
 - Created/Updated module: `objc_data_processing_utility` (See `objc_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `wolfram_data_processing_utility` (See `wolfram_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `portable_data_processing_utility` (See `portable_data_processing_utility/README.md` for details)

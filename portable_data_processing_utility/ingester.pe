@@ -1,0 +1,26 @@
+// ingester.pe
+// Handles the initial loading of sample data
+
+INCLUDE 'data_types.pe'
+
+PROCEDURE IngestData(&target_array DATA_RECORD_ARRAY)
+  DECLARATIONS
+    temp_record DATA_RECORD
+
+  INITIALIZE
+    temp_record.id := 1
+    temp_record.name := "SampleAlpha"
+    temp_record.value := 10.5
+    Call &target_array.Add(temp_record)
+
+    temp_record.id := 2
+    temp_record.name := "SampleBeta"
+    temp_record.value := 20.3
+    Call &target_array.Add(temp_record)
+
+    temp_record.id := 3
+    temp_record.name := "SampleGamma"
+    temp_record.value := 30.1
+    Call &target_array.Add(temp_record)
+
+END PROCEDURE

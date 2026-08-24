@@ -1,0 +1,28 @@
+// transformer.pe
+// Applies business logic to transform records
+
+INCLUDE 'data_types.pe'
+
+PROCEDURE TransformData(&source_array DATA_RECORD_ARRAY, &target_array DATA_RECORD_ARRAY)
+  DECLARATIONS
+    i INTEGER
+    current_record DATA_RECORD
+    new_record DATA_RECORD
+
+  INITIALIZE
+    FOR i FROM 0 TO &source_array.count - 1 DO
+      current_record := &source_array.Get(i)
+      
+      // Create a new record with transformed data
+      new_record := current_record
+      
+      // Transformation: Double the value
+      new_record.value := new_record.value * 2.0
+      
+      // Transformation: Append suffix to name
+      new_record.name := new_record.name + "_Processed"
+      
+      Call &target_array.Add(new_record)
+    END FOR
+
+END PROCEDURE
