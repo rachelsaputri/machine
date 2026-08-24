@@ -1,26 +1,36 @@
 # AWK Data Processing Utility
 
-A robust, standalone AWK utility for efficient data processing, validation, transformation, and reporting.
+A lightweight, high-performance data processing utility written in pure AWK. This tool is designed for parsing, transforming, validating, and reporting on structured data streams without requiring complex dependencies.
 
 ## Features
+- **Ingest**: Reads structured data from standard input or files.
+- **Transform**: Applies column-wise transformations and calculations.
+- **Validate**: Checks data integrity and format compliance.
+- **Report**: Outputs processed results in standard output or to a file.
 
-- **Modular Architecture**: Separated into logical components for processing, validation, and reporting.
-- **Format Support**: Handles CSV, TSV, and space-delimited data.
-- **Validation**: Data type checking (numeric, alphanumeric, date, email, regex patterns).
-- **Transformation**: Supports column extraction, field reordering, and string formatting.
-- **Reporting**: Generates concise summary reports and error logs.
+## Prerequisites
+- GNU AWK (gawk) or any POSIX-compliant AWK implementation.
 
 ## Usage
 
-Basic usage:
+### Basic Transform Pipeline
+Run the following command to process `data.csv`:
 ```bash
-awk -f main.awk -f transformer.awk -f validator.awk -f reporter.awk input.csv -v OFMT="%.2f"
+awk -f main.awk data.csv
 ```
 
-## Files
+### Custom Configuration
+You can pass variables via the command line:
+```bash
+awk -f main.awk -v delimiter="," -v output_format="json" data.csv
+```
 
-- `processor.awk`: Core data reading and field splitting.
-- `validator.awk`: Data validation rules.
-- `transformer.awk`: Data transformation logic.
-- `reporter.awk`: Output generation.
-- `main.awk`: Entry point and control flow.
+## Structure
+- `main.awk`: Entry point and logic orchestration.
+- `parser.awk`: Handles initial data ingestion and parsing.
+- `transformer.awk`: Performs data transformations.
+- `validator.awk`: Ensures data compliance with rules.
+- `reporter.awk`: Formats and outputs final results.
+
+## License
+MIT License
