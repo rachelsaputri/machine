@@ -1,13 +1,41 @@
-/* CLIST Data Parser */
-PARSER:
-  PARSE UPPER ARG INPUT_STR
-  
-  IF INPUT_STR = '' THEN DO
-    SAY 'Error: Input string is required.'
-    EXIT 8
-  END
-  
-  /* Parse logic */
-  PARSE VAR INPUT_STR FIELD1 FIELD2 FIELD3
-  
-  RETURN FIELD1 FIELD2 FIELD3
+/* PARSER.CLIST - Data Ingestion and Parsing */
+/* Reads input datasets and parses data into CLIST variables */
+
+/* Input Dataset Configuration */
+SET INPUTDSN='TSOHLQ.INPUT.DATA'
+SET RECORD_LEN=80
+
+/* Parse Input Data */
+PARSE INPUT
+  FILE &INPUTDSN
+  FORMAT FIXED RECORD
+  LENGTH &RECORD_LEN
+
+/* Validate File Existence */
+IF &INPUTDSN EQ '' THEN DO
+  PUT CENTER CLIST 'ERROR: Input Dataset is empty'
+  SET &SYSRC=4
+  GOTO END
+END
+
+/* Process Each Record */
+/* In a real CLIST, this would use ISPF Edit Macros or TSO RECFM processing */
+/* Here we simulate the parsing logic */
+
+/* Example: Parse Date Field */
+/* Assuming Date is at pos 1-6 */
+SET DATE_FIELD = &INPUT_DATA.1(1:6)
+
+/* Example: Parse ID Field */
+/* Assuming ID is at pos 7-12 */
+SET ID_FIELD = &INPUT_DATA.1(7:12)
+
+/* Output Parsed Data for Next Steps */
+/* In a real scenario, write to a temporary dataset or use CLIST variables */
+PUT CENTER CLIST 'Parsed Date: &DATE_FIELD, ID: &ID_FIELD'
+
+SET &SYSRC=0
+GOTO END
+
+:END
+/* End of Parser */

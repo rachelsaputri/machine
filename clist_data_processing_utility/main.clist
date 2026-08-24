@@ -1,35 +1,44 @@
-/* CLIST Main Control */
-MAIN:
-  PARSE UPPER ARG OPTION
-  IF OPTION = 'HELP' THEN DO
-    CALL SHOW_HELP
-    EXIT 0
-  END
+/* MAIN.CLIST - Entry Point for Data Processing Utility */
+/* Orchestrates the execution of Parser, Validator, Transformer, and Reporter */
 
-  /* Initialize */
-  CALL INIT_PROCESS
-  
-  /* Process Data */
-  CALL PROCESS_DATA
-  
-  /* Report Results */
-  CALL GENERATE_REPORT
-  
-  EXIT 0
+/* Parse Input Parameters */
+IF &PARM0 = '' THEN GOTO USAGE
 
-SHOW_HELP:
-  SAY 'Usage: MAIN [HELP]'
-  SAY '  HELP - Display this help message'
-  RETURN
+/* Set default paths */
+IF &PARM1 = '' THEN SET PPARMLIB=TSOHLQ.LISTLIB.CLIST.PARSER
+IF &PARM2 = '' THEN SET PVALIDLIB=TSOHLQ.LISTLIB.CLIST.VALIDATOR
+IF &PARM3 = '' THEN SET PTRANSLIB=TSOHLQ.LISTLIB.CLIST.TRANSFORMER
+IF &PARM4 = '' THEN SET PREPORTLIB=TSOHLQ.LISTLIB.CLIST.REPORTER
 
-INIT_PROCESS:
-  SAY 'Initializing data processing...'
-  RETURN
+/* Step 1: Parse Data */
+EXECUTE &PPARMLIB
+IF &SYSRC > 0 THEN GOTO CLEANUP
 
-PROCESS_DATA:
-  SAY 'Processing data...'
-  RETURN
+/* Step 2: Validate Data */
+EXECUTE &PVALIDLIB
+IF &SYSRC > 0 THEN GOTO CLEANUP
 
-GENERATE_REPORT:
-  SAY 'Generating report...'
-  RETURN
+/* Step 3: Transform Data */
+EXECUTE &PTRANSLIB
+IF &SYSRC > 0 THEN GOTO CLEANUP
+
+/* Step 4: Report Results */
+EXECUTE &PREPORTLIB
+IF &SYSRC > 0 THEN GOTO CLEANUP
+
+GOTO SUCCESS
+
+:USAGE
+PUT CENTER CLIST 'Usage: EXEC main.clist [parse_lib] [valid_lib] [trans_lib] [report_lib]'
+GOTO END
+
+:CLEANUP
+PUT CENTER CLIST 'Data processing finished with errors. Check logs.'
+GOTO END
+
+:SUCCESS
+PUT CENTER CLIST 'Data processing completed successfully.'
+GOTO END
+
+:END
+/* End of Main */

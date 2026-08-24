@@ -1,0 +1,28 @@
+/* TRANSFORMER.CLIST - Data Transformation */
+/* Transforms validated data into target format */
+
+/* Target Format Configuration */
+SET TARGET_DELIM='|'
+SET TARGET_DATE_FMT='YYYY-MM-DD'
+
+/* Transform ID Field (Add Prefix) */
+SET TRANSFORMED_ID = 'ID-' &ID_FIELD
+
+/* Transform Date Field (Reformat YYYYMMDD to YYYY-MM-DD) */
+/* Note: CLIST string manipulation is limited; ISPF services or external programs are often used */
+/* Simulating transformation here */
+SET YYYYPART = &DATE_FIELD(1:4)
+SET MONTPART = &DATE_FIELD(5:6)
+SET DAYPART = &DATE_FIELD(7:8)
+SET TRANSFORMED_DATE = &YYYYPART '-' &MONTPART '-' &DAYPART
+
+/* Combine Transformed Data */
+SET OUTPUT_RECORD = &TRANSFORMED_ID &TARGET_DELIM &TRANSFORMED_DATE
+
+PUT CENTER CLIST 'Transformed Record: &OUTPUT_RECORD'
+
+SET &SYSRC=0
+GOTO END
+
+:END
+/* End of Transformer */

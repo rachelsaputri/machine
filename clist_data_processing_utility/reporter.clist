@@ -1,13 +1,31 @@
-/* CLIST Report Generator */
-REPORTER:
-  PARSE UPPER ARG RESULTS
-  
-  SAY 'Generating report...'
-  
-  /* Format and output results */
-  IF RESULTS \= '' THEN DO
-    SAY 'Results: ' RESULTS
-  END
-  
-  SAY 'Report generation complete.'
-  RETURN
+/* REPORTER.CLIST - Reporting and Logging */
+/* Generates a report and logs the final status */
+
+/* Report Configuration */
+SET REPORT_FILE='TSOHLQ.REPORT.DATA'
+SET LOG_FILE='TSOHLQ.LOG.DATA'
+
+/* Generate Report Header */
+PUT CENTER CLIST '========================================'
+PUT CENTER CLIST '       DATA PROCESSING REPORT           '
+PUT CENTER CLIST '========================================'
+PUT CENTER CLIST 'Date Processed: &SYSDate'
+PUT CENTER CLIST 'Output Dataset: &REPORT_FILE'
+PUT CENTER CLIST '----------------------------------------'
+
+/* Log Details */
+PUT CENTER CLIST 'Transformed ID: &TRANSFORMED_ID'
+PUT CENTER CLIST 'Transformed Date: &TRANSFORMED_DATE'
+PUT CENTER CLIST '========================================'
+
+/* In a real CLIST, you would use ISPF Edit to write to &REPORT_FILE */
+/* Example: EDIT DATASET(&REPORT_FILE) */
+/* Write the records */
+
+PUT CENTER CLIST 'Report generation complete.'
+
+SET &SYSRC=0
+GOTO END
+
+:END
+/* End of Reporter */

@@ -1,18 +1,35 @@
-/* CLIST Data Validator */
-VALIDATOR:
-  PARSE UPPER ARG DATA
-  
-  IF DATA = '' THEN DO
-    SAY 'Error: Data cannot be empty.'
-    EXIT 8
-  END
-  
-  /* Validation logic */
-  CALL VALIDATE_FORMAT DATA
-  
-  RETURN
+/* VALIDATOR.CLIST - Data Validation */
+/* Validates parsed data against business rules */
 
-VALIDATE_FORMAT:
-  PARSE UPPER ARG D
-  SAY 'Validating format for: ' D
-  RETURN
+/* Validation Rules */
+SET RULE_MAX_ID=999999
+SET RULE_MIN_DATE=19000101
+
+/* Check ID Range */
+IF &ID_FIELD > &RULE_MAX_ID THEN DO
+  PUT CENTER CLIST 'VALIDATION ERROR: ID &ID_FIELD exceeds maximum limit'
+  SET &SYSRC=4
+  GOTO END
+END
+
+/* Check Date Format */
+/* Basic check for YYYYMMDD format */
+IF &DATE_FIELD < &RULE_MIN_DATE THEN DO
+  PUT CENTER CLIST 'VALIDATION ERROR: Date &DATE_FIELD is invalid or too old'
+  SET &SYSRC=4
+  GOTO END
+END
+
+/* Check for Null Fields */
+IF &ID_FIELD EQ '          ' THEN DO
+  PUT CENTER CLIST 'VALIDATION ERROR: ID Field is null'
+  SET &SYSRC=4
+  GOTO END
+END
+
+PUT CENTER CLIST 'Data Validation Passed'
+SET &SYSRC=0
+GOTO END
+
+:END
+/* End of Validator */
