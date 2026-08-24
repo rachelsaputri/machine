@@ -272,3 +272,5 @@ MIT
 - Created/Updated module: `ts_dependency_compliance_engine` (See `ts_dependency_compliance_engine/README.md` for details)
 
 - Created/Updated module: `microscript_compliance_policy_verifier` (See `microscript_compliance_policy_verifier/README.md` for details)
+
+- Created/Updated module: `beanshell_data_processing_pipeline` (See `beanshell_data_processing_pipeline/README.md` for details)

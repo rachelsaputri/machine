@@ -1,0 +1,45 @@
+// Beanshell Data Processing Pipeline - Transformer Component
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Transformer {
+    private String ruleType;
+
+    public Transformer(String ruleType) {
+        this.ruleType = ruleType;
+    }
+
+    public List apply(List data) {
+        List transformedData = new ArrayList();
+        
+        for (def record : data) {
+            def transformedRecord = [:];
+            
+            if (ruleType == "uppercase") {
+                for (def key in record.keySet()) {
+                    def value = record[key];
+                    if (value instanceof String) {
+                        transformedRecord[key] = value.toUpperCase();
+                    } else {
+                        transformedRecord[key] = value;
+                    }
+                }
+            } else if (ruleType == "filter_nulls") {
+                for (def key in record.keySet()) {
+                    def value = record[key];
+                    if (value != null) {
+                        transformedRecord[key] = value;
+                    }
+                }
+            } else {
+                // Default: pass-through
+                transformedRecord = record.clone();
+            }
+            
+            transformedData.add(transformedRecord);
+        }
+        
+        return transformedData;
+    }
+}

@@ -1,0 +1,46 @@
+// Beanshell Data Processing Pipeline - Validator Component
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Validator {
+    private String schemaType;
+
+    public Validator(String schemaType) {
+        this.schemaType = schemaType;
+    }
+
+    public List check(List data) {
+        List validData = new ArrayList();
+        
+        for (def record : data) {
+            def isValid = true;
+            
+            if (schemaType == "not_empty") {
+                for (def key in record.keySet()) {
+                    def value = record[key];
+                    if (value == null || value == "") {
+                        isValid = false;
+                        break;
+                    }
+                }
+            } else if (schemaType == "type_check") {
+                // Example: Check if field0 is a string
+                if (record["field0"] != null && !(record["field0"] instanceof String)) {
+                    isValid = false;
+                }
+            } else {
+                // Default: all records valid
+                isValid = true;
+            }
+            
+            if (isValid) {
+                validData.add(record);
+            } else {
+                print("Invalid record skipped: " + record);
+            }
+        }
+        
+        return validData;
+    }
+}

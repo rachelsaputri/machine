@@ -1,0 +1,49 @@
+// Beanshell Data Processing Pipeline - Main Entry Point
+
+import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
+
+// Load configuration
+File configFile = new File("config.properties");
+if (configFile.exists()) {
+    // In a real BeanShell environment, properties loading might require a specific library
+    // or a simple custom parser. For this example, we assume a simple key=value format.
+    def dataSource = "default_source";
+    def transformationRule = "default_transform";
+    def validationSchema = "default_schema";
+} else {
+    print("Warning: config.properties not found. Using defaults.");
+    def dataSource = "default_source";
+    def transformationRule = "default_transform";
+    def validationSchema = "default_schema";
+}
+
+// Initialize pipeline components
+import bsh.engine.Ingester;
+import bsh.engine.Transformer;
+import bsh.engine.Validator;
+import bsh.engine.Reporter;
+
+def ingester = new Ingester(dataSource);
+def transformer = new Transformer(transformationRule);
+def validator = new Validator(validationSchema);
+def reporter = new Reporter();
+
+// Execute pipeline
+try {
+    def rawData = ingester.loadData();
+    print("Data ingested. Count: " + rawData.size());
+    
+    def processedData = transformer.apply(rawData);
+    print("Data transformed. Count: " + processedData.size());
+    
+    def validData = validator.check(processedData);
+    print("Validation passed. Valid records: " + validData.size());
+    
+    reporter.generateReport(validData);
+    print("Pipeline completed successfully.");
+} catch (Exception e) {
+    print("Pipeline failed: " + e.getMessage());
+    e.printStackTrace();
+}

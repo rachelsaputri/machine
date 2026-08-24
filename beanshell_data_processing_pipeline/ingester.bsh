@@ -1,0 +1,44 @@
+// Beanshell Data Processing Pipeline - Ingester Component
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+
+class Ingester {
+    private String sourceType;
+
+    public Ingester(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public List loadData() {
+        List rawData = new ArrayList();
+        
+        if (sourceType == "csv") {
+            try {
+                def reader = new BufferedReader(new FileReader("input.csv"));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Simple CSV parsing assuming no commas in fields
+                    def parts = line.split(",");
+                    def record = [:];
+                    for (int i = 0; i < parts.size(); i++) {
+                        record["field" + i] = parts[i];
+                    }
+                    rawData.add(record);
+                }
+                reader.close();
+            } catch (Exception e) {
+                print("Error loading data: " + e.getMessage());
+            }
+        } else {
+            // Default mock data for other sources
+            def mockRecord = ["field0": "value1", "field1": "value2"];
+            rawData.add(mockRecord);
+            rawData.add(mockRecord.clone());
+        }
+        
+        return rawData;
+    }
+}

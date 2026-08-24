@@ -1,0 +1,30 @@
+// Beanshell Data Processing Pipeline - Reporter Component
+
+import java.io.FileWriter;
+import java.util.List;
+
+class Reporter {
+
+    public void generateReport(List data) {
+        try {
+            def writer = new FileWriter("report.txt");
+            writer.write("Data Processing Report\n");
+            writer.write("======================\n\n");
+            writer.write("Total Records Processed: " + data.size() + "\n\n");
+            writer.write("Record Details:\n");
+            
+            for (def record : data) {
+                for (def key in record.keySet()) {
+                    writer.write(key + ": " + record[key] + "\n");
+                }
+                writer.write("-------------------\n");
+            }
+            
+            writer.close();
+            print("Report generated successfully: report.txt");
+        } catch (Exception e) {
+            print("Error generating report: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
