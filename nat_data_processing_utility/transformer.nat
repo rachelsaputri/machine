@@ -1,0 +1,36 @@
+DEFINE DATA
+1 TRANSFORMED-DATA TYPE TEXT(1000)
+1 RECORDS          TYPE TEXT(1000)
+1 RECORD-COUNT     TYPE INTEGER
+1 CURRENT-RECORD   TYPE TEXT(256)
+1 PROCESSED-COUNT  TYPE INTEGER
+END DEFINE
+
+PROGRAM TRANSFORM_DATA
+  INCLUDE 'extractor.nat'
+
+  TRANSFORMED-DATA = ''
+  PROCESSED-COUNT = 0
+
+  /* Split records by newline for processing */
+  /* Note: NATURAL string manipulation is limited, simplistic split assumed */
+  RECORDS = RECORDS || CHAR(10) /* Append delimiter for parsing */
+  
+  REPEAT
+    /* Find next newline */
+    /* Simplified logic for demonstration */
+    CURRENT-RECORD = SUBSTR(RECORDS, 1, INDEX(RECORDS, CHAR(10)) - 1)
+    RECORDS = SUBSTR(RECORDS, INDEX(RECORDS, CHAR(10)) + 1)
+
+    IF CURRENT-RECORD != '' THEN
+      /* Apply simple transformation: Uppercase and trim */
+      CURRENT-RECORD = TRIM(UPPER(CURRENT-RECORD))
+      TRANSFORMED-DATA = TRANSFORMED-DATA || CURRENT-RECORD || CHAR(10)
+      PROCESSED-COUNT = PROCESSED-COUNT + 1
+    END IF
+  UNTIL RECORDS = ''
+
+  RECORDS = TRANSFORMED-DATA
+  DISPLAY 'Transformed ', PROCESSED-COUNT, ' records.'
+  STATUS = 0
+END PROGRAM

@@ -328,3 +328,5 @@ MIT
 - Created/Updated module: `./argus_data_processing_utility` (See `./argus_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `simple_data_processing_utility` (See `simple_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `nat_data_processing_utility` (See `nat_data_processing_utility/README.md` for details)

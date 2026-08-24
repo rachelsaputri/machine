@@ -1,0 +1,47 @@
+DEFINE DATA
+1 INPUT-FILE  TYPE TEXT(256)
+1 OUTPUT-FILE TYPE TEXT(256)
+1 CONFIG-FILE TYPE TEXT(256)
+1 LOG-FILE    TYPE TEXT(256)
+END DEFINE
+
+INCLUDE 'config.nat'
+INCLUDE 'extractor.nat'
+INCLUDE 'transformer.nat'
+INCLUDE 'loader.nat'
+INCLUDE 'reporter.nat'
+
+PROGRAM MAIN
+  INPUT-FILE = 'input_data.txt'
+  OUTPUT-FILE = 'output_data.txt'
+  CONFIG-FILE = 'config.nat'
+  LOG-FILE = 'processing.log'
+
+  CALL INIT_CONFIG(CONFIG-FILE)
+  CALL INIT_LOGGING(LOG-FILE)
+
+  DISPLAY 'Starting Data Processing Utility...'
+
+  CALL EXTRACT_DATA(INPUT-FILE)
+  IF STATUS = 0 THEN
+    CALL TRANSFORM_DATA()
+    IF STATUS = 0 THEN
+      CALL LOAD_DATA(OUTPUT-FILE)
+      IF STATUS = 0 THEN
+        CALL GENERATE_REPORT()
+        DISPLAY 'Data Processing Completed Successfully.'
+      ELSE
+        DISPLAY 'Error during data loading.'
+        CALL LOG_ERROR('Failed to load data.')
+      END IF
+    ELSE
+      DISPLAY 'Error during data transformation.'
+      CALL LOG_ERROR('Failed to transform data.')
+    END IF
+  ELSE
+    DISPLAY 'Error during data extraction.'
+    CALL LOG_ERROR('Failed to extract data.')
+  END IF
+
+  DISPLAY 'Utility Execution Finished.'
+END PROGRAM
