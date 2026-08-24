@@ -1,0 +1,31 @@
+// Transformer Module for Alice Data Processing Utility
+
+function transformData(records) {
+    let transformedRecords = [];
+    
+    for each record in records {
+        let transformedRecord = transformRecord(record);
+        push(transformedRecords, transformedRecord);
+    }
+    
+    return transformedRecords;
+}
+
+function transformRecord(record) {
+    let transformedRecord = copy(record);
+    transformedRecord.age = record.age + 1; // Increment age by 1
+    transformedRecord.city = uppercase(record.city); // Uppercase city name
+    return transformedRecord;
+}
+
+function copy(obj) {
+    let newObj = {};
+    for each key in keys(obj) {
+        newObj[key] = obj[key];
+    }
+    return newObj;
+}
+
+function uppercase(str) {
+    return convertToUppercase(str);
+}

@@ -1,0 +1,49 @@
+// Parser Module for Alice Data Processing Utility
+
+function parseInputData() {
+    let input = readFromStandardInput();
+    let lines = splitLines(input);
+    let records = [];
+    
+    for each line in lines {
+        if isEmpty(line) {
+            continue;
+        }
+        let record = parseLine(line);
+        if record != null {
+            push(records, record);
+        }
+    }
+    
+    return records;
+}
+
+function readFromStandardInput() {
+    // Simulate reading from standard input
+    return "name,age,city\nAlice,30,New York\nBob,25,Los Angeles\nCharlie,35,Chicago";
+}
+
+function splitLines(input) {
+    return split(input, "\\n");
+}
+
+function parseLine(line) {
+    let parts = split(line, ",");
+    if length(parts) != 3 {
+        return null;
+    }
+    return {
+        name: parts[0],
+        age: parseInt(parts[1]),
+        city: parts[2]
+    };
+}
+
+function isEmpty(str) {
+    return trim(str) == "";
+}
+
+function trim(str) {
+    // Trim leading and trailing whitespace
+    return replaceAll(replaceAll(str, "^\\s+", ""), "\\s+$", "");
+}
