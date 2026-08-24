@@ -1,0 +1,81 @@
+// Data Transformation Module for Subtext Data Processing Utility
+// Applies business logic, normalization, enrichment, and formatting to validated data
+
+import System;
+import Collections;
+
+namespace DataProcessing
+{
+    class Transformer
+    {
+        private Dictionary config;
+
+        constructor(Dictionary config)
+        {
+            this.config = config;
+        }
+
+        public List<Record> transform(List<Record> records)
+        {
+            var transformed = new List<Record>();
+            
+            // Load transformation rules if provided
+            var rules = this.config.ContainsKey("rules") ? this.config["rules"] : new Dictionary();
+            
+            foreach (var record in records)
+            {
+                var transformedRecord = new Record(new Dictionary(record.Data));
+                
+                // Apply normalizations
+                if (this.config.ContainsKey("normalize"))
+                {
+                    var normalizeConfig = this.config["normalize"]; // Dictionary of field -> format
+                    foreach (var kvp in normalizeConfig)
+                    {
+                        var field = kvp.Key;
+                        var format = kvp.Value.ToString();
+                        var value = transformedRecord.GetField(field);
+                        
+                        if (value != null)
+                        {
+                            if (format == "upper")
+                            {
+                                transformedRecord.Data[field] = value.ToUpper();
+                            }
+                            else if (format == "lower")
+                            {
+                                transformedRecord.Data[field] = value.ToLower();
+                            }
+                            else if (format == "trim")
+                            {
+                                transformedRecord.Data[field] = value.Trim();
+                            }
+                        }
+                    }
+                }
+                
+                // Apply business rules
+                if (rules is Dictionary)
+                {
+                    transformedRecord = this.applyRules(transformedRecord, rules as Dictionary);
+                }
+                
+                transformed.Add(transformedRecord);
+            }
+            
+            return transformed;
+        }
+
+        private Record applyRules(Record record, Dictionary rules)
+        {
+            // Example: If 'status' is 'pending', set 'processed_at' to now
+            if (record.Data.ContainsKey("status") && record.GetField("status") == "pending")
+            {
+                record.Data["processed_at"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                record.Data["status"] = "processed";
+            }
+            
+            return record;
+        }
+    }
+}

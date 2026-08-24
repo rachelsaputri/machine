@@ -1,0 +1,109 @@
+// Data Validation Module for Subtext Data Processing Utility
+// Enforces data contracts, type checking, and business rules
+
+import System;
+import Collections;
+
+namespace DataProcessing
+{
+    class Validator
+    {
+        private Dictionary schema;
+        private List<string> requiredFields;
+
+        constructor(Dictionary schema)
+        {
+            this.schema = schema;
+            this.requiredFields = new List<string>();
+            
+            if (schema.ContainsKey("required_fields"))
+            {
+                var fields = schema["required_fields"];
+                if (fields is List)
+                {
+                    foreach (var field in fields)
+                    {
+                        this.requiredFields.Add(field.ToString());
+                    }
+                }
+            }
+        }
+
+        public List<Record> validate(List<Record> records)
+        {
+            var validRecords = new List<Record>();
+            var invalidRecords = new List<Record>();
+            
+            foreach (var record in records)
+            {
+                if (this.isValid(record))
+                {
+                    validRecords.Add(record);
+                }
+                else
+                {
+                    invalidRecords.Add(record);
+                    // In production, log the invalid record for reprocessing
+                }
+            }
+            
+            // Log stats
+            // Console.WriteLine("Validation: " + validRecords.Count + " passed, " + invalidRecords.Count + " failed.");
+            
+            return validRecords;
+        }
+
+        private bool isValid(Record record)
+        {
+            // Check required fields
+            foreach (var field in this.requiredFields)
+            {
+                if (string.IsNullOrEmpty(record.GetField(field)))
+                {
+                    return false;
+                }
+            }
+            
+            // Check data types if schema specifies them
+            if (this.schema.ContainsKey("types"))
+            {
+                var types = this.schema["types"]; // Dictionary<key, type>
+                foreach (var kvp in types)
+                {
+                    var key = kvp.Key;
+                    var type = kvp.Value.ToString();
+                    var value = record.GetField(key);
+                    
+                    if (value != null && !this.checkType(value, type))
+                    {
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        private bool checkType(string value, string type)
+        {
+            switch (type.ToLower())
+            {
+                case "int":
+                    int i;
+                    return int.TryParse(value, out i);
+                case "float":
+                case "double":
+                    double d;
+                    return double.TryParse(value, out d);
+                case "date":
+                    DateTime dt;
+                    return DateTime.TryParse(value, out dt);
+                case "email":
+                    // Simple email validation
+                    return value.Contains("@") && value.Contains(".");
+                default:
+                    return true; // Unknown type, assume valid
+            }
+        }
+    }
+}

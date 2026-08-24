@@ -1,0 +1,117 @@
+// Data Reporting Module for Subtext Data Processing Utility
+// Formats and exports processed data to various output formats
+
+import System;
+import Collections;
+import IO;
+
+namespace DataProcessing
+{
+    class Reporter
+    {
+        private Dictionary config;
+
+        constructor(Dictionary config)
+        {
+            this.config = config;
+        }
+
+        public void export(List<Record> data, string outputPath)
+        {
+            var format = this.config.ContainsKey("format") ? this.config["format"].ToString() : "csv";
+            
+            switch (format.ToLower())
+            {
+                case "csv":
+                    this.exportCsv(data, outputPath);
+                    break;
+                case "json":
+                    this.exportJson(data, outputPath);
+                    break;
+                case "xml":
+                    this.exportXml(data, outputPath);
+                    break;
+                default:
+                    // Fallback to CSV
+                    this.exportCsv(data, outputPath);
+                    break;
+            }
+        }
+
+        private void exportCsv(List<Record> data, string outputPath)
+        {
+            if (data.Count == 0) return;
+            
+            // Get all unique keys to use as headers
+            var headers = new List<string>();
+            var firstRecord = data[0];
+            foreach (var key in firstRecord.Data.Keys)
+            {
+                headers.Add(key);
+            }
+            
+            var lines = new List<string>();
+            lines.Add(string.Join(",", headers));
+            
+            foreach (var record in data)
+            {
+                var values = new List<string>();
+                foreach (var header in headers)
+                {
+                    var value = record.GetField(header);
+                    values.Add(value ?? "");
+                }
+                lines.Add(string.Join(",", values));
+            }
+            
+            IO.File.WriteAllText(outputPath, string.Join("\n", lines));
+        }
+
+        private void exportJson(List<Record> data, string outputPath)
+        {
+            var jsonList = new List<Dictionary>();
+            
+            foreach (var record in data)
+            {
+                var jsonDict = new Dictionary();
+                foreach (var kvp in record.Data)
+                {
+                    jsonDict[kvp.Key] = kvp.Value;
+                }
+                jsonList.Add(jsonDict);
+            }
+            
+            var jsonString = JSON.Serializer.Serialize(jsonList);
+            IO.File.WriteAllText(outputPath, jsonString);
+        }
+
+        private void exportXml(List<Record> data, string outputPath)
+        {
+            var xml = "<records>\n";
+            
+            foreach (var record in data)
+            {
+                xml += "  <record>\n";
+                foreach (var kvp in record.Data)
+                {
+                    xml += "    <" + kvp.Key + ">" + this.escapeXml(kvp.Value?.ToString() ?? "") + "</" + kvp.Key + ">\n";
+                }
+                xml += "  </record>\n";
+            }
+            
+            xml += "</records>";
+            IO.File.WriteAllText(outputPath, xml);
+        }
+
+        private string escapeXml(string value)
+        {
+            if (value == null) return "";
+            return value
+                .Replace("&", "&amp;")
+                .Replace("<", "&lt;")
+                .Replace(">", "&gt;")
+                .Replace("\"", "&quot;")
+                .Replace("'", "&apos;");
+        }
+    }
+}

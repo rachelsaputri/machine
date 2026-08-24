@@ -1,0 +1,10 @@
+{
+    "normalize": {
+        "email": "lower",
+        "status": "upper"
+    },
+    "rules": {
+        "auto_process_pending": true,
+        "set_timestamp": true
+    }
+}

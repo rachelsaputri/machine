@@ -244,3 +244,5 @@ MIT
 - Created/Updated module: `tacl_data_processing_utility` (See `tacl_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `yql_data_processing_utility` (See `yql_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `./subtext_data_processing_utility` (See `./subtext_data_processing_utility/README.md` for details)
