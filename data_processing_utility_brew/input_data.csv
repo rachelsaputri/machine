@@ -1,0 +1,11 @@
+id,name,email,age
+test001,John Doe,john.doe@example.com,30
+test002,Jane Smith,jane.smith@example.com,25
+test003,Bob Johnson,,35
+test004,Alice Brown,invalid-email,28
+test005,,missing.name@example.com,40
+test006,Charlie Wilson,charlie@example.com,-5
+test007,Diana Prince,diana.prince@example.com,160
+test008,Eve Davis,eve.davis@example.com,32
+test009,Frank Miller,frank@example.com,29
+test010,Grace Lee,grace.lee@example.com,45
