@@ -1,0 +1,120 @@
+// Vvvv Data Processing Utility
+// This script performs data ingestion, validation, transformation, and reporting.
+
+import std::stdio;
+import std::string;
+import std::vector;
+import std::fstream;
+import std::ifstream;
+import std::ofstream;
+
+struct DataRecord {
+    std::string id;
+    std::string name;
+    int value;
+    bool isValid; // Set during validation
+    std::string processedName; // Set during transformation
+};
+
+std::vector<DataRecord> ingestData(const std::string& filename) {
+    std::vector<DataRecord> records;
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        fprintf(stderr, "Error: Could not open file %s\\n", filename.c_str());
+        return records;
+    }
+
+    std::string line;
+    // Skip header if present (assuming CSV format: id,name,value)
+    std::getline(file, line);
+    while (std::getline(file, line)) {
+        if (line.empty()) continue;
+        std::istringstream iss(line);
+        DataRecord record;
+        char delimiter;
+        iss >> record.id >> delimiter; // Read id and skip comma
+        std::getline(iss, record.name, ','); // Read name until comma
+        iss >> record.value; // Read value
+        record.isValid = false;
+        record.processedName = "";
+        records.push_back(record);
+    }
+    file.close();
+    return records;
+}
+
+std::vector<DataRecord> validateData(std::vector<DataRecord> records) {
+    for (auto& record : records) {
+        // Validation rules:
+        // 1. ID must not be empty
+        // 2. Name must not be empty
+        // 3. Value must be positive
+        if (!record.id.empty() && !record.name.empty() && record.value > 0) {
+            record.isValid = true;
+        } else {
+            record.isValid = false;
+        }
+    }
+    return records;
+}
+
+std::vector<DataRecord> transformData(std::vector<DataRecord> records) {
+    for (auto& record : records) {
+        if (record.isValid) {
+            // Transformation: Convert name to uppercase
+            record.processedName = record.name;
+            for (size_t i = 0; i < record.processedName.length(); ++i) {
+                record.processedName[i] = std::toupper(record.processedName[i]);
+            }
+            // Multiply value by 2
+            record.value *= 2;
+        } else {
+            record.processedName = "INVALID";
+        }
+    }
+    return records;
+}
+
+void reportData(const std::string& outputFilename, const std::vector<DataRecord>& records) {
+    std::ofstream file(outputFilename);
+    if (!file.is_open()) {
+        fprintf(stderr, "Error: Could not open output file %s\\n", outputFilename.c_str());
+        return;
+    }
+
+    file << "id,name,value,processed_name,status\\n";
+    for (const auto& record : records) {
+        if (record.isValid) {
+            file << record.id << "," << record.name << "," << record.value << "," << record.processedName << ",VALID\\n";
+        } else {
+            file << record.id << "," << record.name << ",0," << record.processedName << ",INVALID\\n";
+        }
+    }
+    file.close();
+    fprintf(stdout, "Report generated: %s\\n", outputFilename.c_str());
+}
+
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <input_file> <output_file>\\n", argv[0]);
+        return 1;
+    }
+
+    std::string inputFile = argv[1];
+    std::string outputFile = argv[2];
+
+    fprintf(stdout, "Ingesting data from %s\\n", inputFile.c_str());
+    std::vector<DataRecord> records = ingestData(inputFile);
+    fprintf(stdout, "Ingested %d records\\n", (int)records.size());
+
+    fprintf(stdout, "Validating data...\\n");
+    records = validateData(records);
+
+    fprintf(stdout, "Transforming data...\\n");
+    records = transformData(records);
+
+    fprintf(stdout, "Generating report to %s\\n", outputFile.c_str());
+    reportData(outputFile, records);
+
+    return 0;
+}
