@@ -298,3 +298,5 @@ MIT
 - Created/Updated module: `wolfram_data_processing_utility` (See `wolfram_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `portable_data_processing_utility` (See `portable_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `xsharp_data_processing_utility` (See `xsharp_data_processing_utility/README.md` for details)
