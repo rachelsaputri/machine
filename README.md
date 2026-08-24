@@ -264,3 +264,5 @@ MIT
 - Created/Updated module: `unicon_compliance_auditor` (See `unicon_compliance_auditor/README.md` for details)
 
 - Created/Updated module: `turing_compliance_auditor` (See `turing_compliance_auditor/README.md` for details)
+
+- Created/Updated module: `new_threat_detection_system` (See `new_threat_detection_system/README.md` for details)
