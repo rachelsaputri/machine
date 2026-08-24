@@ -1,30 +1,31 @@
 # X++ Data Processing Utility
 
-A comprehensive data processing utility written in X++. This utility provides robust functionalities for ingesting, transforming, validating, and reporting data within the X++ ecosystem.
+## Overview
+This project provides a robust data processing utility built with **XOTcl** (X Window System Object Tcl). It implements a modular pipeline for ingesting, transforming, validating, and reporting on datasets.
 
 ## Features
+- **Modular Pipeline**: Separated components for Ingestion, Transformation, Validation, and Reporting.
+- **Data Validation**: Checks for missing values, type coercion, and schema compliance.
+- **Transformation**: Supports filtering, mapping, and aggregation.
+- **Reporting**: Generates structured summaries of processed data.
 
-- **Data Ingestion**: Efficiently load data from various sources.
-- **Transformation**: Apply complex transformations and mappings to data records.
-- **Validation**: Ensure data integrity with configurable validation rules.
-- **Reporting**: Generate detailed reports on data processing outcomes.
+## Installation
+1. Ensure `tclsh` or `wish` is installed on your system.
+2. Clone this repository.
+3. Run the main script with `tclsh main.xpp`.
 
 ## Usage
+1. **Ingest**: Load data from CSV, JSON, or Text files.
+2. **Validate**: Check data integrity against defined rules.
+3. **Transform**: Apply custom transformation logic.
+4. **Report**: Output processed data to a destination.
 
-To use this utility, include the necessary classes in your project and initialize the `DataProcessor` class.
+## Project Structure
+- `main.xpp`: Entry point for the application.
+- `data_ingester.xpp`: Handles raw data loading.
+- `data_transformer.xpp`: Implements transformation logic.
+- `data_validator.xpp`: Ensures data quality.
+- `reporter.xpp`: Generates output reports.
 
-```xpp
-static void main(Args _args)
-{
-    DataProcessor processor = new DataProcessor();
-    processor.process();
-}
-```
-
-## Files
-
-- `main.xpp`: Entry point for the utility.
-- `data_ingester.xpp`: Handles data loading.
-- `data_transformer.xpp`: Applies data transformations.
-- `data_validator.xpp`: Validates data integrity.
-- `reporter.xpp`: Generates processing reports.
+## License
+MIT License

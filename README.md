@@ -300,3 +300,5 @@ MIT
 - Created/Updated module: `portable_data_processing_utility` (See `portable_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `xsharp_data_processing_utility` (See `xsharp_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `xpp_data_processing_utility` (See `xpp_data_processing_utility/README.md` for details)
