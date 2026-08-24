@@ -284,3 +284,5 @@ MIT
 - Created/Updated module: `./visual_fortran_data_processing_utility` (See `./visual_fortran_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `egllib_data_processing_utility` (See `egllib_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `./euslisp_data_processing_utility` (See `./euslisp_data_processing_utility/README.md` for details)

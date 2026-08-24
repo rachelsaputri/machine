@@ -1,32 +1,17 @@
 # EusLisp Data Processing Utility
 
-## Overview
-This utility provides a set of data processing functions written in EusLisp Robot Programming Language. It includes data ingestion, transformation, validation, and reporting capabilities tailored for robotic data processing workflows.
+This directory contains a data processing utility implemented in EusLisp Robot Programming Language.
 
-## Features
-- **Data Ingestion**: Load data from various formats (CSV, JSON, XML).
-- **Data Transformation**: Apply transformations to data structures.
-- **Data Validation**: Check data integrity and compliance.
-- **Reporting**: Generate reports on processed data.
+## Components
 
-## Directory Structure
-```
-euslisp_data_processing_utility/
-├── README.md
-├── main.l
-├── parser.l
-├── transformer.l
-├── validator.l
-└── reporter.l
-```
+- `data_processor.lisp`: Main processing logic for transforming and validating data pipelines.
 
 ## Usage
-1. Load the necessary modules in your EusLisp environment.
-2. Call the main processing pipeline.
-3. Verify the output using the reporter module.
 
-## Dependencies
-- EusLisp Robot Programming Language
+To run the processor, invoke the `lisp` interpreter:
 
-## License
-MIT
+```bash
+lisp -load data_processor.lisp
+```
+
+Ensure you have valid data structures or files compatible with the expected input format before execution.
