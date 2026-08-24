@@ -1,0 +1,9 @@
+// DataRecord.egl - Definition of the data structure used across the utility
+
+DEFINE CLASS DataRecord
+    PROPERTY id String
+    PROPERTY name String
+    PROPERTY value Numeric
+    PROPERTY computedValue Numeric
+    PROPERTY timestamp TimeStamp
+END CLASS

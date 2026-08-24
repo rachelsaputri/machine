@@ -1,0 +1,51 @@
+// Reporter.egl - Logic to generate reports from processed data
+
+IMPORT System
+
+DEFINE CLASS ReporterModule
+
+    // Generate a summary report
+    METHOD GenerateReport(data DataRecord[], outputPath String)
+        DEFINE count Integer
+        DEFINE totalValue Numeric
+        DEFINE avgValue Numeric
+        DEFINE i Integer
+        DEFINE rec DataRecord
+
+        SET count = COUNT(data)
+        SET totalValue = 0
+
+        FOR i = 1 TO count
+            SET rec = data[i]
+            IF rec.value IS NOT NULL THEN
+                SET totalValue = totalValue + rec.value
+            END IF
+        END FOR
+
+        IF count > 0 THEN
+            SET avgValue = totalValue / count
+        ELSE
+            SET avgValue = 0
+        END IF
+
+        // Write report to file
+        DEFINE reportLine String
+        SET reportLine = "Report for " + TIMESTAMP()
+        OPEN outputPath FOR APPEND
+        WRITE reportLine TO outputPath
+        
+        SET reportLine = "Total Records: " + count
+        WRITE reportLine TO outputPath
+
+        SET reportLine = "Total Value: " + totalValue
+        WRITE reportLine TO outputPath
+
+        SET reportLine = "Average Value: " + avgValue
+        WRITE reportLine TO outputPath
+
+        CLOSE outputPath
+
+        OUTPUT "Report generated: " + outputPath
+    END METHOD
+
+END CLASS

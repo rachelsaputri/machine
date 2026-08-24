@@ -1,0 +1,47 @@
+// Validator.egl - Validation rules to ensure data integrity
+
+IMPORT System
+
+DEFINE CLASS ValidatorModule
+    PROPERTY isValid Boolean DEFAULT False
+
+    // Validate if a file exists and is accessible
+    METHOD ValidateFile(filePath String) RETURN Boolean
+        DEFINE fileExists Boolean
+        SET fileExists = FileExists(filePath)
+        
+        IF fileExists THEN
+            SET this.isValid = True
+            // Additional logic could check file format, headers, etc.
+        ELSE
+            SET this.isValid = False
+            LogError("File not found: " + filePath)
+        END IF
+
+        RETURN this.isValid
+    END METHOD
+
+    // Validate a specific data record structure
+    METHOD ValidateRecord(record DataRecord) RETURN Boolean
+        DEFINE valid Boolean DEFAULT True
+
+        // Check for required fields
+        IF record.id IS NULL THEN
+            SET valid = False
+            LogError("Missing ID in record")
+        END IF
+
+        IF record.value IS NULL THEN
+            SET valid = False
+            LogError("Missing Value in record")
+        END IF
+
+        SET this.isValid = valid
+        RETURN valid
+    END METHOD
+
+    METHOD LogError(message String)
+        OUTPUT "ERROR: " + message
+    END METHOD
+
+END CLASS

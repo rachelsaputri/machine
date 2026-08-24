@@ -1,0 +1,58 @@
+// Main.egl - Entry point for the Data Processing Utility
+
+// Import necessary modules
+IMPORT System
+IMPORT ProcessModule
+IMPORT ValidatorModule
+IMPORT TransformerModule
+IMPORT ReporterModule
+
+DEFINE CLASS MainModule
+    INHERIT processModule
+    PROPERTY inputFile String
+    PROPERTY outputFile String
+    PROPERTY logFile String
+
+    METHOD Main()
+        // Initialize variables
+        Set this.inputFile = "data/input.csv"
+        Set this.outputFile = "data/output.json"
+        Set this.logFile = "logs/process.log"
+
+        // Log start
+        Log("Data Processing Utility Started")
+
+        // Validate input data
+        CALL ValidatorModule.ValidateFile(this.inputFile)
+        IF ValidatorModule.IsValid() THEN
+            // Read and process data
+            DEFINE dataList DataRecord[]
+            READ dataList FROM this.inputFile
+
+            // Transform data
+            DEFINE transformedList DataRecord[]
+            CALL TransformerModule.Transform(dataList, transformedList)
+
+            // Write output
+            WRITE transformedList TO this.outputFile
+
+            // Generate report
+            CALL ReporterModule.GenerateReport(transformedList, this.outputFile)
+            
+            // Log completion
+            Log("Data Processing Utility Completed Successfully")
+        ELSE
+            Log("Validation Failed. Aborting.")
+        END IF
+    END METHOD
+
+    METHOD Log(message String)
+        // Write to log file
+        DEFINE logEntry String
+        SET logEntry = TIMESTAMP() + ": " + message
+        OPEN this.logFile FOR WRITE
+        WRITE logEntry TO this.logFile
+        CLOSE this.logFile
+        OUTPUT logEntry
+    END METHOD
+END CLASS

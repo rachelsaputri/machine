@@ -1,0 +1,34 @@
+// Processor.egl - Core logic for processing data records
+
+IMPORT System
+
+DEFINE CLASS ProcessorModule
+
+    // Process a single record
+    METHOD ProcessRecord(record DataRecord)
+        RETURN record
+    END METHOD
+
+    // Process a batch of records
+    METHOD ProcessBatch(records DataRecord[]) RETURN DataRecord[]
+        DEFINE processedRecords DataRecord[]
+        DEFINE i Integer
+
+        FOR i = 1 TO COUNT(records)
+            CALL this.ProcessRecord(records[i])
+            ADD records[i] TO processedRecords
+        END FOR
+
+        RETURN processedRecords
+    END METHOD
+
+    // Validate a record exists and is non-null
+    METHOD IsValid(record DataRecord) RETURN Boolean
+        IF record IS NULL THEN
+            RETURN False
+        ELSE
+            RETURN True
+        END IF
+    END METHOD
+
+END CLASS

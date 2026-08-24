@@ -1,0 +1,46 @@
+// Transformer.egl - Transformation logic to convert data formats
+
+IMPORT System
+
+DEFINE CLASS TransformerModule
+
+    // Transform a list of records from CSV-like structure to JSON-like structure
+    METHOD Transform(inputData DataRecord[], OUT transformedData DataRecord[])
+        DEFINE i Integer
+        DEFINE newRecord DataRecord
+
+        INITIALIZE transformedData TO []
+
+        FOR i = 1 TO COUNT(inputData)
+            SET newRecord = inputData[i]
+            
+            // Example transformation: Uppercase name field
+            IF newRecord.name IS NOT NULL THEN
+                SET newRecord.name = UPPER(newRecord.name)
+            END IF
+
+            // Example transformation: Add a computed field
+            IF newRecord.value IS NOT NULL THEN
+                SET newRecord.computedValue = newRecord.value * 1.1 // Add 10%
+            END IF
+
+            ADD newRecord TO transformedData
+        END FOR
+    END METHOD
+
+    // Filter out invalid records before transformation
+    METHOD FilterInvalid(inputData DataRecord[], OUT validData DataRecord[])
+        DEFINE i Integer
+        DEFINE rec DataRecord
+
+        INITIALIZE validData TO []
+
+        FOR i = 1 TO COUNT(inputData)
+            SET rec = inputData[i]
+            IF rec.id IS NOT NULL AND rec.value IS NOT NULL THEN
+                ADD rec TO validData
+            END IF
+        END FOR
+    END METHOD
+
+END CLASS
