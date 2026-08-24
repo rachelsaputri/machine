@@ -1,96 +1,16 @@
-/* TACL Data Processing Utility - Main Controller */
+! TACL Data Processing Utility - Main Entry Point
+! This script initializes the data processing pipeline.
 
-/* Define variables */
-$DEFINE VAR DATAFILE = INPUT.DAT
-$DEFINE VAR CONFIGFILE = config.tacl
-$DEFINE VAR REPORTFILE = REPORT.OUT
-$DEFINE VAR STATUS = 0
+DEFINE INPUT_FILE = 'INPUT.TXT'
+DEFINE OUTPUT_FILE = 'OUTPUT.TXT'
+DEFINE REPORT_FILE = 'REPORT.TXT'
+DEFINE LOG_FILE = 'LOG.TXT'
 
-/* Load configuration */
-$CALL CONFIGFILE
+! Read configuration
+INCLUDE config.tacl
 
-/* Main processing loop */
-$DEFINE VAR RECORDCOUNT = 0
-$DEFINE VAR ERRORCOUNT = 0
-$DEFINE VAR PROCESSEDCOUNT = 0
+! Start processing
+PROCESS_DATA INPUT_FILE OUTPUT_FILE REPORT_FILE LOG_FILE
 
-/* Initialize processing */
-$DISPLAY "Starting TACL Data Processing Utility"
-$DISPLAY "Input File: $DATAFILE"
-$DISPLAY "Report File: $REPORTFILE"
-
-/* Open input file */
-$IF NOT OPEN($DATAFILE, READ) THEN
-    $DISPLAY "ERROR: Cannot open input file: $DATAFILE"
-    $SET VAR STATUS = 1
-    $GOTO ENDPROCESS
-$ENDIF
-
-/* Open report file */
-$IF NOT OPEN($REPORTFILE, WRITE) THEN
-    $DISPLAY "ERROR: Cannot open report file: $REPORTFILE"
-    $SET VAR STATUS = 1
-    $GOTO CLOSEINPUT
-$ENDIF
-
-$DISPLAY "Processing data..."
-
-/* Process each record */
-$LOOP
-    /* Read record */
-    $READ NEXT RECORD
-    $IF NOT SUCCESS THEN
-        $GOTO PROCESSINGCOMPLETE
-    $ENDIF
-    
-    $SET VAR RECORDCOUNT = $RECORDCOUNT + 1
-    
-    /* Validate record */
-    $CALL DATA_VALIDATOR RECORD
-    $IF $RESULT != 0 THEN
-        $SET VAR ERRORCOUNT = $ERRORCOUNT + 1
-        $WRITE REPORT "ERROR: Invalid record $RECORDCOUNT"
-        $WRITE REPORT "$LASTERROR"
-        $GOTO NEXTRECORD
-    $ENDIF
-    
-    /* Transform record */
-    $CALL DATA_TRANSFORMER RECORD
-    $IF $RESULT != 0 THEN
-        $SET VAR ERRORCOUNT = $ERRORCOUNT + 1
-        $WRITE REPORT "ERROR: Transformation failed for record $RECORDCOUNT"
-        $WRITE REPORT "$LASTERROR"
-        $GOTO NEXTRECORD
-    $ENDIF
-    
-    /* Write processed record */
-    $WRITE OUTPUT RECORD
-    $IF NOT SUCCESS THEN
-        $SET VAR ERRORCOUNT = $ERRORCOUNT + 1
-        $WRITE REPORT "ERROR: Cannot write processed record $RECORDCOUNT"
-        $GOTO NEXTRECORD
-    $ENDIF
-    
-    $SET VAR PROCESSEDCOUNT = $PROCESSEDCOUNT + 1
-    
-$NEXTRECORD
-    $IF PROCESSEDCOUNT MOD 100 = 0 THEN
-        $DISPLAY "Processed $PROCESSEDCOUNT records..."
-    $ENDIF
-$ENDLOOP
-
-$PROCESSINGCOMPLETE
-    /* Generate final report */
-    $CALL DATA_REPORTER $RECORDCOUNT $ERRORCOUNT $PROCESSEDCOUNT
-    
-    /* Display summary */
-    $DISPLAY "Processing complete:"
-    $DISPLAY "  Total Records: $RECORDCOUNT"
-    $DISPLAY "  Processed: $PROCESSEDCOUNT"
-    $DISPLAY "  Errors: $ERRORCOUNT"
-
-$CLOSEINPUT
-    $CLOSE $DATAFILE
-$ENDPROCESS
-    $DISPLAY "Utility finished with status: $STATUS"
-    $TERMINATE $STATUS
+! End program
+TERMINATE

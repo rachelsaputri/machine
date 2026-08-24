@@ -1,29 +1,29 @@
 # TACL Data Processing Utility
 
-A modular data processing utility written in TACL (Terminal Access Control Language) for handling data ingestion, validation, transformation, and reporting.
+This utility provides a robust framework for data processing using TACL (Terminal Control Language). It includes functionalities for data ingestion, transformation, validation, and reporting.
 
 ## Features
-- Robust data ingestion with error handling
-- Data validation checks
-- Flexible data transformation
-- Comprehensive reporting
-- Configurable processing logic
 
-## File Structure
-- `main.tacl` - Main entry point and control flow
-- `data_processor.tacl` - Core data processing logic
-- `data_validator.tacl` - Validation routines
-- `data_transformer.tacl` - Transformation functions
-- `data_reporter.tacl` - Reporting and output generation
-- `config.tacl` - Configuration parameters
+- **Data Ingestion**: Reads input data from specified sources.
+- **Transformation**: Processes and transforms data according to defined rules.
+- **Validation**: Ensures data integrity and compliance with specified criteria.
+- **Reporting**: Generates comprehensive reports of the data processing results.
 
 ## Usage
-1. Configure parameters in `config.tacl`
-2. Run the main script: `TA main.tacl`
-3. Monitor output for processing results and validation errors
 
-## Error Handling
-The utility includes comprehensive error handling with detailed logging to help diagnose processing issues.
+1. **Configuration**: Edit the `config.tacl` file to specify input/output paths and processing rules.
+2. **Execution**: Run the `main.tacl` script to initiate the data processing pipeline.
+3. **Review**: Check the generated reports in the output directory.
 
-## Customization
-Modify the validation rules in `data_validator.tacl` and transformation logic in `data_transformer.tacl` to suit specific data requirements.
+## File Structure
+
+- `main.tacl`: Entry point script for the data processing utility.
+- `config.tacl`: Configuration file for specifying data sources and processing parameters.
+- `data_processor.tacl`: Core logic for data processing and transformation.
+- `data_reporter.tacl`: Logic for generating reports based on processed data.
+- `data_transformer.tacl`: Functions for transforming data.
+- `data_validator.tacl`: Functions for validating data integrity.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for more details.

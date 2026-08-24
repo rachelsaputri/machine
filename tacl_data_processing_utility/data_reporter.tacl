@@ -1,121 +1,35 @@
-/* TACL Data Processing Utility - Data Reporter */
+! TACL Data Processing Utility - Data Reporter
+! Logic for generating reports based on processed data
 
-/* Reporter configuration */
-$DEFINE VAR REPORTDETAILED = $DETAILEDREPORT
-$DEFINE VAR REPORTTIMESTAMP = $INCLUDETIMESTAMPS
-$DEFINE VAR REPORTFORMAT = $REPORTFORMAT
+GENERATE_REPORT INPUT_FILE OUTPUT_FILE REPORT_FILE
+    OPEN INPUT_FILE FOR READ
+    OPEN OUTPUT_FILE FOR READ
+    OPEN REPORT_FILE FOR WRITE
 
-/* Generate processing report */
-$SUBROUTINE GENERATEPROCESSINGREPORT TOTALRECORDS ERRORCOUNT PROCESSEDCOUNT
-    $DEFINE VAR REPORTSTATUS = 0
-    $DEFINE VAR TIMESTAMP = $GETTIMESTAMP()
-    
-    $DISPLAY "Generating processing report..."
-    
-    /* Open report file */
-    $IF NOT OPEN($REPORTFILE, APPEND) THEN
-        $DISPLAY "ERROR: Cannot open report file"
-        $SET VAR REPORTSTATUS = 1
-        $RETURN $REPORTSTATUS
-    $ENDIF
-    
-    /* Write report header */
-    $WRITE REPORT "=================================================================="
-    $IF $REPORTTIMESTAMP = TRUE THEN
-        $WRITE REPORT "TACL Data Processing Report - $TIMESTAMP"
-    $ELSE
-        $WRITE REPORT "TACL Data Processing Report"
-    $ENDIF
-    $WRITE REPORT "=================================================================="
-    $WRITE REPORT ""
-    
-    /* Write summary statistics */
-    $WRITE REPORT "Processing Summary:"
-    $WRITE REPORT "  Total Records Processed: $TOTALRECORDS"
-    $WRITE REPORT "  Successfully Processed: $PROCESSEDCOUNT"
-    $WRITE REPORT "  Records with Errors: $ERRORCOUNT"
-    $WRITE REPORT ""
-    
-    /* Calculate success rate */
-    $DEFINE VAR SUCCESSRATE = 0
-    $IF $TOTALRECORDS > 0 THEN
-        $SET VAR SUCCESSRATE = ($PROCESSEDCOUNT / $TOTALRECORDS) * 100
-    $ENDIF
-    $WRITE REPORT "Success Rate: $SUCCESSRATE%"
-    $WRITE REPORT ""
-    
-    /* Write detailed error information if configured */
-    $IF $REPORTDETAILED = TRUE THEN
-        $WRITE REPORT "Error Details:"
-        $WRITE REPORT "  Check the error log file for detailed error information"
-        $WRITE REPORT "  Error log location: $ERRORLOGFILE"
-        $WRITE REPORT ""
-    $ENDIF
-    
-    /* Write conclusion */
-    $IF $ERRORCOUNT = 0 THEN
-        $WRITE REPORT "Processing completed successfully with no errors."
-    $ELSE
-        $WRITE REPORT "Processing completed with $ERRORCOUNT error(s) detected."
-    $ENDIF
-    $WRITE REPORT ""
-    $WRITE REPORT "=================================================================="
-    $WRITE REPORT "End of Report"
-    $WRITE REPORT "=================================================================="
-    
-    /* Close report file */
-    $CLOSE $REPORTFILE
-    
-    $DISPLAY "Processing report generated successfully"
-    $RETURN $REPORTSTATUS
-$ENDSUBROUTINE
+    ! Initialize report variables
+    SET RECORD_COUNT = 0
+    SET ERROR_COUNT = 0
+    SET WARNING_COUNT = 0
 
-/* Generate individual record error report */
-$SUBROUTINE GENERATEERRORREPORT RECORDNUMBER ERRORMESSAGE
-    $DEFINE VAR ERRORSTATUS = 0
-    
-    /* Open error log file */
-    $DEFINE VAR ERRORLOGFILE = "ERROR.LOG"
-    $IF NOT OPEN($ERRORLOGFILE, APPEND) THEN
-        $DISPLAY "ERROR: Cannot open error log file"
-        $RETURN 1
-    $ENDIF
-    
-    /* Write error information */
-    $DEFINE VAR TIMESTAMP = $GETTIMESTAMP()
-    $WRITE ERRORLOG "[$TIMESTAMP] Record $RECORDNUMBER: $ERRORMESSAGE"
-    
-    /* Close error log file */
-    $CLOSE $ERRORLOGFILE
-    
-    $RETURN $ERRORSTATUS
-$ENDSUBROUTINE
+    ! Process input file for summary
+    LOOP UNTIL EOF(INPUT_FILE)
+        READ INPUT_FILE INTO RECORD
+        SET RECORD_COUNT = RECORD_COUNT + 1
+        IF CHECK_FOR_ERRORS(RECORD) THEN
+            SET ERROR_COUNT = ERROR_COUNT + 1
+        ELSE IF CHECK_FOR_WARNINGS(RECORD) THEN
+            SET WARNING_COUNT = WARNING_COUNT + 1
+        END IF
+    END LOOP
 
-/* Display summary statistics */
-$SUBROUTINE DISPLAYSUMMARY TOTALRECORDS ERRORCOUNT PROCESSEDCOUNT
-    $DISPLAY "=================================================="
-    $DISPLAY "PROCESSING SUMMARY"
-    $DISPLAY "=================================================="
-    $DISPLAY "Total Records: $TOTALRECORDS"
-    $DISPLAY "Successfully Processed: $PROCESSEDCOUNT"
-    $DISPLAY "Errors Encountered: $ERRORCOUNT"
-    
-    $DEFINE VAR SUCCESSRATE = 0
-    $IF $TOTALRECORDS > 0 THEN
-        $SET VAR SUCCESSRATE = ($PROCESSEDCOUNT / $TOTALRECORDS) * 100
-    $ENDIF
-    $DISPLAY "Success Rate: $SUCCESSRATE%"
-    $DISPLAY "=================================================="
-$ENDSUBROUTINE
+    ! Write report to output
+    WRITE REPORT_FILE 'Report Generated:'
+    WRITE REPORT_FILE 'Total Records: ' + RECORD_COUNT
+    WRITE REPORT_FILE 'Errors: ' + ERROR_COUNT
+    WRITE REPORT_FILE 'Warnings: ' + WARNING_COUNT
 
-/* Utility function to get current timestamp */
-$SUBROUTINE GETTIMESTAMP
-    /* Return current date and time */
-    $DEFINE VAR CURRENTDATE = $GETDATE()
-    $DEFINE VAR CURRENTTIME = $GETTIME()
-    $DEFINE VAR TIMESTAMP = "$CURRENTDATE $CURRENTTIME"
-    
-    $RETURN $TIMESTAMP
-$ENDSUBROUTINE
-
-$DISPLAY "Data Reporter initialized successfully"
+    ! Close files
+    CLOSE INPUT_FILE
+    CLOSE OUTPUT_FILE
+    CLOSE REPORT_FILE
+END GENERATE_REPORT

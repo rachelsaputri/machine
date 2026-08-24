@@ -1,62 +1,46 @@
-/* TACL Data Processing Utility - Data Processor */
+! TACL Data Processing Utility - Data Processor
+! Core logic for data processing and transformation
 
-/* Global processing variables */
-$DEFINE VAR PROCESSINGSTATE = 0  /* 0=init, 1=processing, 2=error, 3=complete */
-$DEFINE VAR PROCESSINGERROR = ""
+PROCESS_DATA INPUT_FILE OUTPUT_FILE REPORT_FILE LOG_FILE
+    OPEN INPUT_FILE FOR READ
+    OPEN OUTPUT_FILE FOR WRITE
+    OPEN REPORT_FILE FOR WRITE
+    OPEN LOG_FILE FOR WRITE
 
-/* Initialize data processor */
-$DEFINE VAR PROCSTATUS = 0
-$DISPLAY "Initializing Data Processor"
+    ! Initialize counters
+    SET TOTAL_RECORDS = 0
+    SET SUCCESSFUL_RECORDS = 0
+    SET FAILED_RECORDS = 0
 
-/* Core processing function */
-$SUBROUTINE PROCESSDATA INPUTDATA
-    $DEFINE VAR LOCALRESULT = 0
-    
-    $SET VAR PROCESSINGSTATE = 1
-    $DISPLAY "Processing data: $INPUTDATA"
-    
-    /* Perform data validation */
-    $CALL DATA_VALIDATOR INPUTDATA
-    $IF $RESULT != 0 THEN
-        $SET VAR LOCALRESULT = 1
-        $SET VAR PROCESSINGSTATE = 2
-        $SET VAR PROCESSINGERROR = "Validation failed"
-        $RETURN $LOCALRESULT
-    $ENDIF
-    
-    /* Perform data transformation */
-    $CALL DATA_TRANSFORMER INPUTDATA
-    $IF $RESULT != 0 THEN
-        $SET VAR LOCALRESULT = 1
-        $SET VAR PROCESSINGSTATE = 2
-        $SET VAR PROCESSINGERROR = "Transformation failed"
-        $RETURN $LOCALRESULT
-    $ENDIF
-    
-    /* Mark as successfully processed */
-    $SET VAR PROCESSINGSTATE = 3
-    $SET VAR LOCALRESULT = 0
-    
-    $RETURN $LOCALRESULT
-$ENDSUBROUTINE
+    ! Process each record
+    LOOP UNTIL EOF(INPUT_FILE)
+        READ INPUT_FILE INTO RECORD
+        SET TOTAL_RECORDS = TOTAL_RECORDS + 1
+        
+        ! Validate record
+        IF VALIDATE_RECORD(RECORD) THEN
+            ! Transform record
+            SET TRANSFORMED_RECORD = TRANSFORM_RECORD(RECORD)
+            
+            ! Write to output
+            WRITE OUTPUT_FILE TRANSFORMED_RECORD
+            SET SUCCESSFUL_RECORDS = SUCCESSFUL_RECORDS + 1
+            LOG LOG_FILE 'INFO' 'Record processed successfully: ' + RECORD
+        ELSE
+            SET FAILED_RECORDS = FAILED_RECORDS + 1
+            LOG LOG_FILE 'ERROR' 'Record validation failed: ' + RECORD
+        END IF
+    END LOOP
 
-/* Get current processing state */
-$SUBROUTINE GETPROCESSINGSTATE
-    $DEFINE VAR LOCALSTATE = $PROCESSINGSTATE
-    $RETURN $LOCALSTATE
-$ENDSUBROUTINE
+    ! Write summary report
+    WRITE REPORT_FILE 'Processing Summary:'
+    WRITE REPORT_FILE 'Total Records: ' + TOTAL_RECORDS
+    WRITE REPORT_FILE 'Successful Records: ' + SUCCESSFUL_RECORDS
+    WRITE REPORT_FILE 'Failed Records: ' + FAILED_RECORDS
 
-/* Get last processing error */
-$SUBROUTINE GETPROCESSINGERROR
-    $DEFINE VAR LOCALERROR = $PROCESSINGERROR
-    $RETURN $LOCALERROR
-$ENDSUBROUTINE
-
-/* Reset processor state */
-$SUBROUTINE RESETPROCESSOR
-    $SET VAR PROCESSINGSTATE = 0
-    $SET VAR PROCESSINGERROR = ""
-    $DISPLAY "Data processor reset"
-$ENDSUBROUTINE
-
-$DISPLAY "Data Processor initialized successfully"
+    ! Close files
+    CLOSE INPUT_FILE
+    CLOSE OUTPUT_FILE
+    CLOSE REPORT_FILE
+    CLOSE LOG_FILE
+END PROCESS_DATA
