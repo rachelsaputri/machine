@@ -316,3 +316,5 @@ MIT
 - Created/Updated module: `mercury_data_processing_utility` (See `mercury_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./act3_data_processing_utility` (See `./act3_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `data_processing_actionscript_utility` (See `data_processing_actionscript_utility/README.md` for details)
