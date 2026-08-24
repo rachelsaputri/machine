@@ -1,0 +1,12 @@
+// Core data processing logic
+IMPORT validator
+
+FUNCTION ingest_data(source)
+    // Simulate data ingestion
+    LET data = []
+    // In a real implementation, read from file or stream
+    APPEND data, {"id": 1, "value": "alpha"}
+    APPEND data, {"id": 2, "value": "beta"}
+    APPEND data, {"id": 3, "value": "gamma"}
+    RETURN data
+END FUNCTION

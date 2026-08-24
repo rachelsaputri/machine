@@ -1,0 +1,8 @@
+// Data reporting functions
+FUNCTION report_results(data)
+    PRINT "Processed Data Results:"
+    FOR EACH item IN data DO
+        PRINT "ID: " + item.id + ", Value: " + item.value
+    END FOR
+    PRINT "Total items processed: " + LENGTH(data)
+END FUNCTION

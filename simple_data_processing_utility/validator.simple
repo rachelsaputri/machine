@@ -1,0 +1,16 @@
+// Data validation rules
+FUNCTION validate_data(data)
+    // Check if data is not empty
+    IF LENGTH(data) == 0 THEN
+        RETURN FALSE
+    END IF
+    
+    // Check if each item has required fields
+    FOR EACH item IN data DO
+        IF NOT HAS_KEY(item, "id") OR NOT HAS_KEY(item, "value") THEN
+            RETURN FALSE
+        END IF
+    END FOR
+    
+    RETURN TRUE
+END FUNCTION

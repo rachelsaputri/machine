@@ -1,0 +1,24 @@
+// Main entry point for the SiMPLE data processing utility
+IMPORT processor
+IMPORT transformer
+IMPORT validator
+IMPORT reporter
+
+FUNCTION main()
+    // Initialize data source
+    LET dataSource = "input.csv"
+    
+    // Ingest data
+    LET rawData = ingest_data(dataSource)
+    
+    // Validate data
+    IF validate_data(rawData) THEN
+        // Transform data
+        LET transformedData = transform_data(rawData)
+        
+        // Report results
+        report_results(transformedData)
+    ELSE
+        PRINT "Data validation failed."
+    END IF
+END FUNCTION

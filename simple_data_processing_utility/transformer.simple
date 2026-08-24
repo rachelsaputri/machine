@@ -1,0 +1,13 @@
+// Data transformation functions
+FUNCTION transform_data(data)
+    LET transformed = []
+    FOR EACH item IN data DO
+        // Apply transformation logic
+        LET newItem = {
+            "id": item.id,
+            "value": TO_UPPER(item.value)
+        }
+        APPEND transformed, newItem
+    END FOR
+    RETURN transformed
+END FUNCTION
