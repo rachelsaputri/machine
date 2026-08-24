@@ -1,103 +1,38 @@
-/* TACL Data Processing Utility - Data Validator */
+! TACL Data Processing Utility - Data Validator
+! Functions for validating data integrity
 
-/* Validation configuration */
-$DEFINE VAR VALIDATIONMODE = $STRICTVALIDATION
-$DEFINE VAR MAXERRORLENGTH = $MAXFIELDLENGTH
+VALIDATE_RECORD RECORD
+    ! Check if record is non-empty
+    IF LENGTH(TRIM(RECORD)) = 0 THEN
+        RETURN FALSE
+    END IF
+    
+    ! Check for fixed length (example: 10 characters)
+    IF LENGTH(RECORD) != 10 THEN
+        RETURN FALSE
+    END IF
+    
+    ! Check if numeric (example: first 5 characters)
+    SET NUMERIC_PART = SUBSTRING(RECORD, 1, 5)
+    IF NOT IS_NUMERIC(NUMPART) THEN
+        RETURN FALSE
+    END IF
+    
+    ! All checks passed
+    RETURN TRUE
+END VALIDATE_RECORD
 
-/* Data validation function */
-$SUBROUTINE VALIDATEINPUTDATA INPUTDATA
-    $DEFINE VAR VALIDATIONSTATUS = 0
-    $DEFINE VAR FIELDINDEX = 0
-    $DEFINE VAR FIELDVALUE = ""
-    
-    /* Check for empty data */
-    $IF $LENGTH($INPUTDATA) = 0 THEN
-        $SET VAR VALIDATIONSTATUS = 1
-        $SET VAR $LASTERROR = "Empty input data"
-        $RETURN $VALIDATIONSTATUS
-    $ENDIF
-    
-    /* Validate field lengths */
-    $DEFINE VAR FIELDLIST = $SPLIT($INPUTDATA, ",")
-    
-    $LOOP
-        $SET VAR FIELDINDEX = $FIELDINDEX + 1
-        $IF $FIELDINDEX > $LENGTH($FIELDLIST) THEN
-            $GOTO VALIDATIONCOMPLETE
-        $ENDIF
-        
-        $SET VAR FIELDVALUE = $FIELDLIST($FIELDINDEX)
-        
-        /* Check field length */
-        $IF $LENGTH($FIELDVALUE) > $MAXFIELDLENGTH THEN
-            $SET VAR VALIDATIONSTATUS = 1
-            $SET VAR $LASTERROR = "Field $FIELDINDEX exceeds maximum length"
-            $RETURN $VALIDATIONSTATUS
-        $ENDIF
-        
-        /* Check for blank fields if strict validation */
-        $IF $VALIDATIONMODE = 1 AND $LENGTH($FIELDVALUE) = 0 THEN
-            $SET VAR VALIDATIONSTATUS = 1
-            $SET VAR $LASTERROR = "Blank field found in $FIELDINDEX"
-            $RETURN $VALIDATIONSTATUS
-        $ENDIF
-        
-    $ENDLOOP
-
-$VALIDATIONCOMPLETE
-    $IF $VALIDATIONSTATUS = 0 THEN
-        $DISPLAY "Data validation successful"
-    $ELSE
-        $DISPLAY "Data validation failed: $LASTERROR"
-    $ENDIF
-    
-    $RETURN $VALIDATIONSTATUS
-$ENDSUBROUTINE
-
-/* Specialized validation for numeric fields */
-$SUBROUTINE VALIDATEFIELDNUMERIC FIELDVALUE
-    $DEFINE VAR NUMSTATUS = 0
-    
-    /* Check if field is numeric */
-    $DEFINE VAR DIGITCHECK = $CHECKNUMERIC($FIELDVALUE)
-    
-    $IF $DIGITCHECK = 0 THEN
-        $SET VAR NUMSTATUS = 1
-        $SET VAR $LASTERROR = "Non-numeric value in numeric field"
-    $ENDIF
-    
-    $RETURN $NUMSTATUS
-$ENDSUBROUTINE
-
-/* Specialized validation for date fields */
-$SUBROUTINE VALIDATEFIELDDATE FIELDVALUE
-    $DEFINE VAR DATESTATUS = 0
-    
-    /* Basic date format validation (YYYY-MM-DD) */
-    $IF $LENGTH($FIELDVALUE) != 10 THEN
-        $SET VAR DATESTATUS = 1
-        $SET VAR $LASTERROR = "Invalid date format"
-        $RETURN $DATESTATUS
-    $ENDIF
-    
-    /* Check separator characters */
-    $IF $SUBSTR($FIELDVALUE, 5, 1) != "-" OR $SUBSTR($FIELDVALUE, 8, 1) != "-" THEN
-        $SET VAR DATESTATUS = 1
-        $SET VAR $LASTERROR = "Invalid date separators"
-        $RETURN $DATESTATUS
-    $ENDIF
-    
-    /* Check numeric components */
-    $DEFINE VAR YEARPART = $SUBSTR($FIELDVALUE, 1, 4)
-    $DEFINE VAR MONTHPART = $SUBSTR($FIELDVALUE, 6, 2)
-    $DEFINE VAR DAYPART = $SUBSTR($FIELDVALUE, 9, 2)
-    
-    $IF NOT $CHECKNUMERIC($YEARPART) OR NOT $CHECKNUMERIC($MONTHPART) OR NOT $CHECKNUMERIC($DAYPART) THEN
-        $SET VAR DATESTATUS = 1
-        $SET VAR $LASTERROR = "Non-numeric date components"
-    $ENDIF
-    
-    $RETURN $DATESTATUS
-$ENDSUBROUTINE
-
-$DISPLAY "Data Validator initialized successfully"
+IS_NUMERIC TEXT
+    SET NUMERIC_CHARS = '0123456789'
+    SET VALID = TRUE
+    SET I = 1
+    LOOP WHILE I <= LENGTH(TEXT)
+        SET CHAR = SUBSTRING(TEXT, I, 1)
+        IF INDEX(NUMERIC_CHARS, CHAR) = 0 THEN
+            SET VALID = FALSE
+            BREAK LOOP
+        END IF
+        SET I = I + 1
+    END LOOP
+    RETURN VALID
+END IS_NUMERIC

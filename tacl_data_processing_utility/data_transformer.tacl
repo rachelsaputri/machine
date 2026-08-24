@@ -1,101 +1,39 @@
-/* TACL Data Processing Utility - Data Transformer */
+! TACL Data Processing Utility - Data Transformer
+! Functions for transforming data
 
-/* Transformation configuration */
-$DEFINE VAR CONVERTTOUPPERCASE = $CONVERTTOUPPER
-$DEFINE VAR TRIMDATA = $TRIMSPACES
-$DEFINE VAR STANDARDIZEDELIM = $STANDARDIZEDELIMITERS
+TRANSFORM_RECORD RECORD
+    ! Apply date format transformation
+    SET RECORD = FORMAT_DATE(RECORD)
+    
+    ! Apply uppercase transformation
+    SET RECORD = CONVERT_TO_UPPERCASE(RECORD)
+    
+    ! Apply capitalize first letter transformation
+    SET RECORD = CAPITALIZE_FIRST_LETTER(RECORD)
+    
+    RETURN RECORD
+END TRANSFORM_RECORD
 
-/* Main transformation function */
-$SUBROUTINE TRANSFORMINPUTDATA INPUTDATA
-    $DEFINE VAR TRANSFORMSTATUS = 0
-    $DEFINE VAR RESULTDATA = $INPUTDATA
-    
-    /* Apply trimming if configured */
-    $IF $TRIMDATA = TRUE THEN
-        $SET VAR RESULTDATA = $TRIM($RESULTDATA)
-    $ENDIF
-    
-    /* Apply case conversion if configured */
-    $IF $CONVERTTOUPPERCASE = TRUE THEN
-        $SET VAR RESULTDATA = $UPPER($RESULTDATA)
-    $ELSE
-        $SET VAR RESULTDATA = $LOWER($RESULTDATA)
-    $ENDIF
-    
-    /* Standardize delimiters if configured */
-    $IF $STANDARDIZEDELIM = TRUE THEN
-        /* Replace various delimiters with comma */
-        $SET VAR RESULTDATA = $REPLACE($RESULTDATA, ";", ",")
-        $SET VAR RESULTDATA = $REPLACE($RESULTDATA, "\t", ",")
-        $SET VAR RESULTDATA = $REPLACE($RESULTDATA, "|", ",")
-    $ENDIF
-    
-    /* Additional transformation logic can be added here */
-    /* Example: Remove special characters */
-    /* $SET VAR RESULTDATA = $REPLACE($RESULTDATA, "[^A-Z0-9,]", "") */
-    
-    $DISPLAY "Data transformation completed"
-    
-    /* Return transformed data via global variable */
-    $SET VAR $TRANSFORMEDDATA = $RESULTDATA
-    
-    $RETURN $TRANSFORMSTATUS
-$ENDSUBROUTINE
+FORMAT_DATE RECORD
+    ! Example: Convert 'MM/DD/YYYY' to 'YYYY-MM-DD'
+    SET DATE_PARTS = SPLIT(RECORD, '/')
+    IF LENGTH(DATE_PARTS) = 3 THEN
+        SET FORMATTED_DATE = DATE_PARTS[3] + '-' + DATE_PARTS[1] + '-' + DATE_PARTS[2]
+        SET RECORD = REPLACE(RECORD, DATE_PARTS[1] + '/' + DATE_PARTS[2] + '/' + DATE_PARTS[3], FORMATTED_DATE)
+    END IF
+    RETURN RECORD
+END FORMAT_DATE
 
-/* Field-level transformation function */
-$SUBROUTINE TRANSFORMFIELD FIELDVALUE FIELDTYPE
-    $DEFINE VAR FIELDSTATUS = 0
-    $DEFINE VAR TRANSFORMEDFIELD = $FIELDVALUE
-    
-    /* Apply type-specific transformations */
-    $CASE $FIELDTYPE
-        $CASE "ALPHA"
-            /* Alpha fields: ensure uppercase */
-            $SET VAR TRANSFORMEDFIELD = $UPPER($TRANSFORMEDFIELD)
-        
-        $CASE "NUMERIC"
-            /* Numeric fields: remove non-numeric characters */
-            /* $SET VAR TRANSFORMEDFIELD = $NUMONLY($TRANSFORMEDFIELD) */
-        
-        $CASE "DATE"
-            /* Date fields: standardize format */
-            /* Already handled by validation */
-        
-        $CASE "EMAIL"
-            /* Email fields: ensure lowercase */
-            $SET VAR TRANSFORMEDFIELD = $LOWER($TRANSFORMEDFIELD)
-        
-        $CASE DEFAULT
-            /* Default: no transformation */
-        $ENDCASE
-    
-    $SET VAR $TRANSFORMEDFIELD = $TRANSFORMEDFIELD
-    $RETURN $FIELDSTATUS
-$ENDSUBROUTINE
+CONVERT_TO_UPPERCASE TEXT
+    RETURN UPPER(TEXT)
+END CONVERT_TO_UPPERCASE
 
-/* Batch transformation for arrays */
-$SUBROUTINE TRANSFORMFIELDARRAY FIELDARRAY
-    $DEFINE VAR ARRAYSTATUS = 0
-    $DEFINE VAR ARRAYINDEX = 0
-    $DEFINE VAR ITEMARRAY = $LENGTH($FIELDARRAY)
-    
-    $LOOP
-        $SET VAR ARRAYINDEX = $ARRAYINDEX + 1
-        $IF $ARRAYINDEX > $ITEMARRAY THEN
-            $GOTO ARRAYTRANSFORMCOMPLETE
-        $ENDIF
-        
-        /* Transform each array item */
-        $CALL TRANSFORMFIELD $FIELDARRAY($ARRAYINDEX) "ALPHA"
-        $SET VAR FIELDARRAY($ARRAYINDEX) = $TRANSFORMEDFIELD
-        
-    $ENDLOOP
-
-$ARRAYTRANSFORMCOMPLETE
-    $SET VAR $TRANSFORMEDARRAY = $FIELDARRAY
-    $DISPLAY "Array transformation completed"
-    
-    $RETURN $ARRAYSTATUS
-$ENDSUBROUTINE
-
-$DISPLAY "Data Transformer initialized successfully"
+CAPITALIZE_FIRST_LETTER TEXT
+    IF LENGTH(TEXT) > 0 THEN
+        SET FIRST_CHAR = SUBSTRING(TEXT, 1, 1)
+        SET REST_OF_TEXT = SUBSTRING(TEXT, 2)
+        RETURN UPPER(FIRST_CHAR) + REST_OF_TEXT
+    ELSE
+        RETURN TEXT
+    END IF
+END CAPITALIZE_FIRST_LETTER

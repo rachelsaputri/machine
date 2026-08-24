@@ -250,3 +250,5 @@ MIT
 - Created/Updated module: `able_compliance_data_extractor` (See `able_compliance_data_extractor/README.md` for details)
 
 - Created/Updated module: `napier88_data_processing_utility` (See `napier88_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `tacl_data_processing_utility` (See `tacl_data_processing_utility/README.md` for details)
