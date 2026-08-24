@@ -304,3 +304,5 @@ MIT
 - Created/Updated module: `xpp_data_processing_utility` (See `xpp_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `clist_data_processing_utility` (See `clist_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `assembly_data_processing_utility` (See `assembly_data_processing_utility/README.md` for details)
