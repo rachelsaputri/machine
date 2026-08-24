@@ -324,3 +324,5 @@ MIT
 - Created/Updated module: `alice_data_processing_utility` (See `alice_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `clarion_data_processing_utility` (See `clarion_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `./argus_data_processing_utility` (See `./argus_data_processing_utility/README.md` for details)
