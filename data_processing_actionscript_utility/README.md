@@ -1,88 +1,64 @@
-# Data Processing Utility (ActionScript 3.0)
+# Data Processing Utility (ActionScript)
+
+This repository contains a modular, reusable utility for processing, transforming, validating, and exporting data, written strictly in ActionScript 3.0.
 
 ## Overview
 
-A complete, production-ready ActionScript 3.0 data processing utility that handles:
+The `data_processing_actionscript_utility` package provides a robust foundation for handling data pipelines within Flash/AIR applications or server-side ActionScript environments. It separates concerns into distinct components for data ingestion, validation, transformation, and export.
 
-- **Data Ingestion**: Parses delimited text data (CSV, TSV, etc.)
-- **Validation**: Configurable validation rules (non-empty, numeric, custom)
-- **Transformation**: Converts records to XML format for internal processing
-- **Export**: Exports processed data to CSV, JSON, and XML formats
-- **Error Handling**: Comprehensive error collection and reporting
+## Components
 
-## Features
+- **DataProcessor**: The main orchestrator class. It holds the data, applies filters, runs transformations, and manages export operations.
+- **DataTransformer**: Handles the actual transformation logic, applying provided functions to data items or entire arrays.
+- **DataValidator**: Ensures data integrity. It validates arrays, objects, and can optionally check against a basic schema structure.
+- **DataExporter**: Standardizes the output of processed data into different formats (Object or JSON).
+- **DataTypes**: Utility class containing constants for data type identification.
+- **DataProcessorUnit**: A higher-level wrapper class that bundles the processor with a specific name, making it easy to manage multiple data pipelines concurrently.
 
-### Robust CSV Parsing
-- Handles quoted fields with embedded delimiters
-- Supports escaped quotes within quoted fields
-- Configurable delimiter (comma, tab, semicolon, etc.)
-- Header skipping option
-
-### Validation Rules
-- `non_empty`: Ensures all fields are non-empty
-- `numeric_first`: Ensures first field is numeric
-- `none`: No validation (default)
-
-### Export Formats
-- **CSV**: Properly escaped and quoted output
-- **JSON**: Human-readable formatted JSON
-- **XML**: Structured XML output
-
-### Error Handling
-- Collects all errors during processing
-- Reports line numbers for problematic records
-- Skips invalid records without halting processing
-- Tracks record count and error count
-
-## Usage
-
-### Basic Processing
+## Usage Example
 
 ```actionscript
-var config:XML = <config>
-	<delimiter>,</delimiter>
-	<skipHeaders>true</skipHeaders>
-	<validationRule>non_empty</validationRule>
-</config>;
+import data_processing_actionscript_utility.DataProcessor;
+import data_processing_actionscript_utility.DataProcessorUnit;
 
-var result:* = DataProcessor.processData(dataString, config);
+// Create a unit with initial data
+var initialData:Array = [
+    { id: 1, value: "foo", active: true },
+    { id: 2, value: "bar", active: false },
+    { id: 3, value: "baz", active: true }
+];
 
-// Access results
-trace("Records: " + result.count);
-trace("Errors: " + result.errorCount);
+var unit:DataProcessorUnit = new DataProcessorUnit("MainPipeline", initialData);
 
-for each (var record:XML in result.data) {
-	trace(record.field_1.toString());
+// Define a transform function
+target = function(item:Object):Object {
+    item.value = item.value.toUpperCase();
+    item.computed = item.id * 2;
+    return item;
 }
+
+// Define a filter function
+criteria = function(item:Object):Boolean {
+    return item.active == true;
+}
+
+// Run the pipeline
+var results:Array = unit.runPipeline(transformFunction, filterFunction);
+
+// Export results
+var exportedData:Object = unit.exportResults("json");
+trace(exportedData);
 ```
 
-### Exporting Data
+## Installation
 
-```actionscript
-var csvOutput:String = DataProcessor.exportData(dataArray, "csv");
-var jsonOutput:String = DataProcessor.exportData(dataArray, "json");
-var xmlOutput:String = DataProcessor.exportData(dataArray, "xml");
-```
+Simply copy the `.as` files from this directory into your project's source folder and ensure the package structure matches (`data_processing_actionscript_utility`).
 
-## Limitations
+## Dependencies
 
-- Maximum record size: 1MB
-- Maximum field size: 10KB
-- Requires Flash Player 9+ or AIR runtime
-
-## Files
-
-- `DataProcessor.as`: Main processing logic
-- `main.as`: Entry point with sample data and UI
-- `DataProcessorUnit.pas`: Pascal unit (reference only)
-- `DataTypes.pas`: Pascal types (reference only)
-- `README.md`: This documentation
-
-## Requirements
-
-- Adobe Flash Player 9.0+ or Adobe AIR 1.0+
-- ActionScript 3.0 compiler
+- Flash Player 10+ or Adobe AIR 1.5+ (for JSON support)
+- Standard ActionScript 3.0 Language Reference
 
 ## License
 
-MIT License
+MIT
