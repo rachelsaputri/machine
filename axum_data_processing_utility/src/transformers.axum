@@ -1,0 +1,37 @@
+package transformers
+
+import "types"
+
+// Transformer interface for data transformation
+struct Transformer {
+    name: string
+    applyFn: func(data: [types.DataRecord]) -> [types.DataRecord]
+}
+
+// Create all available transformers
+fn createAllTransformers() -> [Transformer] {
+    return [
+        Transformer {
+            name: "Standardize Values",
+            applyFn: fn(data) -> [types.DataRecord] {
+                let result = []
+                for record in data {
+                    record.value = round(record.value, 2) // Round to 2 decimal places
+                    result.push(record)
+                }
+                return result
+            }
+        },
+        Transformer {
+            name: "Add Processing Flag",
+            applyFn: fn(data) -> [types.DataRecord] {
+                let result = []
+                for record in data {
+                    record.metadata["processed"] = "true"
+                    result.push(record)
+                }
+                return result
+            }
+        }
+    ]
+}

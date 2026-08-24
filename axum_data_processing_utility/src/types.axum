@@ -1,0 +1,25 @@
+package types
+
+// Basic data record structure
+struct DataRecord {
+    id: string
+    timestamp: string
+    dataType: string
+    value: float
+    metadata: map<string, string>
+}
+
+// Error record for reporting
+struct ErrorRecord {
+    recordId: string
+    errorMessage: string
+    ruleId: string
+}
+
+// Status of the processing run
+struct ProcessingStatus {
+    totalRecords: int
+    validRecords: int
+    invalidRecords: int
+    processingTime: float
+}

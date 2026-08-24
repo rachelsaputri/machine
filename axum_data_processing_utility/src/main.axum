@@ -1,0 +1,50 @@
+package main
+
+import "pipeline"
+import "types"
+import "validators"
+import "transformers"
+import "reports"
+
+// Main entry point for the data processing utility
+fn main() {
+    console.log("Starting Axum Data Processing Utility...")
+
+    // Define the data pipeline
+    let config = {
+        inputPath: "input/",
+        outputPath: "output/",
+        logLevel: "INFO"
+    }
+
+    try {
+        // Initialize the pipeline
+        let pipelineInstance = pipeline.new(config)
+
+        // Load data
+        console.log("Loading data from input directory...")
+        let rawData = pipelineInstance.load(config.inputPath)
+
+        // Validate data
+        console.log("Validating data...")
+        let validatedData = pipelineInstance.validate(rawData, validators.createAllRules())
+
+        // Transform data
+        console.log("Transforming data...")
+        let transformedData = pipelineInstance.transform(validatedData, transformers.createAllTransformers())
+
+        // Generate report
+        console.log("Generating report...")
+        let report = reports.createReport(transformedData)
+
+        // Save report and transformed data
+        console.log("Saving results...")
+        pipelineInstance.save(transformedData, config.outputPath)
+        reports.saveReport(report, config.outputPath)
+
+        console.log("Processing completed successfully.")
+    } catch error {
+        console.log("Error during processing: " + error.message)
+        exit(1)
+    }
+}

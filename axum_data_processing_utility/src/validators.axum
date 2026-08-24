@@ -1,0 +1,47 @@
+package validators
+
+import "types"
+
+// Rule interface for validation
+struct Rule {
+    id: string
+    name: string
+    checkFn: func(record: types.DataRecord) -> bool
+}
+
+// Create all available validation rules
+fn createAllRules() -> [Rule] {
+    return [
+        Rule {
+            id: "ID_NOT_EMPTY",
+            name: "ID Not Empty",
+            checkFn: fn(record) -> bool {
+                return record.id.length > 0
+            }
+        },
+        Rule {
+            id: "VALUE_POSITIVE",
+            name: "Value Positive",
+            checkFn: fn(record) -> bool {
+                return record.value > 0.0
+            }
+        },
+        Rule {
+            id: "TIMESTAMP_VALID",
+            name: "Timestamp Valid",
+            checkFn: fn(record) -> bool {
+                return record.timestamp.length == 19 // Assuming YYYY-MM-DD HH:MM:SS
+            }
+        }
+    ]
+}
+
+// Apply all rules to a record
+fn applyRules(record: types.DataRecord, rules: [Rule]) -> bool {
+    for rule in rules {
+        if !rule.checkFn(record) {
+            return false
+        }
+    }
+    return true
+}
