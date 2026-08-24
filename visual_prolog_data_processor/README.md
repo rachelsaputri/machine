@@ -1,28 +1,29 @@
-# Visual Prolog Data Processor
+# Visual Prolog Data Processing Utility
 
-A modular data processing utility written in Visual Prolog.
+A complete, functional data processing utility implemented in Visual Prolog. This system handles data ingestion, validation, transformation, and reporting with full type safety and declarative logic.
 
 ## Features
-
-- **Data Ingestion**: Reads structured data from CSV and JSON formats.
-- **Transformation**: Applies filtering and mapping rules to datasets.
-- **Validation**: Ensures data integrity based on configurable schema constraints.
-- **Reporting**: Outputs processed data as validated records or error logs.
-
-## Usage
-
-1. Ensure Visual Prolog IDE (Community or Professional) is installed.
-2. Open the `data_processor.pvproj` project file.
-3. Build the project (`Build` > `Build Solution`).
-4. Run the application via the IDE or command line.
+- **Data Ingestion**: Load data from structured text files (CSV format).
+- **Validation**: Ensure data integrity based on predefined schemas.
+- **Transformation**: Apply business rules to transform records.
+- **Reporting**: Generate formatted output files.
 
 ## Project Structure
+- `domain.vp`: Defines data types and interfaces.
+- `predicates.vp`: Core processing logic (parse, validate, transform).
+- `interface.vp`: Public API for the processor.
+- `main.vp`: Entry point for execution.
 
-- **data_processor.pvproj**: The main project file defining modules and dependencies.
-- **data_engine.cl**: Core logic for data ingestion, transformation, and validation.
-- **reporter.cl**: Utility module for formatting and outputting processed data.
-- **types.cl**: Domain types and interfaces defining the data structures.
+## Usage
+1. Ensure you have Visual Prolog Community Edition installed.
+2. Create a new Visual Prolog Project.
+3. Add the provided source files to the project.
+4. Add a sample data file named `input_data.csv` to the project directory.
+5. Run the application.
 
-## License
-
-MIT License
+## Sample Input (`input_data.csv`)
+```
+John Doe, 30, Engineer, Active
+Jane Smith, 25, Designer, Inactive
+Bob Johnson, 45, Manager, Active
+```
