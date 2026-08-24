@@ -1,0 +1,40 @@
+#type Report = { total_processed: int, valid_count: int, invalid_count: int };
+#type DataRecord = { id: int, value: string, timestamp: int };
+
+#func to_string(input: int): string {
+    if (input == 0) {
+        return "0";
+    }
+    let negative: bool = input < 0;
+    let num: int = negative ? -input : input;
+    let digits: string[] = empty;
+    while (num > 0) {
+        let remainder: int = num % 10;
+        let digit: string = to_string(remainder);
+        digits = prepend(digits, digit);
+        num = num / 10;
+    }
+    let result: string = "";
+    for (d: string in digits) {
+        result = result + d;
+    }
+    if (negative) {
+        result = "-" + result;
+    }
+    return result;
+}
+
+#func print_report(report: Report) {
+    println("Data Processing Report");
+    println("---------------------");
+    println("Total Processed: " + to_string(report.total_processed));
+    println("Valid Records: " + to_string(report.valid_count));
+    println("Invalid Records: " + to_string(report.invalid_count));
+}
+
+#func print_records(records: DataRecord[]) {
+    println("Processed Data:");
+    for (record: DataRecord in records) {
+        println("  ID: " + to_string(record.id) + ", Value: " + record.value + ", Timestamp: " + to_string(record.timestamp));
+    }
+}

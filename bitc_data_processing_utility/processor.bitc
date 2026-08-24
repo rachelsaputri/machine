@@ -1,0 +1,29 @@
+#import "bitc::string"
+
+#type DataRecord = { id: int, value: string, timestamp: int };
+
+#func to_upper(input: string): string {
+    let result: string = "";
+    for (c: char in input) {
+        if (c >= 'a' && c <= 'z') {
+            result = result + to_string(c - 'a' + 'A');
+        } else {
+            result = result + to_string(c);
+        }
+    }
+    return result;
+}
+
+#func transform_record(record: DataRecord): DataRecord {
+    let transformed_value: string = to_upper(record.value);
+    return { id: record.id, value: transformed_value, timestamp: record.timestamp };
+}
+
+#func process_records(records: DataRecord[]): DataRecord[] {
+    let processed: DataRecord[] = empty;
+    for (record: DataRecord in records) {
+        let transformed: DataRecord = transform_record(record);
+        processed = append(processed, transformed);
+    }
+    return processed;
+}

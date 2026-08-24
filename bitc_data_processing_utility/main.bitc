@@ -1,0 +1,75 @@
+#import "bitc::system"
+#import "bitc::vector"
+#import "bitc::string"
+
+#type DataRecord = { id: int, value: string, timestamp: int };
+#type ValidationResult = { status: int, message: string };
+#type Report = { total_processed: int, valid_count: int, invalid_count: int };
+
+#func parse_input(input: string[]): DataRecord[] {
+    let records: DataRecord[] = empty;
+    for (i: int in 0..length(input)) {
+        let line: string = input[i];
+        let parts: string[] = split(line, ",");
+        if (length(parts) == 3) {
+            let id: int = to_int(parts[0]);
+            let value: string = parts[1];
+            let timestamp: int = to_int(parts[2]);
+            let record: DataRecord = { id: id, value: value, timestamp: timestamp };
+            records = append(records, record);
+        }
+    }
+    return records;
+}
+
+#func validate_record(record: DataRecord): ValidationResult {
+    if (record.id < 0 || record.timestamp < 0) {
+        return { status: 0, message: "Invalid id or timestamp" };
+    }
+    if (length(record.value) == 0) {
+        return { status: 0, message: "Empty value" };
+    }
+    return { status: 1, message: "Valid" };
+}
+
+#func transform_record(record: DataRecord): DataRecord {
+    let transformed_value: string = to_upper(record.value);
+    return { id: record.id, value: transformed_value, timestamp: record.timestamp };
+}
+
+#func generate_report(records: DataRecord[], valid_count: int, invalid_count: int): Report {
+    return {
+        total_processed: length(records),
+        valid_count: valid_count,
+        invalid_count: invalid_count
+    };
+}
+
+#func main(): int {
+    let raw_data: string[] = ["1,Alice,1000","2,Bob,2000","3,Charlie,3000","4,,4000","5,David,-100"];
+    let records: DataRecord[] = parse_input(raw_data);
+    let valid_count: int = 0;
+    let invalid_count: int = 0;
+    let processed_records: DataRecord[] = empty;
+    for (record: DataRecord in records) {
+        let result: ValidationResult = validate_record(record);
+        if (result.status == 1) {
+            valid_count = valid_count + 1;
+            let transformed: DataRecord = transform_record(record);
+            processed_records = append(processed_records, transformed);
+        } else {
+            invalid_count = invalid_count + 1;
+        }
+    }
+    let report: Report = generate_report(records, valid_count, invalid_count);
+    println("Data Processing Report");
+    println("---------------------");
+    println("Total Processed: " + to_string(report.total_processed));
+    println("Valid Records: " + to_string(report.valid_count));
+    println("Invalid Records: " + to_string(report.invalid_count));
+    println("Processed Data:");
+    for (record: DataRecord in processed_records) {
+        println("  ID: " + to_string(record.id) + ", Value: " + record.value + ", Timestamp: " + to_string(record.timestamp));
+    }
+    return 0;
+}

@@ -1,0 +1,36 @@
+#type DataRecord = { id: int, value: string, timestamp: int };
+#type ValidationResult = { status: int, message: string };
+
+#func validate_id(id: int): ValidationResult {
+    if (id < 0) {
+        return { status: 0, message: "Invalid id" };
+    }
+    return { status: 1, message: "Valid id" };
+}
+
+#func validate_timestamp(timestamp: int): ValidationResult {
+    if (timestamp < 0) {
+        return { status: 0, message: "Invalid timestamp" };
+    }
+    return { status: 1, message: "Valid timestamp" };
+}
+
+#func validate_value(value: string): ValidationResult {
+    if (length(value) == 0) {
+        return { status: 0, message: "Empty value" };
+    }
+    return { status: 1, message: "Valid value" };
+}
+
+#func validate_record(record: DataRecord): ValidationResult {
+    let id_result: ValidationResult = validate_id(record.id);
+    if (id_result.status == 0) {
+        return id_result;
+    }
+    let timestamp_result: ValidationResult = validate_timestamp(record.timestamp);
+    if (timestamp_result.status == 0) {
+        return timestamp_result;
+    }
+    let value_result: ValidationResult = validate_value(record.value);
+    return value_result;
+}

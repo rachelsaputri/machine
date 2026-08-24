@@ -1,0 +1,57 @@
+#import "bitc::string"
+#import "bitc::vector"
+
+#type DataRecord = { id: int, value: string, timestamp: int };
+
+#func split(input: string, delimiter: string): string[] {
+    let parts: string[] = empty;
+    let current: string = "";
+    for (c: char in input) {
+        if (c == delimiter[0]) {
+            parts = append(parts, current);
+            current = "";
+        } else {
+            current = current + to_string(c);
+        }
+    }
+    parts = append(parts, current);
+    return parts;
+}
+
+#func to_int(input: string): int {
+    let result: int = 0;
+    let sign: int = 1;
+    let start: int = 0;
+    if (length(input) > 0 && input[0] == '-') {
+        sign = -1;
+        start = 1;
+    }
+    for (i: int in start..length(input)) {
+        let c: char = input[i];
+        let digit: int = c - '0';
+        if (digit >= 0 && digit <= 9) {
+            result = result * 10 + digit;
+        }
+    }
+    return result * sign;
+}
+
+#func parse_line(line: string): DataRecord {
+    let parts: string[] = split(line, ",");
+    let id: int = to_int(parts[0]);
+    let value: string = parts[1];
+    let timestamp: int = to_int(parts[2]);
+    return { id: id, value: value, timestamp: timestamp };
+}
+
+#func parse_input(input: string[]): DataRecord[] {
+    let records: DataRecord[] = empty;
+    for (line: string in input) {
+        let parts: string[] = split(line, ",");
+        if (length(parts) == 3) {
+            let record: DataRecord = parse_line(line);
+            records = append(records, record);
+        }
+    }
+    return records;
+}
