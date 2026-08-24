@@ -1,0 +1,38 @@
+procedure main()
+    local args, target, policy, auditor
+    
+    args := parse_args()
+    target := get_value(args, "--target", ".")
+    policy := get_value(args, "--policy", "audit_config.icn")
+    
+    write("Starting Compliance Audit...")
+    
+    auditor := new(AuditEngine)
+    
+    if not auditor.initialize(policy) then {
+        write("ERROR: Failed to initialize policy engine.")
+        stop(1)
+    }
+    
+    auditor.scan(target)
+    auditor.generate_report()
+    
+    write("Audit complete.")
+end
+
+procedure parse_args()
+    local args, i, arg
+    create args
+    i := 1
+    while arg := arg(i) do {
+        args[arg] := i + 1 | ""
+        i +:= 1
+    }
+    return args
+end
+
+procedure get_value(args, key, default)
+    if key | args then
+        return args[key]
+    return default
+end

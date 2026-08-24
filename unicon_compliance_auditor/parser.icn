@@ -1,0 +1,20 @@
+procedure PolicyParser.load(file)
+    local policies, line, key, val
+    policies := []
+    
+    if open(file) then {
+        while line := readline(file) do {
+            if line[1] = "#" | line = "" then next
+            key := substring(line, 1, find("="))
+            val := substring(line, find("=") + 1)
+            key := strip(key)
+            val := strip(val)
+            if key = "" | val = "" then next
+            policies ||:= {pattern: key, message: val}
+        }
+        close(file)
+    } else {
+        return 0
+    }
+    return policies
+end

@@ -1,0 +1,53 @@
+procedure AuditEngine.initialize(policyFile)
+    local policies
+    policies := PolicyParser.load(policyFile)
+    if invalid(policies) then return 0
+    self.policies := policies
+    return 1
+end
+
+procedure AuditEngine.scan(targetDir)
+    local entries, file, violations
+    violations := []
+    
+    every file := !FindFiles(targetDir) do {
+        if not file.directory then {
+            if matches_policy(file, self.policies) then
+                violations ||:= "COMPLIANT: " || file || "\n"
+            else
+                violations ||:= "VIOLATION: " || file || "\n"
+        }
+    }
+    self.violations := violations
+end
+
+procedure matches_policy(filePath, policies)
+    local policy
+    every policy := policies do {
+        if test_rule(policy, filePath) then
+            return 0
+    }
+    return 1
+end
+
+procedure test_rule(policy, filePath)
+    local pattern, msg
+    pattern := policy.pattern
+    msg := policy.message
+    
+    if match(pattern, filePath) then {
+        write("ALERT: " || msg || " (File: " || filePath || ")")
+        return 1
+    }
+    return 0
+end
+
+procedure FindFiles(dir)
+    suspend dir
+    if directory(dir) then {
+        every e := !directory(dir) do
+            FindFiles(dir || "/" || e)
+    } else {
+        suspend dir
+    }
+end

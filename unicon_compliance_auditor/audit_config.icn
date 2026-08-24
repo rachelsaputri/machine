@@ -1,0 +1,9 @@
+# Audit Configuration
+# Format: <regex_pattern>=<violation_message>
+
+*.pwd$=Password files must be secured or removed
+*~/.ssh/authorized_keys=SSH public keys found. Verify access policy.
+*.conf=Configuration file detected. Check permissions.
+*/tmp/*=Temporary files detected in restricted path.
+*.key$=Private key file detected. Encrypt or restrict access.
+*/var/log/*=Log files detected. Verify retention policy.
