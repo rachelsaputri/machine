@@ -344,3 +344,5 @@ MIT
 - Created/Updated module: `batch_data_processing_utility` (See `batch_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `inform_data_processing_utility` (See `inform_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `fortress_data_processing_utility` (See `fortress_data_processing_utility/README.md` for details)
