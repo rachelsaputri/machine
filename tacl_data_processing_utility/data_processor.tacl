@@ -1,0 +1,62 @@
+/* TACL Data Processing Utility - Data Processor */
+
+/* Global processing variables */
+$DEFINE VAR PROCESSINGSTATE = 0  /* 0=init, 1=processing, 2=error, 3=complete */
+$DEFINE VAR PROCESSINGERROR = ""
+
+/* Initialize data processor */
+$DEFINE VAR PROCSTATUS = 0
+$DISPLAY "Initializing Data Processor"
+
+/* Core processing function */
+$SUBROUTINE PROCESSDATA INPUTDATA
+    $DEFINE VAR LOCALRESULT = 0
+    
+    $SET VAR PROCESSINGSTATE = 1
+    $DISPLAY "Processing data: $INPUTDATA"
+    
+    /* Perform data validation */
+    $CALL DATA_VALIDATOR INPUTDATA
+    $IF $RESULT != 0 THEN
+        $SET VAR LOCALRESULT = 1
+        $SET VAR PROCESSINGSTATE = 2
+        $SET VAR PROCESSINGERROR = "Validation failed"
+        $RETURN $LOCALRESULT
+    $ENDIF
+    
+    /* Perform data transformation */
+    $CALL DATA_TRANSFORMER INPUTDATA
+    $IF $RESULT != 0 THEN
+        $SET VAR LOCALRESULT = 1
+        $SET VAR PROCESSINGSTATE = 2
+        $SET VAR PROCESSINGERROR = "Transformation failed"
+        $RETURN $LOCALRESULT
+    $ENDIF
+    
+    /* Mark as successfully processed */
+    $SET VAR PROCESSINGSTATE = 3
+    $SET VAR LOCALRESULT = 0
+    
+    $RETURN $LOCALRESULT
+$ENDSUBROUTINE
+
+/* Get current processing state */
+$SUBROUTINE GETPROCESSINGSTATE
+    $DEFINE VAR LOCALSTATE = $PROCESSINGSTATE
+    $RETURN $LOCALSTATE
+$ENDSUBROUTINE
+
+/* Get last processing error */
+$SUBROUTINE GETPROCESSINGERROR
+    $DEFINE VAR LOCALERROR = $PROCESSINGERROR
+    $RETURN $LOCALERROR
+$ENDSUBROUTINE
+
+/* Reset processor state */
+$SUBROUTINE RESETPROCESSOR
+    $SET VAR PROCESSINGSTATE = 0
+    $SET VAR PROCESSINGERROR = ""
+    $DISPLAY "Data processor reset"
+$ENDSUBROUTINE
+
+$DISPLAY "Data Processor initialized successfully"
