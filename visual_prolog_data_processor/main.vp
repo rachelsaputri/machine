@@ -1,0 +1,18 @@
+module main
+
+include "interface.vp"
+
+
+class main
+
+    clauses
+        run() :
+            %% Main execution logic.
+            Input = "input_data.csv",
+            Output = "output_data.csv",
+            interface.runPipeline(Input, Output),
+            stdIO.write("Processing complete. Results in ", Output).
+
+end class main
+
+goal main::run().

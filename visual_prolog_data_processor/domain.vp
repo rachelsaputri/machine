@@ -1,0 +1,159 @@
+module domain
+
+open core
+
+
+class predicates
+
+class dataRecord :
+    clauses
+        dataRecord()
+            end dataRecord.
+end dataRecord.
+
+
+class dataProcessor :
+    clauses
+        dataProcessor()
+            end dataProcessor.
+end dataProcessor.
+
+
+class dataValidator :
+    clauses
+        dataValidator()
+            end dataValidator.
+end dataValidator.
+
+
+class dataReporter :
+    clauses
+        dataReporter()
+            end dataReporter.
+end dataReporter.
+
+
+class mainModule :
+    clauses
+        mainModule()
+            end mainModule.
+end mainModule.
+
+
+class engine :
+    clauses
+        engine()
+            end engine.
+end engine.
+
+
+class pipeline :
+    clauses
+        pipeline()
+            end pipeline.
+end pipeline.
+
+
+class transformer :
+    clauses
+        transformer()
+            end transformer.
+end transformer.
+
+
+class config :
+    clauses
+        config()
+            end config.
+end config.
+
+
+class exceptions :
+    clauses
+        exceptions()
+            end exceptions.
+end exceptions.
+
+
+class utils :
+    clauses
+        utils()
+            end utils.
+end utils.
+
+
+class models :
+    clauses
+        models()
+            end models.
+end models.
+
+
+class types :
+    clauses
+        types()
+            end types.
+end types.
+
+
+class constants :
+    clauses
+        constants()
+            end constants.
+end constants.
+
+
+class helpers :
+    clauses
+        helpers()
+            end helpers.
+end helpers.
+
+
+class interfaces :
+    clauses
+        interfaces()
+            end interfaces.
+end interfaces.
+
+
+class logic :
+    clauses
+        logic()
+            end logic.
+end logic.
+
+
+class rules :
+    clauses
+        rules()
+            end rules.
+end rules.
+
+
+class schemas :
+    clauses
+        schemas()
+            end schemas.
+end schemas.
+
+
+class services :
+    clauses
+        services()
+            end services.
+end services.
+
+
+class tools :
+    clauses
+        tools()
+            end tools.
+end tools.
+
+
+class validations :
+    clauses
+        validations()
+            end validations.
+end validations.

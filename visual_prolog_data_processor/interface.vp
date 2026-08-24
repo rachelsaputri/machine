@@ -1,0 +1,14 @@
+module interface
+
+include "predicates.vp"
+
+
+class public
+
+    %% Public API
+
+    runPipeline(InputFile : string, OutputFile : string) :
+        %% Entry point for the pipeline.
+        processFile(InputFile, OutputFile).
+
+end class interface

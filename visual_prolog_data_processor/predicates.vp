@@ -1,0 +1,134 @@
+module predicates
+
+include "domain.vp"
+
+
+class predicates
+
+    %% Core Processing Predicates
+
+    processFile(InputFile : string, OutputFile : string) :
+        %% Reads a CSV file, validates, transforms, and writes results.
+        readLines(InputFile, Lines),
+        parseRecords(Lines, Records),
+        validateRecords(Records, ValidRecords),
+        transformRecords(ValidRecords, TransformedRecords),
+        writeRecords(OutputFile, TransformedRecords).
+
+    parseRecords(Lines : list(string), Records : list(dataRecord)) :
+        %% Parses raw string lines into typed data records.
+        parseLines(Lines, Records).
+
+    validateRecords(Records : list(dataRecord), ValidRecords : list(dataRecord)) :
+        %% Filters out invalid records based on schema rules.
+        filterValid(Records, ValidRecords).
+
+    transformRecords(Records : list(dataRecord), TransformedRecords : list(dataRecord)) :
+        %% Applies transformation logic (e.g., uppercase names, age scaling).
+        mapTransform(Records, TransformedRecords).
+
+    writeRecords(File : string, Records : list(dataRecord)) :
+        %% Writes processed records to a file.
+        writeLines(File, Records, []).
+
+    %% Helper Predicates
+
+    readLines(File : string, Lines : list(string)) :
+        %% Reads a file into a list of strings.
+        openRead(File, Stream),
+        readLinesStream(Stream, Lines),
+        close(Stream).
+
+    readLinesStream(Stream : stream, Lines : list(string)) :
+        %% Recursively reads lines from a stream.
+        ( try
+            readLine(Stream, Line),
+            readLinesStream(Stream, RestLines),
+            Lines = [Line | RestLines]
+          catch
+            endOfFile
+          then
+            Lines = []
+          ).
+
+    parseLines(Lines : list(string), Records : list(dataRecord)) :
+        %% Converts list of strings to list of records.
+        parseLineList(Lines, Records).
+
+    parseLineList([], []).
+    parseLineList([Line | RestLines], [Record | RestRecords]) :-
+        parseSingleLine(Line, Record),
+        parseLineList(RestLines, RestRecords).
+
+    parseSingleLine(Line : string, Record : dataRecord) :
+        %% Splits line by comma and constructs record.
+        split(Line, ',', Parts),
+        ( if Parts.len == 3 then
+            Name = Parts[0],
+            AgeStr = Parts[1],
+            Status = Parts[2],
+            Age = parseInteger(AgeStr),
+            Record = dataRecord(Name, Age, Status)
+          else
+            throw error("Invalid format", Line)
+          ).
+
+    filterValid([], []).
+    filterValid([R | Rest], Valid) :-
+        isValid(R),
+        filterValid(Rest, ValidRest),
+        Valid = [R | ValidRest].
+    filterValid([_ | Rest], Valid) :-
+        filterValid(Rest, Valid).
+
+    isValid(dataRecord(Name, Age, Status)) :
+        Name != "",
+        Age > 0,
+        Status == "Active" || Status == "Inactive".
+
+    mapTransform([], []).
+    mapTransform([R | Rest], Transformed) :-
+        transformRecord(R, TransformedR),
+        mapTransform(Rest, TransformedRest),
+        Transformed = [TransformedR | TransformedRest].
+
+    transformRecord(dataRecord(Name, Age, Status), dataRecord(UpperName, ScaledAge, TransformedStatus)) :
+        toUpperCase(Name, UpperName),
+        ScaledAge = Age * 2,
+        transformStatus(Status, TransformedStatus).
+
+    transformStatus("Active", "ACTIVE_USER").
+    transformStatus("Inactive", "INACTIVE_USER").
+
+    writeLines([], _, _).
+    writeLines([R | Rest], File, Context) :-
+        recordToString(R, Str),
+        openWrite(File, Context),
+        writeLine(Stream, Str),
+        writeLines(Rest, File, Context).
+
+    recordToString(dataRecord(Name, Age, Status), String) :
+        format("%s, %d, %s", [Name, Age, Status], String).
+
+    parseInteger(Str : string, Int : integer) :
+        Str.toInteger(Int).
+
+    toUpperCase(Str : string, Upper : string) :
+        Str.toUpperCase(Upper).
+
+    split(Line : string, Delimiter : string, Parts : list(string)) :
+        Line.split(Delimiter, Parts).
+
+    openRead(File : string, Stream : stream) :
+        Stream = file.open(File, file.read).
+
+    close(Stream : stream) :
+        Stream.close().
+
+    openWrite(File : string, Context : stream) :
+        Context = file.open(File, file.write).
+
+    writeLine(Stream : stream, Line : string) :
+        Stream.writeLine(Line).
+
+end class predicates

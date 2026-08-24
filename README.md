@@ -288,3 +288,5 @@ MIT
 - Created/Updated module: `./euslisp_data_processing_utility` (See `./euslisp_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `xc_awesome_data_processing_utility` (See `xc_awesome_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `visual_prolog_data_processor` (See `visual_prolog_data_processor/README.md` for details)
