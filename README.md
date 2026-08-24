@@ -280,3 +280,5 @@ MIT
 - Created/Updated module: `algol_w_data_processing_utility` (See `algol_w_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./vbr_data_processing_utility` (See `./vbr_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `./visual_fortran_data_processing_utility` (See `./visual_fortran_data_processing_utility/README.md` for details)
