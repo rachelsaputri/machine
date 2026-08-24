@@ -276,3 +276,5 @@ MIT
 - Created/Updated module: `beanshell_data_processing_pipeline` (See `beanshell_data_processing_pipeline/README.md` for details)
 
 - Created/Updated module: `./vala_data_processing_utility` (See `./vala_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `vbs_data_processing_utility` (See `vbs_data_processing_utility/README.md` for details)
