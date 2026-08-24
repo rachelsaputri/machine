@@ -242,3 +242,5 @@ MIT
 - Created/Updated module: `newton_data_processing_utility` (See `newton_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `tacl_data_processing_utility` (See `tacl_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `yql_data_processing_utility` (See `yql_data_processing_utility/README.md` for details)

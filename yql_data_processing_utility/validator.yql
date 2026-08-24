@@ -1,0 +1,26 @@
+-- YQL Data Validation Module
+
+FUNCTION check(data, schema_path) {
+    DECLARE schema;
+    DECLARE errors;
+
+    SET schema = PARSE_JSON(schema_path);
+    SET errors = [];
+
+    FOR EACH row IN data DO
+        FOR EACH field IN schema DO
+            IF NOT CONTAINS(row, field.name) THEN
+                APPEND(errors, 'Missing field: ' + field.name);
+            ELSIF NOT TYPEOF(row[field.name]) = field.type THEN
+                APPEND(errors, 'Type mismatch for: ' + field.name);
+            END IF;
+        END FOR;
+    END FOR;
+
+    IF LENGTH(errors) > 0 THEN
+        LOG 'Validation Errors: ' + JOIN(errors, ', ');
+        RETURN FALSE;
+    END IF;
+
+    RETURN TRUE;
+}

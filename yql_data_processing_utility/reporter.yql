@@ -1,0 +1,27 @@
+-- YQL Data Reporting Module
+
+FUNCTION generate(data, target) {
+    DECLARE report_data;
+    DECLARE summary;
+
+    -- Calculate basic statistics
+    SET summary = {
+        'total_records': LENGTH(data),
+        'avg_value': AVG(data.value),
+        'min_value': MIN(data.value),
+        'max_value': MAX(data.value)
+    };
+
+    -- Output report
+    CASE target OF
+        'console':
+            PRINT 'Report Summary:';
+            PRINT JSON.stringify(summary);
+        'file':
+            WRITE_FILE('/output/report.txt', JSON.stringify(summary));
+        ELSE
+            LOG 'Unknown target for report generation';
+    END CASE;
+
+    LOG 'Report generated.';
+}
