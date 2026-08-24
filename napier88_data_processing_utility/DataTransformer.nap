@@ -1,0 +1,133 @@
+MODULE DataTransformer;
+
+TYPE
+  Record = RECORD
+    id: INTEGER;
+    value: REAL;
+    timestamp: STRING;
+    category: STRING;
+  END;
+
+PROCEDURE Normalize(records: ARRAY OF Record; count: INTEGER): BOOLEAN;
+  VAR
+    minValue: REAL;
+    maxValue: REAL;
+    i: INTEGER;
+    range: REAL;
+  BEGIN
+    IF count = 0 THEN
+      RETURN FALSE;
+    END;
+    
+    (* Find min and max values *)
+    minValue := records[1].value;
+    maxValue := records[1].value;
+    
+    FOR i := 2 TO count DO
+      IF records[i].value < minValue THEN
+        minValue := records[i].value;
+      END;
+      IF records[i].value > maxValue THEN
+        maxValue := records[i].value;
+      END;
+    END;
+    
+    range := maxValue - minValue;
+    
+    (* Normalize values to [0, 1] range *)
+    IF range > 0 THEN
+      FOR i := 1 TO count DO
+        records[i].value := (records[i].value - minValue) / range;
+      END;
+    END;
+    
+    RETURN TRUE;
+  END Normalize;
+
+PROCEDURE Standardize(records: ARRAY OF Record; count: INTEGER): BOOLEAN;
+  VAR
+    sum: REAL;
+    mean: REAL;
+    variance: REAL;
+    stdDev: REAL;
+    i: INTEGER;
+  BEGIN
+    IF count = 0 THEN
+      RETURN FALSE;
+    END;
+    
+    (* Calculate mean *)
+    sum := 0.0;
+    FOR i := 1 TO count DO
+      sum := sum + records[i].value;
+    END;
+    mean := sum / count;
+    
+    (* Calculate standard deviation *)
+    variance := 0.0;
+    FOR i := 1 TO count DO
+      variance := variance + (records[i].value - mean) * (records[i].value - mean);
+    END;
+    variance := variance / count;
+    stdDev := Sqrt(variance);
+    
+    (* Standardize values *)
+    IF stdDev > 0 THEN
+      FOR i := 1 TO count DO
+        records[i].value := (records[i].value - mean) / stdDev;
+      END;
+    END;
+    
+    RETURN TRUE;
+  END Standardize;
+
+PROCEDURE SortByValue(records: ARRAY OF Record; count: INTEGER);* Simple bubble sort *;
+  VAR
+    i, j: INTEGER;
+    temp: Record;
+  BEGIN
+    FOR i := 1 TO count - 1 DO
+      FOR j := 1 TO count - i DO
+        IF records[j].value > records[j+1].value THEN
+          temp := records[j];
+          records[j] := records[j+1];
+          records[j+1] := temp;
+        END;
+      END;
+    END;
+  END SortByValue;
+
+PROCEDURE SortById(records: ARRAY OF Record; count: INTEGER);
+  VAR
+    i, j: INTEGER;
+    temp: Record;
+  BEGIN
+    FOR i := 1 TO count - 1 DO
+      FOR j := 1 TO count - i DO
+        IF records[j].id > records[j+1].id THEN
+          temp := records[j];
+          records[j] := records[j+1];
+          records[j+1] := temp;
+        END;
+      END;
+    END;
+  END SortById;
+
+FUNCTION Sqrt(x: REAL): REAL;
+  VAR
+    guess: REAL;
+    i: INTEGER;
+  BEGIN
+    IF x = 0.0 THEN
+      RETURN 0.0;
+    END;
+    
+    guess := x / 2.0;
+    FOR i := 1 TO 100 DO
+      guess := (guess + x / guess) / 2.0;
+    END;
+    
+    RETURN guess;
+  END Sqrt;
+
+END DataTransformer.

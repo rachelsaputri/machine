@@ -1,0 +1,250 @@
+MODULE DataValidator;
+
+TYPE
+  Record = RECORD
+    id: INTEGER;
+    value: REAL;
+    timestamp: STRING;
+    category: STRING;
+  END;
+
+CONST
+  MaxIdValue = 1000000;
+  MinValue = -1e6;
+  MaxValue = 1e6;
+
+VAR
+  errorCount: INTEGER;
+
+PROCEDURE Validate(records: ARRAY OF Record; count: INTEGER): BOOLEAN;
+  VAR
+    i: INTEGER;
+    validCount: INTEGER;
+  BEGIN
+    errorCount := 0;
+    
+    FOR i := 1 TO count DO
+      ValidateRecord(records[i]);
+    END;
+    
+    RETURN errorCount = 0;
+  END Validate;
+
+PROCEDURE ValidateRecord(IN record: Record);
+  BEGIN
+    (* Check ID range *)
+    IF record.id < 1 OR record.id > MaxIdValue THEN
+      LogError("Invalid ID value: " + ToString(record.id));
+    END;
+    
+    (* Check value range *)
+    IF record.value < MinValue OR record.value > MaxValue THEN
+      LogError("Invalid value: " + ToString(record.value));
+    END;
+    
+    (* Check timestamp format *)
+    IF NOT IsValidTimestamp(record.timestamp) THEN
+      LogError("Invalid timestamp: " + record.timestamp);
+    END;
+    
+    (* Check category is not empty *)
+    IF Length(record.category) = 0 THEN
+      LogError("Empty category");
+    END;
+  END ValidateRecord;
+
+PROCEDURE LogError(message: STRING);
+  BEGIN
+    errorCount := errorCount + 1;
+    WRITELN("Validation Error: " + message);
+  END LogError;
+
+FUNCTION IsValidTimestamp(timestamp: STRING): BOOLEAN;
+  VAR
+    year, month, day, hour, minute, second: INTEGER;
+    i: INTEGER;
+  BEGIN
+    IF Length(timestamp) < 19 THEN
+      RETURN FALSE;
+    END;
+    
+    (* Basic format check: YYYY-MM-DD HH:MM:SS *)
+    IF timestamp[5] <> '-' OR timestamp[8] <> '-' OR 
+       timestamp[11] <> ' ' OR timestamp[14] <> ':' OR 
+       timestamp[17] <> ':' THEN
+      RETURN FALSE;
+    END;
+    
+    (* Extract and validate date/time components *)
+    year := ParseInteger(SubString(timestamp, 1, 4));
+    month := ParseInteger(SubString(timestamp, 6, 2));
+    day := ParseInteger(SubString(timestamp, 9, 2));
+    hour := ParseInteger(SubString(timestamp, 12, 2));
+    minute := ParseInteger(SubString(timestamp, 15, 2));
+    second := ParseInteger(SubString(timestamp, 18, 2));
+    
+    IF month < 1 OR month > 12 OR 
+       day < 1 OR day > 31 OR 
+       hour < 0 OR hour > 23 OR 
+       minute < 0 OR minute > 59 OR 
+       second < 0 OR second > 59 THEN
+      RETURN FALSE;
+    END;
+    
+    RETURN TRUE;
+  END IsValidTimestamp;
+
+FUNCTION ParseInteger(str: STRING): INTEGER;
+  VAR
+    result: INTEGER;
+    i: INTEGER;
+    negative: BOOLEAN;
+  BEGIN
+    result := 0;
+    negative := FALSE;
+    
+    (* Skip whitespace *)
+    i := 1;
+    WHILE i <= Length(str) AND str[i] = ' ' DO
+      i := i + 1;
+    END;
+    
+    (* Handle sign *)
+    IF i <= Length(str) THEN
+      IF str[i] = '-' THEN
+        negative := TRUE;
+        i := i + 1;
+      ELSIF str[i] = '+' THEN
+        i := i + 1;
+      END;
+    END;
+    
+    (* Parse digits *)
+    WHILE i <= Length(str) AND IsDigit(str[i]) DO
+      result := result * 10 + (str[i] - '0');
+      i := i + 1;
+    END;
+    
+    IF negative THEN
+      result := -result;
+    END;
+    
+    RETURN result;
+  END ParseInteger;
+
+FUNCTION SubString(str: STRING, start: INTEGER, length: INTEGER): STRING;
+  VAR
+    result: STRING;
+    i: INTEGER;
+  BEGIN
+    result := "";
+    FOR i := 0 TO length - 1 DO
+      IF start + i <= Length(str) THEN
+        result := result + str[start + i];
+      END;
+    END;
+    RETURN result;
+  END SubString;
+
+FUNCTION IsDigit(char: CHAR): BOOLEAN;
+  BEGIN
+    RETURN (char >= '0') AND (char <= '9');
+  END IsDigit;
+
+FUNCTION Length(str: STRING): INTEGER;
+  VAR
+    i: INTEGER;
+  BEGIN
+    i := 1;
+    WHILE i <= 1024 AND str[i] <> '\0' DO
+      i := i + 1;
+    END;
+    RETURN i - 1;
+  END Length;
+
+FUNCTION ToString(value: INTEGER): STRING;
+  VAR
+    str: STRING;
+    temp: INTEGER;
+    neg: BOOLEAN;
+  BEGIN
+    str := "";
+    
+    IF value < 0 THEN
+      neg := TRUE;
+      temp := -value;
+    ELSE
+      neg := FALSE;
+      temp := value;
+    END;
+    
+    IF temp = 0 THEN
+      RETURN "0";
+    END;
+    
+    WHILE temp > 0 DO
+      str := (temp MOD 10 + '0') + str;
+      temp := temp / 10;
+    END;
+    
+    IF neg THEN
+      str := '-' + str;
+    END;
+    
+    RETURN str;
+  END ToString;
+
+FUNCTION ToString(value: REAL): STRING;
+  VAR
+    intPart: INTEGER;
+    decPart: INTEGER;
+    decDigits: INTEGER;
+    str: STRING;
+  BEGIN
+    intPart := FLOOR(value);
+    decPart := ABS((value - intPart) * 1000000);
+    decDigits := 6;
+    
+    (* Remove trailing zeros *)
+    WHILE decDigits > 0 AND decPart MOD 10 = 0 DO
+      decPart := decPart / 10;
+      decDigits := decDigits - 1;
+    END;
+    
+    IF decDigits > 0 THEN
+      str := ToString(intPart) + "." + FormatNumber(decPart, decDigits);
+    ELSE
+      str := ToString(intPart);
+    END;
+    
+    RETURN str;
+  END ToString;
+
+FUNCTION FormatNumber(value: INTEGER, digits: INTEGER): STRING;
+  VAR
+    str: STRING;
+    i: INTEGER;
+  BEGIN
+    str := "";
+    FOR i := digits - 1 DOWNTO 0 DO
+      str := (value MOD 10 + '0') + str;
+      value := value / 10;
+    END;
+    RETURN str;
+  END FormatNumber;
+
+FUNCTION FLOOR(value: REAL): INTEGER;
+  BEGIN
+    RETURN INT(value);
+  END FLOOR;
+
+FUNCTION ABS(value: REAL): REAL;
+  BEGIN
+    IF value < 0 THEN
+      RETURN -value;
+    ELSE
+      RETURN value;
+    END;
+  END ABS;
+
+END DataValidator.

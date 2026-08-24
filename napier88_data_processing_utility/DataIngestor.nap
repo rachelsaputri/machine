@@ -1,0 +1,239 @@
+MODULE DataIngestor;
+
+IMPORT System;
+
+CONST
+  MaxLineLength = 1024;
+  CsvDelimiter = ',';
+
+TYPE
+  Record = RECORD
+    id: INTEGER;
+    value: REAL;
+    timestamp: STRING;
+    category: STRING;
+  END;
+
+PROCEDURE LoadFromFile(IN filename: STRING; OUT records: ARRAY OF Record; OUT count: INTEGER): BOOLEAN;
+  VAR
+    fileHandle: INTEGER;
+    line: STRING;
+    fields: ARRAY[1..4] OF STRING;
+    fieldCount: INTEGER;
+    i: INTEGER;
+  BEGIN
+    OPEN(fileHandle, filename, READ);
+    IF fileHandle < 0 THEN
+      RETURN FALSE;
+    END;
+    
+    count := 0;
+    
+    WHILE NOT EOF(fileHandle) AND count < 10000 DO
+      READLINE(fileHandle, line);
+      
+      (* Skip empty lines *)
+      IF Length(line) = 0 THEN
+        CONTINUE;
+      END;
+      
+      (* Skip header line *)
+      IF CountOccurrences(line, ',') = 3 AND StartsWith(line, 'id') THEN
+        CONTINUE;
+      END;
+      
+      fieldCount := SplitLine(line, fields, 4);
+      IF fieldCount = 4 THEN
+        count := count + 1;
+        records[count].id := ParseInteger(fields[1]);
+        records[count].value := ParseReal(fields[2]);
+        records[count].timestamp := fields[3];
+        records[count].category := fields[4];
+      END;
+    END;
+    
+    CLOSE(fileHandle);
+    RETURN count > 0;
+  END LoadFromFile;
+
+PROCEDURE SplitLine(IN line: STRING; OUT fields: ARRAY OF STRING; maxFields: INTEGER): INTEGER;
+  VAR
+    i: INTEGER;
+    fieldIndex: INTEGER;
+    currentField: STRING;
+  BEGIN
+    fieldIndex := 1;
+    currentField := "";
+    
+    FOR i := 1 TO Length(line) DO
+      IF line[i] = CsvDelimiter THEN
+        fields[fieldIndex] := currentField;
+        fieldIndex := fieldIndex + 1;
+        IF fieldIndex > maxFields THEN
+          RETURN fieldIndex - 1;
+        END;
+        currentField := "";
+      ELSE
+        currentField := currentField + line[i];
+      END;
+    END;
+    
+    fields[fieldIndex] := currentField;
+    RETURN fieldIndex;
+  END SplitLine;
+
+FUNCTION ParseInteger(str: STRING): INTEGER;
+  VAR
+    result: INTEGER;
+    i: INTEGER;
+    negative: BOOLEAN;
+  BEGIN
+    result := 0;
+    negative := FALSE;
+    
+    (* Skip whitespace *)
+    i := 1;
+    WHILE i <= Length(str) AND str[i] = ' ' DO
+      i := i + 1;
+    END;
+    
+    (* Handle sign *)
+    IF i <= Length(str) THEN
+      IF str[i] = '-' THEN
+        negative := TRUE;
+        i := i + 1;
+      ELSIF str[i] = '+' THEN
+        i := i + 1;
+      END;
+    END;
+    
+    (* Parse digits *)
+    WHILE i <= Length(str) AND IsDigit(str[i]) DO
+      result := result * 10 + (str[i] - '0');
+      i := i + 1;
+    END;
+    
+    IF negative THEN
+      result := -result;
+    END;
+    
+    RETURN result;
+  END ParseInteger;
+
+FUNCTION ParseReal(str: STRING): REAL;
+  VAR
+    intPart: INTEGER;
+    decPart: INTEGER;
+    decimalPos: INTEGER;
+    i: INTEGER;
+    result: REAL;
+  BEGIN
+    decimalPos := IndexOf(str, '.');
+    IF decimalPos > 0 THEN
+      intPart := ParseInteger(SubString(str, 1, decimalPos - 1));
+      decPart := ParseInteger(SubString(str, decimalPos + 1, Length(str) - decimalPos));
+      result := intPart + decPart / Power(10, Length(str) - decimalPos);
+    ELSE
+      result := ParseInteger(str);
+    END;
+    
+    RETURN result;
+  END ParseReal;
+
+FUNCTION IndexOf(str: STRING, char: CHAR): INTEGER;
+  VAR
+    i: INTEGER;
+  BEGIN
+    FOR i := 1 TO Length(str) DO
+      IF str[i] = char THEN
+        RETURN i;
+      END;
+    END;
+    RETURN 0;
+  END IndexOf;
+
+FUNCTION SubString(str: STRING, start: INTEGER, length: INTEGER): STRING;
+  VAR
+    result: STRING;
+    i: INTEGER;
+  BEGIN
+    result := "";
+    FOR i := 0 TO length - 1 DO
+      IF start + i <= Length(str) THEN
+        result := result + str[start + i];
+      END;
+    END;
+    RETURN result;
+  END SubString;
+
+FUNCTION IsDigit(char: CHAR): BOOLEAN;
+  BEGIN
+    RETURN (char >= '0') AND (char <= '9');
+  END IsDigit;
+
+FUNCTION Length(str: STRING): INTEGER;
+  VAR
+    i: INTEGER;
+  BEGIN
+    i := 1;
+    WHILE i <= 1024 AND str[i] <> '\0' DO
+      i := i + 1;
+    END;
+    RETURN i - 1;
+  END Length;
+
+FUNCTION StartsWith(str: STRING, prefix: STRING): BOOLEAN;
+  VAR
+    i: INTEGER;
+    len: INTEGER;
+  BEGIN
+    len := Length(prefix);
+    IF len > Length(str) THEN
+      RETURN FALSE;
+    END;
+    
+    FOR i := 1 TO len DO
+      IF str[i] <> prefix[i] THEN
+        RETURN FALSE;
+      END;
+    END;
+    
+    RETURN TRUE;
+  END StartsWith;
+
+FUNCTION CountOccurrences(str: STRING, char: CHAR): INTEGER;
+  VAR
+    count: INTEGER;
+    i: INTEGER;
+  BEGIN
+    count := 0;
+    FOR i := 1 TO Length(str) DO
+      IF str[i] = char THEN
+        count := count + 1;
+      END;
+    END;
+    RETURN count;
+  END CountOccurrences;
+
+FUNCTION CURRENT_TIME(): STRING;
+  (* Simplified time function *)
+  VAR
+    timeStr: STRING;
+  BEGIN
+    timeStr := "2024-01-01 12:00:00";(* Placeholder *)
+    RETURN timeStr;
+  END CURRENT_TIME;
+
+FUNCTION Power(base: REAL, exponent: INTEGER): REAL;
+  VAR
+    result: REAL;
+    i: INTEGER;
+  BEGIN
+    result := 1.0;
+    FOR i := 1 TO exponent DO
+      result := result * base;
+    END;
+    RETURN result;
+  END Power;
+
+END DataIngestor.

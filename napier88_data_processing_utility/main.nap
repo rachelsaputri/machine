@@ -1,0 +1,103 @@
+MODULE Main;
+
+IMPORT DataIngestor, DataTransformer, DataValidator, DataReporter;
+
+CONST
+  MaxRecords = 10000;
+  OutputDir = "/output";
+  LogFile = "/var/log/data_processing.log";
+
+TYPE
+  Record = RECORD
+    id: INTEGER;
+    value: REAL;
+    timestamp: STRING;
+    category: STRING;
+  END;
+
+  ProcessingStatus = {OK, ERROR, WARNING, IN_PROGRESS};
+
+VAR
+  records: ARRAY[1..MaxRecords] OF Record;
+  recordCount: INTEGER;
+  status: ProcessingStatus;
+
+PROCEDURE ProcessData(IN inputPath: STRING);
+  VAR
+    ingestResult: BOOLEAN;
+    transformResult: BOOLEAN;
+    validateResult: BOOLEAN;
+    reportResult: BOOLEAN;
+  BEGIN
+    Log("Starting data processing pipeline");
+    
+    (* Ingest data *)
+    ingestResult := DataIngestor.LoadFromFile(inputPath, records, recordCount);
+    IF NOT ingestResult THEN
+      status := ERROR;
+      Log("Data ingestion failed");
+      RETURN;
+    END;
+    
+    (* Transform data *)
+    transformResult := DataTransformer.Normalize(records, recordCount);
+    IF NOT transformResult THEN
+      status := WARNING;
+      Log("Some transformations failed");
+    ELSE
+      status := OK;
+    END;
+    
+    (* Validate data *)
+    validateResult := DataValidator.Validate(records, recordCount);
+    IF NOT validateResult THEN
+      status := WARNING;
+      Log("Some validation checks failed");
+    END;
+    
+    (* Generate report *)
+    reportResult := DataReporter.Generate(OutputDir, records, recordCount);
+    IF NOT reportResult THEN
+      status := ERROR;
+      Log("Report generation failed");
+    END;
+    
+    Log("Processing completed with status: " + ToString(status));
+  END ProcessData;
+
+PROCEDURE Log(message: STRING);
+  BEGIN
+    OPEN(LogFile, APPEND);
+    WRITE(LogFile, CURRENT_TIME() + ": " + message);
+    CLOSE(LogFile);
+  END Log;
+
+PROCEDURE ToString(status: ProcessingStatus): STRING;
+  BEGIN
+    CASE status OF
+      OK: RETURN "OK";
+      ERROR: RETURN "ERROR";
+      WARNING: RETURN "WARNING";
+      IN_PROGRESS: RETURN "IN_PROGRESS";
+    ELSE
+      RETURN "UNKNOWN";
+    END;
+  END ToString;
+
+BEGIN
+  IF ARGUMENT_COUNT() < 1 THEN
+    WRITELN("Usage: main.nap <input_file>");
+    HALT(1);
+  END;
+  
+  ProcessData(ARGUMENT(1));
+  
+  CASE status OF
+    OK: HALT(0);
+    ERROR: HALT(2);
+    WARNING: HALT(1);
+    IN_PROGRESS: HALT(0);(* Continue processing *)
+  ELSE
+    HALT(3);
+  END;
+END Main.

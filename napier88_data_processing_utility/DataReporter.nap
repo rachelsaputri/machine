@@ -1,0 +1,160 @@
+MODULE DataReporter;
+
+TYPE
+  Record = RECORD
+    id: INTEGER;
+    value: REAL;
+    timestamp: STRING;
+    category: STRING;
+  END;
+
+PROCEDURE Generate(outputDir: STRING; records: ARRAY OF Record; count: INTEGER): BOOLEAN;
+  VAR
+    reportFile: INTEGER;
+    i: INTEGER;
+    avgValue: REAL;
+    maxValue: REAL;
+    minValue: REAL;
+  BEGIN
+    IF count = 0 THEN
+      WRITELN("No records to report");
+      RETURN FALSE;
+    END;
+    
+    OPEN(reportFile, outputDir + "/report.txt", WRITE);
+    IF reportFile < 0 THEN
+      WRITELN("Failed to create report file");
+      RETURN FALSE;
+    END;
+    
+    (* Write header *)
+    WRITE(reportFile, "Data Processing Report\n");
+    WRITE(reportFile, "=====================\n\n");
+    
+    (* Calculate statistics *)
+    avgValue := 0.0;
+    maxValue := records[1].value;
+    minValue := records[1].value;
+    
+    FOR i := 1 TO count DO
+      avgValue := avgValue + records[i].value;
+      IF records[i].value > maxValue THEN
+        maxValue := records[i].value;
+      END;
+      IF records[i].value < minValue THEN
+        minValue := records[i].value;
+      END;
+    END;
+    avgValue := avgValue / count;
+    
+    (* Write statistics *)
+    WRITE(reportFile, "Statistics:\n");
+    WRITE(reportFile, "  Total Records: " + ToString(count) + "\n");
+    WRITE(reportFile, "  Average Value: " + ToString(avgValue) + "\n");
+    WRITE(reportFile, "  Maximum Value: " + ToString(maxValue) + "\n");
+    WRITE(reportFile, "  Minimum Value: " + ToString(minValue) + "\n\n");
+    
+    (* Write records *)
+    WRITE(reportFile, "Records:\n");
+    WRITE(reportFile, "ID\tValue\tTimestamp\tCategory\n");
+    WRITE(reportFile, "--\t-----\t---------\t--------\n");
+    
+    FOR i := 1 TO count DO
+      WRITE(reportFile, ToString(records[i].id) + "\t");
+      WRITE(reportFile, ToString(records[i].value) + "\t");
+      WRITE(reportFile, records[i].timestamp + "\t");
+      WRITE(reportFile, records[i].category + "\n");
+    END;
+    
+    CLOSE(reportFile);
+    
+    WRITELN("Report generated successfully");
+    RETURN TRUE;
+  END Generate;
+
+FUNCTION ToString(value: INTEGER): STRING;
+  VAR
+    str: STRING;
+    temp: INTEGER;
+    neg: BOOLEAN;
+  BEGIN
+    str := "";
+    
+    IF value < 0 THEN
+      neg := TRUE;
+      temp := -value;
+    ELSE
+      neg := FALSE;
+      temp := value;
+    END;
+    
+    IF temp = 0 THEN
+      RETURN "0";
+    END;
+    
+    WHILE temp > 0 DO
+      str := (temp MOD 10 + '0') + str;
+      temp := temp / 10;
+    END;
+    
+    IF neg THEN
+      str := '-' + str;
+    END;
+    
+    RETURN str;
+  END ToString;
+
+FUNCTION ToString(value: REAL): STRING;
+  VAR
+    intPart: INTEGER;
+    decPart: INTEGER;
+    decDigits: INTEGER;
+    str: STRING;
+  BEGIN
+    intPart := FLOOR(value);
+    decPart := ABS((value - intPart) * 1000000);
+    decDigits := 6;
+    
+    (* Remove trailing zeros *)
+    WHILE decDigits > 0 AND decPart MOD 10 = 0 DO
+      decPart := decPart / 10;
+      decDigits := decDigits - 1;
+    END;
+    
+    IF decDigits > 0 THEN
+      str := ToString(intPart) + "." + FormatNumber(decPart, decDigits);
+    ELSE
+      str := ToString(intPart);
+    END;
+    
+    RETURN str;
+  END ToString;
+
+FUNCTION FormatNumber(value: INTEGER, digits: INTEGER): STRING;
+  VAR
+    str: STRING;
+    i: INTEGER;
+  BEGIN
+    str := "";
+    FOR i := digits - 1 DOWNTO 0 DO
+      str := (value MOD 10 + '0') + str;
+      value := value / 10;
+    END;
+    RETURN str;
+  END FormatNumber;
+
+FUNCTION FLOOR(value: REAL): INTEGER;
+  BEGIN
+    RETURN INT(value);
+  END FLOOR;
+
+FUNCTION ABS(value: REAL): REAL;
+  BEGIN
+    IF value < 0 THEN
+      RETURN -value;
+    ELSE
+      RETURN value;
+    END;
+  END ABS;
+
+END DataReporter.
