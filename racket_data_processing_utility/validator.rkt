@@ -1,29 +1,41 @@
 #lang racket
 
-;; validator.rkt - Data validation module
+;; Module for validating data against rules
 
-(provide validate-data)
-
-;; Validate data records
 (define (validate-data data)
   (define valid-records '())
-  (define invalid-count 0)
+  (define errors '())
   
-  (for-each (lambda (record)
-              (if (is-valid-record? record)
-                  (set! valid-records (cons record valid-records))
-                  (set! invalid-count (add1 invalid-count))))
-            data)
+  (for ([record data])
+    (let ([result (validate-record record)])
+      (if (eq? result 'valid)
+          (set! valid-records (append valid-records (list record)))
+          (set! errors (append errors (list record))))))
   
-  (when (> invalid-count 0)
-    (error (format "Validation failed: ~a invalid records" invalid-count)))
+  (printf "Validation complete:\n")
+  (printf "  Valid: ~a records\n" (length valid-records))
+  (printf "  Invalid: ~a records\n" (length errors))
   
-  (reverse valid-records))
+  valid-records)
 
-;; Check if a single record is valid
-(define (is-valid-record? record)
-  (and (hash? record)
-       (not (hash-empty? record))
-       ;; Add specific field validation if schema is known
-       ;; For now, just check that it's not empty
-       (every (lambda (k) (not (string=? (hash-ref record k "")))) (hash-keys record))))
+(define (validate-record record)
+  (cond
+    [(empty? record) 'invalid]
+    [else 'valid]))
+
+(define (validate-schema record schema)
+  (define required-fields (hash-keys schema))
+  (define missing-fields (filter (lambda (field) 
+                                   (not (hash-has-key? record field)))
+                                 required-fields))
+  
+  (if (empty? missing-fields)
+      'valid
+      (list 'missing-fields missing-fields)))
+
+(define (validate-format value format-type)
+  (cond
+    [(eq? format-type 'integer) (integer? value)]
+    [(eq? format-type 'float) (real? value)]
+    [(eq? format-type 'string) (string? value)]
+    [else #t]))

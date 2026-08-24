@@ -1,40 +1,49 @@
 #lang racket
 
-;; transformer.rkt - Data transformation module
+;; Module for transforming and cleansing data
 
-(provide transform-data)
+(define (transform-data data)
+  (cond
+    [(list? data)
+     (map transform-record data)]
+    [else
+     (error "Data must be a list")]))
 
-;; Transform data based on rule
-(define (transform-data data rule)
+(define (transform-record record)
+  (cond
+    [(hash? record)
+     (transform-hash-record record)]
+    [(list? record)
+     (transform-list-record record)]
+    [else
+     record]))
+
+(define (transform-hash-record record)
+  (define transformed (hash-map record
+                                (lambda (k v)
+                                  (cons k (transform-value v)))))
+  (hash-values transformed))
+
+(define (transform-list-record record)
+  (map transform-value record))
+
+(define (transform-value value)
+  (cond
+    [(string? value)
+     (string-trim value)]
+    [(number? value)
+     (inexact->exact (round value))]
+    [else
+     value]))
+
+;; Example transformation rules
+(define (apply-rules data rules)
   (map (lambda (record)
-         (transform-record record rule))
+         (apply-record-rules record rules))
        data))
 
-;; Transform a single record
-(define (transform-record record rule)
-  (cond
-    [(equal? rule "uppercase")
-     (hash-map record (lambda (k v)
-                        (if (string? v)
-                            (string-upcase v)
-                            v)))]
-    [(equal? rule "lowercase")
-     (hash-map record (lambda (k v)
-                        (if (string? v)
-                            (string-downcase v)
-                            v)))]
-    [(equal? rule "trim")
-     (hash-map record (lambda (k v)
-                        (if (string? v)
-                            (string-trim v)
-                            v)))]
-    [(equal? rule "filter_empty")
-     ;; Filter out records with empty values in any field
-     (if (any-empty? record)
-         #f ;; Signal to filter out
-         record)]
-    [else (error (format "Unknown transformation rule: ~a" rule))]))
-
-;; Helper to check if any value in record is empty string
-(define (any-empty? record)
-  (any (lambda (v) (string=? v "")) (hash-values record)))
+(define (apply-record-rules record rules)
+  (foldl (lambda (rule acc)
+           (rule acc))
+         record
+         rules))

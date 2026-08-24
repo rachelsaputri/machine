@@ -1,58 +1,41 @@
 #lang racket
 
-;; reporter.rkt - Data reporting and export module
+;; Module for generating reports and exporting data
 
-(provide export-data generate-report)
-
-(require "utils.rkt")
-
-;; Export data to file
-(define (export-data data file-path format)
+(define (generate-report data output-path)
+  (define report-content (format-report data))
+  (define file-extension (get-file-extension output-path))
+  
   (cond
-    [(equal? format "csv") (export-csv data file-path)]
-    [(equal? format "json") (export-json data file-path)]
-    [(equal? format "txt") (export-txt data file-path)]
-    [else (error (format "Unsupported export format: ~a" format))]))
+    [(eq? file-extension 'json) (export-json report-content output-path)]
+    [(eq? file-extension 'csv) (export-csv report-content output-path)]
+    [(eq? file-extension 'txt) (export-txt report-content output-path)]
+    [else (export-txt report-content output-path)]))
 
-;; Export to CSV
-(define (export-csv data file-path)
-  (when (empty? data)
-    (error "No data to export"))
-  
-  (define header (hash-keys (first data)))
-  (define csv-string (build-string "\n" (cons (string-join header ",")
-                                               (map (lambda (record)
-                                                      (string-join (map (lambda (k) (hash-ref record k "")) header) ","))
-                                                  data))))
-  
-  (define output-file (open-output-file file-path))
-  (display csv-string output-file)
-  (close-output-port output-file))
+(define (format-report data)
+  (let ([total (length data)])
+    (format "~a records processed successfully" total)))
 
-;; Export to JSON
-(define (export-json data file-path)
-  (require json)
-  (define json-string (pretty-bytes (jsexpr->bytes data)))
-  (define output-file (open-output-file file-path))
-  (display json-string output-file)
-  (close-output-port output-file))
+(define (export-json data output-path)
+  (define json-string (pretty-format json))
+  (with-output-to-file output-path
+    #:exists 'replace
+    (lambda ()
+      (display json-string))))
 
-;; Export to TXT
-(define (export-txt data file-path)
-  (define lines (map (lambda (record)
-                       (string-join (map (lambda (k v) (format "~a: ~a" k v)) (hash-keys record) (hash-values record)) "\n"))
-                     data))
-  (define output-file (open-output-file file-path))
-  (display (string-join lines "\n") output-file)
-  (close-output-port output-file))
+(define (export-csv data output-path)
+  (define csv-string (format "record_count,~a" (length data)))
+  (with-output-to-file output-path
+    #:exists 'replace
+    (lambda ()
+      (display csv-string))))
 
-;; Generate summary report
-(define (generate-report raw-data processed-data validate-flag transform-rule)
-  (format "Original Records: ~a
-Processed Records: ~a
-Validation Enabled: ~a
-Transformation: ~a"
-          (length raw-data)
-          (length processed-data)
-          (if validate-flag "Yes" "No")
-          (if transform-rule transform-rule "None")))
+(define (export-txt data output-path)
+  (with-output-to-file output-path
+    #:exists 'replace
+    (lambda ()
+      (display data))))
+
+(define (get-file-extension path)
+  (let ([extension (last (string-split path "."))])
+    (string->symbol extension)))
