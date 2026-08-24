@@ -336,3 +336,5 @@ MIT
 - Created/Updated module: `axum_data_processing_utility` (See `axum_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `bitc_data_processing_utility` (See `bitc_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `rapira_data_processing_utility` (See `rapira_data_processing_utility/README.md` for details)

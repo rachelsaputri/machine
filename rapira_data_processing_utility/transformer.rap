@@ -1,59 +1,26 @@
-function transform(data, config) {
-    if (!data || !data.data) {
-        return { data: [], status: "error" };
-    }
+/**
+ * Module responsible for transforming ingested data.
+ */
 
-    const processed_data = [];
-    for (let i = 0; i < data.data.length; i++) {
-        const item = data.data[i];
-        const transformed = transform_item(item, config);
-        processed_data.push(transformed);
-    }
+module TransformerModule;
 
-    return {
-        data: processed_data,
-        status: "success"
+function transformer(data) {
+    print("Transforming data...\n");
+    
+    var transformedRecords = [];
+    
+    for record in data.records {
+        var newRecord = {};
+        newRecord.id = record.id;
+        newRecord.value = record.value.toUpperCase();
+        newRecord.status = record.status == "active" ? "1" : "0";
+        transformedRecords.append(newRecord);
+    }
+    
+    var transformedData = {
+        "records": transformedRecords
     };
-}
-
-function transform_item(item, config) {
-    if (!item) return item;
-
-    const transformed = JSON.parse(JSON.stringify(item)); // Deep copy
-
-    // Apply transformations
-    if (transformed.id) {
-        transformed.id = transformed.id.toUpperCase();
-    }
-
-    if (transformed.status) {
-        transformed.status = transformed.status.trim().toLowerCase();
-    }
-
-    if (transformed.category) {
-        transformed.category = transformed.category.trim();
-    }
-
-    transformed.processed_at = new Date().toISOString();
-    transformed.source = "rapira_processor";
-
-    return transformed;
-}
-
-function normalize_value(value) {
-    if (typeof value === "string") {
-        return value.trim().toLowerCase();
-    }
-    return value;
-}
-
-function apply_default_transformations(item, config) {
-    const defaults = config.default_transformations || [];
-    for (let i = 0; i < defaults.length; i++) {
-        const rule = defaults[i];
-        if (item[rule.field]) {
-            item[rule.field] = rule.fn(item[rule.field]);
-        }
-    }
-    return item;
+    
+    print("Data transformation complete.\n");
+    return transformedData;
 }

@@ -1,44 +1,46 @@
-import processor;
-import transformer;
-import validator;
-import reporter;
+/**
+ * Main module for the Rapira Data Processing Utility.
+ * This module orchestrates the data ingestion, transformation, validation, and reporting pipeline.
+ */
+
+include "ingester.rap"
+include "transformer.rap"
+include "validator.rap"
+include "reporter.rap"
+
+module RapiraDataProcessingUtility;
 
 function main() {
-    log("Initializing Rapira Data Processing Utility...");
+    print("Starting Rapira Data Processing Utility...\n");
 
-    const config = {
-        debug_mode: true,
-        strict_validation: true
-    };
-
-    const raw_data = read_input();
-    log("Input data received: " + raw_data);
-
-    const validated_data = validator.validate(raw_data, config);
-    if (validated_data.status != "success") {
-        log("Validation failed: " + validated_data.message);
+    var rawData = ingester();
+    
+    if rawData == null {
+        print("Failed to ingest data.\n");
         return;
     }
 
-    const transformed_data = transformer.transform(validated_data.data, config);
-    log("Data transformed successfully.");
+    print("Data ingested successfully.\n");
 
-    const process_result = processor.process(transformed_data, config);
-    log("Processing complete.");
+    var transformedData = transformer(rawData);
+    
+    if transformedData == null {
+        print("Failed to transform data.\n");
+        return;
+    }
 
-    reporter.generate_report(process_result, config);
-    log("Report generated.");
+    print("Data transformed successfully.\n");
 
-    log("Utility execution finished.");
+    var isValid = validator(transformedData);
+    
+    if !isValid {
+        print("Data validation failed.\n");
+        return;
+    }
+
+    print("Data validated successfully.\n");
+
+    reporter(transformedData);
+
+    print("Processing complete.\n");
 }
-
-function read_input() {
-    // Simulating input reading for standalone execution
-    return "sample_data_record_001,processed,active";
-}
-
-function log(message) {
-    print("[LOG] " + message);
-}
-
-main();
