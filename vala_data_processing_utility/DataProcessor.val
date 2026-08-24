@@ -1,0 +1,146 @@
+using GLib;
+
+public class DataProcessorError : public GLib.Error {
+    public static GLib.Type failed_to_open () {
+        return GLib.register_error_domain ("data_processor_error_quark", sizeof (DataProcessorError), null);
+    }
+    
+    public static GLib.Quark failed_to_open_quark () {
+        return DataProcessorError.failed_to_open ();
+    }
+}
+
+public class FailedToOpenError : public DataProcessorError {
+    public FailedToOpenError (string message) {
+        GLib.stderr.printf("%s\n", message);
+    }
+}
+
+public class DataProcessorError : public GLib.Error {
+    public static GLib.Type failed_to_open () {
+        return GLib.register_error_domain ("data_processor_error_quark", sizeof (DataProcessorError), null);
+    }
+    
+    public static GLib.Quark failed_to_open_quark () {
+        return DataProcessorError.failed_to_open ();
+    }
+}
+
+public class DataProcessor {
+    private List<DataRecord> records;
+    private CSVExporter csv_exporter;
+    private JSONExporter json_exporter;
+    
+    public DataProcessor() {
+        this.records = new List<DataRecord>();
+    }
+    
+    public int get_record_count() {
+        return this.records.length;
+    }
+    
+    public void ingest(string path, string format) throws DataProcessorError {
+        var file = File.open(path, "r");
+        if (file == null) {
+            throw new DataProcessorError.FAILED_TO_OPEN("Failed to open input file: %s".printf(path));
+        }
+        
+        string? line;
+        bool is_first_line = true;
+        
+        while ((line = file.read_line()) != null) {
+            if (is_first_line && (format == "csv" || format == "json")) {
+                is_first_line = false;
+                continue;
+            }
+            
+            if (format == "csv") {
+                parse_csv_line(line);
+            } else if (format == "json") {
+                // Simple JSON line parsing
+                var id = extract_json_field(line, "id");
+                var value = extract_json_field(line, "value");
+                this.records.append(new DataRecord(id != null ? id : "unknown", value != null ? value : ""));
+            } else {
+                // Treat as raw text with ID
+                var parts = line.split(",", 2);
+                var id = parts.length > 0 ? parts[0] : "unknown";
+                var value = parts.length > 1 ? parts[1] : line;
+                this.records.append(new DataRecord(id, value));
+            }
+        }
+        
+        file.close();
+    }
+    
+    private void parse_csv_line(string line) {
+        var parts = line.split(",", 3);
+        if (parts.length >= 3) {
+            var id = parts[0];
+            var value = parts[1];
+            var status = parts[2];
+            this.records.append(new DataRecord(id, value));
+            this.records.get_nth(this.records.length - 1).status = status;
+        } else if (parts.length == 2) {
+            this.records.append(new DataRecord(parts[0], parts[1]));
+        } else if (parts.length == 1) {
+            this.records.append(new DataRecord(parts[0], parts[0]));
+        }
+    }
+    
+    private string? extract_json_field(string json_line, string field) {
+        var pattern = "\"%s\":\"(.*?)\"".printf(field);
+        var regex = new Regex(pattern);
+        var match = regex.match(json_line);
+        if (match) {
+            return regex.fetch_match(json_line, 1);
+        }
+        return null;
+    }
+    
+    public void transform() {
+        var it = this.records.begin();
+        while (it != null) {
+            var record = it->data;
+            // Transform: convert value to uppercase
+            record.value = record.value.up();
+            it = it->next;
+        }
+    }
+    
+    public void validate() {
+        var it = this.records.begin();
+        while (it != null) {
+            var record = it->data;
+            // Validate: if value is empty, mark as invalid
+            if (record.value.length == 0) {
+                record.status = "invalid";
+            } else {
+                record.status = "valid";
+            }
+            it = it->next;
+        }
+    }
+    
+    public void export(string path, string format) throws DataProcessorError {
+        if (format == "csv") {
+            this.csv_exporter = new CSVExporter(path);
+            var it = this.records.begin();
+            while (it != null) {
+                this.csv_exporter.export_record(it->data);
+                it = it->next;
+            }
+            this.csv_exporter.close();
+        } else if (format == "json") {
+            this.json_exporter = new JSONExporter(path);
+            var it = this.records.begin();
+            while (it != null) {
+                this.json_exporter.export_record(it->data);
+                it = it->next;
+            }
+            this.json_exporter.close();
+        } else {
+            throw new DataProcessorError.FAILED_TO_OPEN("Unsupported output format: %s".printf(format));
+        }
+    }
+}
