@@ -1,0 +1,316 @@
+-- main.beta
+-- Main entry point for the Beta Data Processing Utility
+
+( -- MainClass
+  do
+    # Initialize the main processor
+    processor <- (new DataProcessor)
+    
+    # Default input/output paths
+    inputPath <- 'input_data.csv'
+    outputPath <- 'output_report.json'
+    
+    # Execute the pipeline
+    do
+      # 1. Ingest
+      (processor->loadData(inputPath) & 
+       (print "Data ingested successfully." ;
+        
+        # 2. Transform
+        (processor->transform() & 
+         (print "Data transformed successfully." ;
+          
+          # 3. Validate
+          (processor->validate() & 
+           (print "Data validated successfully." ;
+            
+            # 4. Report
+            (processor->report(outputPath) & 
+             (print "Report generated at: "; output; println) ;
+            )))))
+      )
+    
+)
+)
+
+
+( -- DataProcessor
+  ( * 
+    ingestor : DataIngestor
+    transformer : DataTransformer
+    validator : DataValidator
+    reporter : DataReporter
+    data : List^DataRecord
+    
+    do
+      # Initialize components
+      ingestor <- (new DataIngestor)
+      transformer <- (new DataTransformer)
+      validator <- (new DataValidator)
+      reporter <- (new DataReporter)
+      data <- (new List^DataRecord)
+      
+      # Load data method
+      loadData | path : Address |
+      do
+        (ingestor->parse(path, data) &
+         (print "Loaded "; data->size; " records." ;
+        ))
+      
+      # Transform data method
+      transform |
+      do
+        (transformer->apply(data, data) &
+         (print "Transformation applied." ;
+        ))
+      
+      # Validate data method
+      validate |
+      do
+        (validator->check(data, errors) &
+         (if (errors->size > 0) then
+            (print "Validation errors found: "; errors->size ;
+             errors->forEach(error | (print "  - "; error->message ; println))
+            )
+          else
+            (print "No validation errors." ;
+            )
+         )
+        )
+      
+      # Report data method
+      report | path : Address |
+      do
+        (reporter->generate(data, path) &
+         (print "Report generated." ;
+        ))
+  )
+)
+
+
+( -- DataRecord
+  ( * 
+    fields : Dictionary^String^String
+    
+    do
+      # Constructor
+      new | | |
+      do
+        fields <- (new Dictionary^String^String)
+      
+      # Set field
+      setField | key : Address ; value : Address |
+      do
+        (fields->insert(key, value) ;
+        )
+      
+      # Get field
+      getField | key : Address | result : Address |
+      do
+        (result <- (fields->retrieve(key) ifNull 'null') ;
+        )
+      
+      # Convert to dictionary for serialization
+      toDictionary | | result : Dictionary^String^Address |
+      do
+        result <- (new Dictionary^String^Address)
+        (fields->forEach(key, value | (result->insert(key, value) ;) ;)
+        )
+  )
+)
+
+
+( -- DataIngestor
+  ( * 
+    # Parse a CSV file and populate the data list
+    parse | path : Address ; data : List^DataRecord |
+    do
+      # Simulate file reading (In a real Beta implementation, you'd use OS primitives)
+      # Here we simulate loading a CSV structure
+      lineCounter <- 0
+      (line | stream : Address | 
+        stream <- (new FileReadStream path)
+        (stream->readLine | line : Address | 
+          if (line # 'EOF') then
+            do
+              lineCounter <- lineCounter + 1
+              if (lineCounter > 1) then # Skip header
+                record <- (new DataRecord)
+                fields <- line->split(',')
+                (i : Integer | 
+                  (i <- 0) ;
+                  (fields->forEach(field | 
+                    (if (i < 2) then # Assuming 2 columns for simplicity: id, value
+                      case i of
+                        0: (record->setField('id', field) ;)
+                        1: (record->setField('value', field) ;)
+                      esac
+                    ) ;
+                    i <- i + 1
+                  )
+                )
+                data->add(record)
+              endif
+            
+        ) ;
+        stream->close
+      )
+    
+  )
+)
+
+
+( -- DataTransformer
+  ( * 
+    # Apply transformations to data
+    apply | input : List^DataRecord ; output : List^DataRecord |
+    do
+      (input->forEach(record | 
+        transformedRecord <- (new DataRecord)
+        id <- (record->getField 'id')
+        valueStr <- (record->getField 'value')
+        
+        # Transformation logic: Convert value to float, if possible, then double it
+        try
+          valueFloat <- (valueStr->toFloat)
+          newValue <- (valueFloat * 2.0)->toString
+          (transformedRecord->setField('id', id) ;
+           (transformedRecord->setField('value', newValue) ;
+            output->add(transformedRecord)
+           )
+          )
+        except
+          # If conversion fails, keep original but mark as error
+          (transformedRecord->setField('id', id) ;
+           (transformedRecord->setField('value', valueStr & '_invalid') ;
+            output->add(transformedRecord)
+           )
+          )
+        endtry
+      )
+    
+  )
+)
+
+
+( -- DataValidator
+  ( * 
+    # Validate data records
+    check | input : List^DataRecord ; errors : List^ValidationErrors |
+    do
+      (input->forEach(record | 
+        id <- (record->getField 'id')
+        value <- (record->getField 'value')
+        
+        # Rule 1: ID must not be empty
+        if (id->length == 0) then
+          (errors->add((new ValidationError 'Empty ID found for record')))
+        endif
+        
+        # Rule 2: Value must be numeric (check for '_invalid' suffix)
+        if (value->endsWith('_invalid') not) then
+          # Try to parse to verify numeric
+          try
+            value->toFloat
+          except
+            (errors->add((new ValidationError 'Non-numeric value found for ID ' & id)))
+          endtry
+        endif
+      )
+    
+  )
+)
+
+
+( -- ValidationError
+  ( * 
+    message : Address
+    
+    do
+      new | msg : Address | |
+      do
+        message <- msg
+  )
+)
+
+
+( -- DataReporter
+  ( * 
+    # Generate a JSON report
+    generate | data : List^DataRecord ; path : Address |
+    do
+      file <- (new FileWriteStream path)
+      (file->writeLine '{' ;
+       (file->writeLine '"records": [' ;
+        
+        count <- 0
+        total <- (data->size)
+        (data->forEach(record | 
+          count <- count + 1
+          dict <- (record->toDictionary)
+          jsonStr <- (dict->toJson)
+          
+          if (count < total) then
+            (file->writeLine jsonStr & ',' ;)
+          else
+            (file->writeLine jsonStr ;)
+          endif
+        )
+        
+        (file->writeLine ']' ;
+         (file->writeLine '}' ;
+          file->close
+         )
+        )
+      )
+    
+  )
+)
+
+
+( -- FileReadStream
+  ( * 
+    # Placeholder for file reading logic
+    path : Address
+    
+    do
+      new | p : Address | |
+      do
+        path <- p
+      
+      readLine | line : Address |
+      do
+        # In a real BETA system, this would interact with the OS
+        # For this simulation, we return dummy data or EOF
+        # Since we can't actually read files in this static code block,
+        # we will rely on the main logic to be illustrative of the structure.
+        # To make it "functional" in a theoretical sense, we assume
+        # the environment provides the primitives.
+        line <- 'EOF' # Simplification for static context
+      
+      close |
+      do
+        # Cleanup
+  )
+)
+
+
+( -- FileWriteStream
+  ( * 
+    path : Address
+    
+    do
+      new | p : Address | |
+      do
+        path <- p
+      
+      writeLine | content : Address |
+      do
+        # In a real implementation, this writes to disk
+        # print 'Writing to file: ' & content # Debug output
+      
+      close |
+      do
+        # Cleanup
+  )
+)
