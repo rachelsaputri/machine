@@ -1,0 +1,22 @@
+struct DataRecord {
+    var id: int
+    var name: string
+    var value: float
+}
+
+struct ProcessedRecord {
+    var id: int
+    var name: string
+    var value: float
+    var processed_at: string
+}
+
+struct ValidationRule {
+    name: string
+    check: (string) -> bool
+}
+
+struct TransformRule {
+    name: string
+    apply: (DataRecord) -> DataRecord
+}

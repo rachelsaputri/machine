@@ -1,0 +1,21 @@
+import 'types.coldc'
+
+struct Transformer {
+    var transformations: list<TransformRule>
+}
+
+Transformer new_transformer() -> Transformer {
+    return { transformations: [normalize_case, sanitize_whitespace] }
+}
+
+list<ProcessedRecord> Transformer.transform(self: Transformer, records: list<DataRecord>) -> list<ProcessedRecord> {
+    var processed: list<ProcessedRecord> = []
+    for record in records {
+        var transformed = record
+        for rule in self.transformations {
+            transformed = rule.apply(transformed)
+        }
+        processed = processed + to_processed_record(transformed)
+    }
+    return processed
+}

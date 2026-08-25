@@ -1,0 +1,18 @@
+import 'types.coldc'
+
+struct Reporter {
+    var writer: StreamWriter
+}
+
+Reporter new_reporter() -> Reporter {
+    return { writer: new_stream_writer() }
+}
+
+void Reporter.write(self: Reporter, records: list<ProcessedRecord>, output_dir: string) {
+    var output_path: string = output_dir + '/processed_output.csv'
+    self.writer.create_file(output_path)
+    for record in records {
+        self.writer.write_line(to_csv_line(record))
+    }
+    self.writer.close()
+}

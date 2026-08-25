@@ -1,0 +1,18 @@
+import 'types.coldc'
+
+struct Ingester {
+    var file_handler: FileHandler
+}
+
+Ingester new_ingester() -> Ingester {
+    return { file_handler: new_file_handler() }
+}
+
+list<string> Ingester.read(self: Ingester, directory: string) -> list<string> {
+    var files: list<string> = self.file_handler.list_files(directory)
+    var content: list<string> = []
+    for file in files {
+        content = content + self.file_handler.read(file)
+    }
+    return content
+}

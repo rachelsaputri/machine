@@ -1,0 +1,29 @@
+import 'ingester.coldc'
+import 'validator.coldc'
+import 'transformer.coldc'
+import 'reporter.coldc'
+
+struct Pipeline {
+    var config: Config
+    var ingester: Ingester
+    var validator: Validator
+    var transformer: Transformer
+    var reporter: Reporter
+}
+
+Pipeline new_pipeline(config: Config) -> Pipeline {
+    return {
+        config: config,
+        ingester: new_ingester(),
+        validator: new_validator(),
+        transformer: new_transformer(),
+        reporter: new_reporter()
+    }
+}
+
+void Pipeline.start(self: Pipeline) {
+    var raw_data: list<string> = self.ingester.read(self.config.input_dir)
+    var valid_data: list<DataRecord> = self.validator.validate(raw_data)
+    var processed_data: list<ProcessedRecord> = self.transformer.transform(valid_data)
+    self.reporter.write(processed_data, self.config.output_dir)
+}
