@@ -352,3 +352,5 @@ MIT
 - Created/Updated module: `nsis_data_processing_utility` (See `nsis_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `cecil_data_processing_engine` (See `cecil_data_processing_engine/README.md` for details)
+
+- Created/Updated module: `c_data_processing_utility` (See `c_data_processing_utility/README.md` for details)
