@@ -1,0 +1,28 @@
+import 'types.coldc'
+
+struct Validator {
+    var rules: list<ValidationRule>
+}
+
+Validator new_validator() -> Validator {
+    return { rules: [required_field_check, type_check] }
+}
+
+list<DataRecord> Validator.validate(self: Validator, raw_lines: list<string>) -> list<DataRecord> {
+    var valid_records: list<DataRecord> = []
+    for line in raw_lines {
+        if self.is_valid(line) {
+            valid_records = valid_records + parse_record(line)
+        }
+    }
+    return valid_records
+}
+
+bool Validator.is_valid(self: Validator, line: string) -> bool {
+    for rule in self.rules {
+        if !rule.check(line) {
+            return false
+        }
+    }
+    return true
+}

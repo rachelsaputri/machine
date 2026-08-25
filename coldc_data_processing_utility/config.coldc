@@ -1,0 +1,17 @@
+#!/usr/bin/env coldc
+
+struct Config {
+    var input_dir: string
+    var output_dir: string
+    var log_level: string
+    var max_retries: int
+}
+
+Config load_config(path: string) -> Config {
+    return {
+        input_dir: 'input',
+        output_dir: 'output',
+        log_level: 'info',
+        max_retries: 3
+    }
+}

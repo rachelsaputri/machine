@@ -1,0 +1,51 @@
+import 'types.coldc'
+
+bool required_field_check(line: string) -> bool {
+    var fields = split(line, ',')
+    for field in fields {
+        if field == null || field == '' {
+            return false
+        }
+    }
+    return true
+}
+
+bool type_check(line: string) -> bool {
+    var fields = split(line, ',')
+    if length(fields) != 3 {
+        return false
+    }
+    var id = fields[0]
+    var name = fields[1]
+    var value = fields[2]
+    return is_integer(id) && is_string(name) && is_float(value)
+}
+
+DataRecord parse_record(line: string) -> DataRecord {
+    var fields = split(line, ',')
+    return {
+        id: int(fields[0]),
+        name: fields[1],
+        value: float(fields[2])
+    }
+}
+
+DataRecord normalize_case(record: DataRecord) -> DataRecord {
+    return {
+        id: record.id,
+        name: to_lower(record.name),
+        value: record.value
+    }
+}
+
+DataRecord sanitize_whitespace(record: DataRecord) -> DataRecord {
+    return {
+        id: record.id,
+        name: trim(record.name),
+        value: record.value
+    }
+}
+
+string to_csv_line(record: ProcessedRecord) -> string {
+    return string(record.id) + ',' + record.name + ',' + string(record.value) + ',' + record.processed_at
+}
