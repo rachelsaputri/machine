@@ -1,130 +1,172 @@
-/**
- * D Data Processing Utility
- * 
- * A complete utility for reading, processing, and analyzing structured text data.
- */
-
 import std.stdio;
 import std.string;
-import std.conv;
+import std.file;
+import std.json;
 import std.algorithm;
+import std.conv;
 import std.array;
 import std.exception;
 
-struct DataRecord {
-    string id;
-    string category;
-    double value1;
-    double value2;
-    string status;
-}
+import types;
+import ingester;
+import transformer;
+import validator;
+import reporter;
 
-struct DataStats {
-    int count;
-    double sumValue1;
-    double sumValue2;
-    double minVal1;
-    double maxVal1;
-    double minVal2;
-    double maxVal2;
-}
+import std.getopt;
 
-/**
- * Parses a single line of data into a DataRecord.
- * Expects format: ID,Category,Value1,Value2,Status
- */
-DataRecord parseRecord(string line) {
-    auto trimmed = line.strip();
-    if (trimmed.empty || trimmed.startsWith("#")) {
-        throw new Exception("Invalid or empty line: " ~ line);
-    }
-    
-    auto parts = trimmed.split(",");
-    if (parts.length != 5) {
-        throw new Exception("Malformed record with " ~ to!string(parts.length) ~ " fields: " ~ line);
-    }
-    
-    // Simple validation for numeric fields
-    double val1;
-    double val2;
-    
-    try {
-        val1 = to!double(parts[2].strip());
-    } catch (Exception e) {
-        throw new Exception("Invalid Value1 in line: " ~ line);
-    }
-    
-    try {
-        val2 = to!double(parts[3].strip());
-    } catch (Exception e) {
-        throw new Exception("Invalid Value2 in line: " ~ line);
-    }
-    
-    return DataRecord(
-        parts[0].strip(),
-        parts[1].strip(),
-        val1,
-        val2,
-        parts[4].strip()
-    );
-}
+void main(string[] args)
+{
+    string inputFile;
+    string outputFile;
+    string format = "json";
+    string reportFormat = "json";
+    string[] transformers;
+    bool showHelp;
 
-/**
- * Processes the input file, parses records, calculates statistics, and prints a report.
- */
-void main(string[] args) {
-    if (args.length < 2) {
-        stderr.writeln("Usage: " ~ args[0] ~ " <input_file>");
+    try
+    {
+        std.getopt(std.getopt.options(
+            "input", &inputFile,
+            "Output file path", &outputFile,
+            "Format (json, csv)", &format,
+            "Report format (json, csv)", &reportFormat,
+            "Transformers", &transformers,
+            "help", &showHelp
+        ), std.getput.required(&inputFile, "Input file is required."),
+           std.getput.required(&outputFile, "Output file is required."));
+    }
+    catch (GetOptException e)
+    {
+        writeln("Error: ", e.msg);
+        writeln("Use --help for usage information.");
         exit(1);
     }
-    
-    string filename = args[1];
-    
-    try {
-        auto file = File(filename, "r");
-        
-        DataStats stats = DataStats(0, 0, 0, double.infinity, -double.infinity, double.infinity, -double.infinity);
-        
-        foreach (line; file.byLineCopy) {
-            auto record = parseRecord(line);
-            stats.count++;
-            
-            stats.sumValue1 += record.value1;
-            stats.sumValue2 += record.value2;
-            
-            if (record.value1 < stats.minVal1) stats.minVal1 = record.value1;
-            if (record.value1 > stats.maxVal1) stats.maxVal1 = record.value1;
-            if (record.value2 < stats.minVal2) stats.minVal2 = record.value2;
-            if (record.value2 > stats.maxVal2) stats.maxVal2 = record.value2;
-        }
-        
-        file.close();
-        
-        // Print Report
-        stdout.writeln("===== DATA PROCESSING REPORT =====");
-        stdout.writeln("Input File: " ~ filename);
-        stdout.writeln("Records Processed: " ~ to!string(stats.count));
-        stdout.writeln("");
-        stdout.writeln("--- Statistics for Value1 ---");
-        stdout.writeln("Sum: " ~ format("%.2f", stats.sumValue1));
-        if (stats.count > 0) {
-            stdout.writeln("Average: " ~ format("%.2f", stats.sumValue1 / stats.count));
-        }
-        stdout.writeln("Min: " ~ format("%.2f", stats.minVal1));
-        stdout.writeln("Max: " ~ format("%.2f", stats.maxVal1));
-        stdout.writeln("");
-        stdout.writeln("--- Statistics for Value2 ---");
-        stdout.writeln("Sum: " ~ format("%.2f", stats.sumValue2));
-        if (stats.count > 0) {
-            stdout.writeln("Average: " ~ format("%.2f", stats.sumValue2 / stats.count));
-        }
-        stdout.writeln("Min: " ~ format("%.2f", stats.minVal2));
-        stdout.writeln("Max: " ~ format("%.2f", stats.maxVal2));
-        stdout.writeln("");
-        stdout.writeln("==================================");
-        
-    } catch (Exception e) {
-        stderr.writeln("Error processing file: " ~ e.msg);
+
+    if (showHelp)
+    {
+        writeln("D Data Processing Utility");
+        writeln("=========================");
+        writeln();
+        writeln("Usage: d_data_processing_utility [options]");
+        writeln();
+        writeln("Options:");
+        writeln("  --input FILE      Input data file path (required)");
+        writeln("  --output FILE     Output report file path (required)");
+        writeln("  --format FORMAT   Input format: json or csv (default: json)");
+        writeln("  --report-format FORMAT Output format: json or csv (default: json)");
+        writeln("  --transformers LIST Comma-separated list of transformers");
+        writeln("                    Supported: remove_empty, uppercase, lowercase, trim_whitespace");
+        writeln("  --help            Show this help message");
+        return;
+    }
+
+    // Validate format
+    format = toLower(format);
+    reportFormat = toLower(reportFormat);
+
+    if (format !in ["json", "csv"])
+    {
+        writeln("Error: Unsupported input format \'\', please use json or csv.");
         exit(1);
     }
+
+    if (reportFormat !in ["json", "csv"])
+    {
+        writeln("Error: Unsupported output format \'\', please use json or csv.");
+        exit(1);
+    }
+
+    // Parse transformer list
+    string[] parsedTransformers;
+    foreach (t; transformers)
+    {
+        foreach (name; t.split(","))
+        {
+            string trimmed = name.strip();
+            if (trimmed !in ["remove_empty", "uppercase", "lowercase", "trim_whitespace"])
+            {
+                writeln("Warning: Unknown transformer \'\', skipping.");
+                continue;
+            }
+            parsedTransformers ~= trimmed;
+        }
+    }
+
+    writeln("Starting data processing...");
+    writeln("Input file: ", inputFile);
+    writeln("Output file: ", outputFile);
+    writeln("Input format: ", format);
+    writeln("Output format: ", reportFormat);
+    writeln("Transformers: ", parsedTransformers.join(", "));
+
+    // 1. Ingest Data
+    auto data = try
+    {
+        if (format == "json")
+        {
+            ingestJSON(inputFile);
+        }
+        else
+        {
+            ingestCSV(inputFile);
+        }
+    }
+    catch (Exception e)
+    {
+        writeln("Error during ingestion: ", e.msg);
+        exit(1);
+    }
+
+    if (data.empty)
+    {
+        writeln("Warning: No data ingested from input file.");
+        // Still create an empty report
+        reporter.writeReport(outputFile, [], reportFormat);
+        writeln("Empty report generated at ", outputFile);
+        return;
+    }
+
+    writeln("Ingested ", data.length, " records.");
+
+    // 2. Transform Data
+    try
+    {
+        data = transformData(data, parsedTransformers);
+    }
+    catch (Exception e)
+    {
+        writeln("Error during transformation: ", e.msg);
+        exit(1);
+    }
+
+    // 3. Validate Data
+    auto validationResults = validateData(data);
+    if (validationResults.hasErrors)
+    {
+        writeln("Validation Errors:");
+        foreach (err; validationResults.errors)
+        {
+            writeln("  - ", err);
+        }
+        // Decide whether to fail or continue. For this utility, we continue but log.
+        // In production, you might want to exit(1) here.
+    }
+    else
+    {
+        writeln("All records passed validation.");
+    }
+
+    // 4. Generate Report
+    try
+    {
+        reporter.writeReport(outputFile, data, reportFormat);
+    }
+    catch (Exception e)
+    {
+        writeln("Error during report generation: ", e.msg);
+        exit(1);
+    }
+
+    writeln("Processing complete. Report saved to ", outputFile);
 }

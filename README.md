@@ -370,3 +370,5 @@ MIT
 - Created/Updated module: `mimic_data_processing_utility` (See `mimic_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./nqc_data_processing_utility` (See `./nqc_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `d_data_processing_utility` (See `d_data_processing_utility/README.md` for details)
