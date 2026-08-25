@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <math.h>
+#include "main.nqc"
+
+// Validation and Transformation Logic
+int validate_record(DataRecord* record) {
+    if (record->id < 0) {
+        printf("Warning: Invalid ID %d for record.\n", record->id);
+        return 0;
+    }
+    if (fabs(record->value) > 1e6) {
+        printf("Warning: Out of range value %.2f for ID %d.\n", record->value, record->id);
+        return 0;
+    }
+    if (strlen(record->label) == 0) {
+        printf("Warning: Empty label for ID %d.\n", record->id);
+        return 0;
+    }
+    return 1;
+}
+
+int process_records(DataRecord records[], int count) {
+    int validCount = 0;
+
+    for (int i = 0; i < count; i++) {
+        if (validate_record(&records[i])) {
+            // Transformation Example: Normalize value
+            // For demonstration, let's just double the value
+            records[i].value = records[i].value * 2.0;
+            validCount++;
+        }
+    }
+
+    return validCount;
+}

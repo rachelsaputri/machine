@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <string.h>
+#include "main.nqc"
+
+// Simple CSV parser for ingestion
+int ingest_data(const char* filePath, DataRecord records[], int maxRecords) {
+    FILE* fp = fopen(filePath, "r");
+    if (fp == NULL) {
+        printf("Error: Cannot open file %s\n", filePath);
+        return 0;
+    }
+
+    char line[1024];
+    int count = 0;
+    int headersSkipped = 0;
+
+    while (fgets(line, sizeof(line), fp) != NULL && count < maxRecords) {
+        // Remove newline characters
+        line[strcspn(line, "\n")] = 0;
+
+        if (!headersSkipped) {
+            headersSkipped = 1;
+            continue;
+        }
+
+        // Parse CSV line: id,value,label
+        char* idStr = strtok(line, ",");
+        char* valStr = strtok(NULL, ",");
+        char* labelStr = strtok(NULL, ",");
+
+        if (idStr && valStr && labelStr) {
+            records[count].id = atoi(idStr);
+            records[count].value = atof(valStr);
+            strncpy(records[count].label, labelStr, sizeof(records[count].label) - 1);
+            records[count].label[sizeof(records[count].label) - 1] = '\0';
+            count++;
+        } else {
+            printf("Warning: Malformed line skipped.\n");
+        }
+    }
+
+    fclose(fp);
+    return count;
+}

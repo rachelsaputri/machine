@@ -1,0 +1,107 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Include local modules
+#include "ingester.nqc"
+#include "processor.nqc"
+#include "reporter.nqc"
+
+// Data structure for a single record
+struct DataRecord {
+    int id;
+    float value;
+    char label[50];
+};
+
+// Global configuration
+typedef struct {
+    char inputPath[256];
+    char outputPath[256];
+    int verbose;
+} Config;
+
+Config g_config;
+
+void log_message(const char* msg) {
+    if (g_config.verbose) {
+        printf("[INFO] %s\n", msg);
+    }
+}
+
+void usage() {
+    printf("Usage: nqc_utility [-i <input>] [-o <output>] [-v]\n");
+    printf("  -i <input>    Input file path\n");
+    printf("  -o <output>   Output file path\n");
+    printf("  -v            Verbose mode\n");
+}
+
+int parse_args(int argc, char** argv) {
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            switch (argv[i][1]) {
+                case 'i':
+                    if (i + 1 < argc) {
+                        strncpy(g_config.inputPath, argv[++i], sizeof(g_config.inputPath) - 1);
+                    }
+                    break;
+                case 'o':
+                    if (i + 1 < argc) {
+                        strncpy(g_config.outputPath, argv[++i], sizeof(g_config.outputPath) - 1);
+                    }
+                    break;
+                case 'v':
+                    g_config.verbose = 1;
+                    break;
+                default:
+                    usage();
+                    return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    // Initialize default config
+    strncpy(g_config.inputPath, "data/input.csv", sizeof(g_config.inputPath));
+    strncpy(g_config.outputPath, "data/output.csv", sizeof(g_config.outputPath));
+    g_config.verbose = 0;
+
+    if (parse_args(argc, argv) != 0) {
+        return 1;
+    }
+
+    log_message("Starting NQC Data Processing Utility");
+
+    // Step 1: Ingest Data
+    int recordCount = 0;
+    DataRecord records[1000]; // Assume max 1000 records for simplicity
+
+    recordCount = ingest_data(g_config.inputPath, records, 1000);
+
+    if (recordCount <= 0) {
+        printf("Error: No records ingested or file not found.
+");
+        return 1;
+    }
+
+    log_message("Ingestion complete. Records ingested: %d", recordCount);
+
+    // Step 2: Process Data
+    int processedCount = process_records(records, recordCount);
+
+    log_message("Processing complete. Valid records: %d", processedCount);
+
+    // Step 3: Report Results
+    int success = generate_report(g_config.outputPath, records, recordCount);
+
+    if (success) {
+        log_message("Report generated successfully.");
+    } else {
+        printf("Error: Failed to generate report.");
+        return 1;
+    }
+
+    log_message("Utility finished successfully.");
+    return 0;
+}

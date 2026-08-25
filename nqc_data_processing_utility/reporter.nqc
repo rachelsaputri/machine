@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <string.h>
+#include "main.nqc"
+
+int generate_report(const char* outputPath, DataRecord records[], int count) {
+    FILE* fp = fopen(outputPath, "w");
+    if (fp == NULL) {
+        printf("Error: Cannot create output file %s\n", outputPath);
+        return 0;
+    }
+
+    // Write Header
+    fprintf(fp, "id,value,label\n");
+
+    // Write Data
+    for (int i = 0; i < count; i++) {
+        if (validate_record(&records[i])) {
+            fprintf(fp, "%d,%.2f,%s\n", records[i].id, records[i].value, records[i].label);
+        }
+    }
+
+    fclose(fp);
+    return 1;
+}
