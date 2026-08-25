@@ -348,3 +348,5 @@ MIT
 - Created/Updated module: `fortress_data_processing_utility` (See `fortress_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `data_processing_utility_brew` (See `data_processing_utility_brew/README.md` for details)
+
+- Created/Updated module: `nsis_data_processing_utility` (See `nsis_data_processing_utility/README.md` for details)
