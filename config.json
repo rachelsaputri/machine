@@ -1,0 +1,29 @@
+{
+    "inputPath": "./data/input.csv",
+    "outputPath": "./data/output.json",
+    "transformationRules": [
+        {
+            "type": "rename",
+            "from": "field1",
+            "to": "name"
+        },
+        {
+            "type": "cast",
+            "field": "field2",
+            "toType": "integer"
+        },
+        {
+            "type": "add",
+            "field": "processed_at",
+            "value": "{{current_timestamp}}"
+        }
+    ],
+    "validationSchema": {
+        "type": "object",
+        "properties": {
+            "name": { "type": "string" },
+            "field2": { "type": "integer" }
+        },
+        "required": ["name", "field2"]
+    }
+}
