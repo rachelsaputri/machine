@@ -1,14 +1,43 @@
-     VALIDATE_DATA MODULE(DATA_RECORD);
+/* Validator Module for Easy PL/I Data Processing Utility */
 
-     /* VALIDATE DATA MODULE */
-     DECLARE DATA_RECORD CHARACTER(100);
-     DECLARE IS_VALID BIT INIT('1'B);
+PROCESS OPTIMIZE;
 
-     /* CHECK FOR EMPTY RECORD */
-     IF DATA_RECORD = '' THEN IS_VALID = '0'B;
+DCL ValidationRule1 BIT(1) INIT('1'B);
+DCL ValidationRule2 BIT(1) INIT('1'B);
+DCL ValidationRule3 BIT(1) INIT('1'B);
 
-     /* ADD MORE VALIDATION RULES AS NEEDED */
+/* Validate Record */
+DCL ValidateRecord PROC (CHAR(20), DEC FIXED(10,2), CHAR(10)) RETURNS (BIT(1));
 
-     VALIDATE_DATA = IS_VALID;
+BEGIN;
+  /* Initialize validator state */
+END;
 
-     END VALIDATE_DATA;
+DCL ValidateRecord PROC (CHAR(20), DEC FIXED(10,2), CHAR(10)) RETURNS (BIT(1));
+  DCL V_Field1 CHAR(20);
+  DCL V_Field2 DEC FIXED(10,2);
+  DCL V_Field3 CHAR(10);
+  DCL Result BIT(1);
+  
+  /* Store input */
+  V_Field1 = CurrentField1;
+  V_Field2 = CurrentField2;
+  V_Field3 = CurrentField3;
+  
+  /* Apply validation rules */
+  /* Example: Check Field1 length */
+  IF LENGTH(TRIM(V_Field1)) < 1 THEN
+    Result = '0'B;
+  ELSE
+    Result = '1'B;
+    
+  /* Example: Check Field2 range */
+  IF V_Field2 < 0 OR V_Field2 > 10000 THEN
+    Result = '0'B;
+    
+  /* Example: Check Field3 format */
+  IF LENGTH(TRIM(V_Field3)) < 5 THEN
+    Result = '0'B;
+    
+  RETURN(Result);
+END;

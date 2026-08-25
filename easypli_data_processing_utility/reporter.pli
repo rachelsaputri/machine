@@ -1,13 +1,39 @@
-     REPORTER MODULE(DATA_RECORD);
+/* Reporter Module for Easy PL/I Data Processing Utility */
 
-     /* REPORTER MODULE */
-     DECLARE DATA_RECORD CHARACTER(100);
-     DECLARE REPORT_RECORD CHARACTER(100);
+PROCESS OPTIMIZE;
 
-     /* GENERATE REPORT RECORD */
-     REPORT_RECORD = 'Record Processed: ' || DATA_RECORD;
+DCL TotalRecords FIXED DEC(10);
+DCL ValidRecords FIXED DEC(10);
+DCL FailedRecords FIXED DEC(10);
 
-     /* WRITE REPORT */
-     WRITE FILE(REPORT_FILE) FROM(REPORT_RECORD);
+/* Generate Report */
+DCL GenerateReport PROC (FIXED DEC(10), FIXED DEC(10), FIXED DEC(10));
 
-     END REPORTER;
+BEGIN;
+  /* Initialize reporter state */
+END;
+
+DCL GenerateReport PROC (FIXED DEC(10), FIXED DEC(10), FIXED DEC(10));
+  DCL R_Total FIXED DEC(10);
+  DCL R_Valid FIXED DEC(10);
+  DCL R_Failed FIXED DEC(10);
+  
+  /* Store input */
+  R_Total = TotalRecords;
+  R_Valid = ValidRecords;
+  R_Failed = FailedRecords;
+  
+  /* Generate report output */
+  PUT SKIP LIST('=== Data Processing Report ===');
+  PUT SKIP LIST('Total Records Processed: ' || TRIM(PUT(R_Total, FIXED(10))));
+  PUT SKIP LIST('Valid Records: ' || TRIM(PUT(R_Valid, FIXED(10))));
+  PUT SKIP LIST('Failed Records: ' || TRIM(PUT(R_Failed, FIXED(10))));
+  
+  /* Calculate success rate */
+  IF R_Total > 0 THEN
+    PUT SKIP LIST('Success Rate: ' || TRIM(PUT(R_Valid / R_Total * 100, FIXED(5,2))) || '%');
+  ELSE
+    PUT SKIP LIST('Success Rate: N/A');
+    
+  PUT SKIP LIST('==============================');
+END;

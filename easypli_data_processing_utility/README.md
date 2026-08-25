@@ -1,19 +1,24 @@
 # Easy PL/I Data Processing Utility
 
-This is a data processing utility written in Easy PL/I.
+A complete, production-ready data processing utility written in Easy PL/I. This tool handles the full data pipeline lifecycle: ingestion, transformation, validation, and reporting.
 
 ## Features
-- Data ingestion
-- Data transformation
-- Data validation
-- Report generation
+- Data Ingestion: Reads structured data from input sources.
+- Data Transformation: Applies standardization and cleaning rules.
+- Data Validation: Ensures data integrity and schema compliance.
+- Reporting: Generates summary reports and exports results.
 
 ## Usage
-Compile the main program and run it to process your data files.
+Compile with a standard Easy PL/I compiler and run the main program:
+```
+epli main.pli
+main
+```
 
-## Files
-- `main.pli`: Entry point for the data processing utility.
-- `parser.pli`: Contains the logic for parsing input data.
-- `transformer.pli`: Contains the logic for transforming data.
-- `validator.pli`: Contains the logic for validating data.
-- `reporter.pli`: Contains the logic for generating reports.
+## Components
+- `main.pli`: Entry point, orchestrates the pipeline.
+- `parser.pli`: Handles data ingestion and parsing.
+- `transformer.pli`: Applies transformation rules.
+- `validator.pli`: Validates data against schemas.
+- `reporter.pli`: Generates output reports.
+- `processor.pli`: Core processing logic.
