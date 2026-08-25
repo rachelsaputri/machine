@@ -1,0 +1,13 @@
+(define (ingest-file filepath)
+  "Reads data from the specified file."
+  (if (file-exists? filepath)
+      (read-lines filepath)
+      (error "File not found: " filepath)))
+
+(define (normalize-line line)
+  "Normalizes a line of input data."
+  (trim (lowercase line)))
+
+(define (ingest-and-clean filepath)
+  "Ingests and cleans the data."
+  (map normalize-line (ingest-file filepath)))

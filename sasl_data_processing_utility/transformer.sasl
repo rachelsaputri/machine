@@ -1,43 +1,14 @@
--- sasl_data_processing_utility/transformer.sasl
--- Provides data transformation functions.
+(define (transform-data data)
+  "Applies transformations to the raw data."
+  (map clean-entry data))
 
--- Normalize a string field: trim whitespace and convert to lowercase
-NormaliseString(\text -> 
-    let
-        trimmed = Trim(text);
-        lowercased = ToLower(trimmed)
-    in lowercased
-)
+(define (clean-entry entry)
+  "Cleans a single data entry."
+  (if (null? entry)
+      '()
+      (let ((fields (split-by-comma entry)))
+        (map trim fields))))
 
--- Extract numeric value from a string (if possible)
-ExtractNumeric(\value -> 
-    case 
-        IsNumeric(value) of
-            true -> ParseFloat(value)
-            false -> 0.0
-    end
-)
-
--- Standardize date format (YYYY-MM-DD -> DD/MM/YYYY)
-StandardiseDate(\dateStr -> 
-    if Length(dateStr) == 10 then
-        let
-            year = Substring(dateStr, 0, 4);
-            month = Substring(dateStr, 5, 2);
-            day = Substring(dateStr, 8, 2)
-        in concat(day, "/", month, "/", year)
-    else
-        dateStr
-    end
-)
-
--- Apply all transformations to a record
-TransformRecord(\record -> 
-    let
-        processedName = NormaliseString(\field_1 -> record["name"]);
-        processedValue = ExtractNumeric(\field_1 -> record["value"]);
-        processedDate = StandardiseDate(\field_1 -> record["date"]);
-        processedRecord = append(append(record, {"name": processedName}), {"value": processedValue});
-        finalRecord = append(processedRecord, {"date": processedDate})
-    in finalRecord
-)
+(define (filter-records data predicate)
+  "Filters data based on a predicate function."
+  (filter predicate data))

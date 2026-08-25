@@ -1,49 +1,21 @@
--- sasl_data_processing_utility/main.sasl
--- Main entry point for the SASL Data Processing Utility.
+(import 'ingester' 'transformer' 'validator' 'reporter')
 
-Import(transformer)
-Import(validator)
-Import(reporter)
+(define (process-data source-path target-path)
+  "Main entry point for the data processing pipeline."
+  (let ((raw-data (ingest-file source-path)))
+    (if (null? raw-data)
+        (log-message "No data to process.")
+        (let ((cleaned-data (transform-data raw-data))
+              (reporter (init-reporter target-path)))
+          (if (validate-data cleaned-data)
+              (begin
+                (report-clean reporter cleaned-data)
+                (log-message "Processing complete."))
+              (begin
+                (report-errors reporter cleaned-data)
+                (log-message "Validation failed."))
+              (deinit-reporter reporter)))))))
 
--- Test data ingestion simulation
-IngestTestData() -> 
-    [
-        {"name": "  Alpha Unit  ", "value": "100", "date": "2023-01-01"},
-        {"name": "Beta Unit", "value": "-5", "date": "2023-02-15"},
-        {"name": "Gamma Unit", "value": "200", "date": "2023-03-10"},
-        {"name": "Delta Unit", "value": "999", "date": ""},
-        {"name": "  Epsilon  ", "value": "abc", "date": "2023-04-20"}
-    ]
-
--- Main processing pipeline
-Main() -> 
-    let
-        rawData = IngestTestData();
-        inputCount = Length(rawData);
-        
-        -- Transform all records
-        transformedData = Map(\r -> TransformRecord(r), rawData);
-        processedCount = Length(transformedData);
-        
-        -- Validate all records
-        validationResults = Map(\r -> ValidateRecord(r), transformedData);
-        
-        -- Split into valid and invalid
-        validRecords = Filter(\v -> v["valid"], validationResults);
-        invalidRecords = Filter(\v -> not v["valid"], validationResults);
-        
-        validCount = Length(validRecords);
-        invalidCount = Length(invalidRecords);
-        
-        -- Print valid records
-        PrintValidRecords(validRecords);
-        
-        -- Print invalid records
-        PrintInvalidRecords(invalidRecords);
-        
-        -- Print summary
-        Print(GenerateSummary(inputCount, processedCount, validCount, invalidCount))
-    in true
-
--- Execute main
-Main()
+(define (main)
+  "Starts the pipeline with default configuration."
+  (process-data "./input/data.csv" "./output/report.txt"))

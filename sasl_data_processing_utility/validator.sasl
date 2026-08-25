@@ -1,31 +1,17 @@
--- sasl_data_processing_utility/validator.sasl
--- Provides data validation functions.
+(define (validate-data data)
+  "Validates the cleaned data."
+  (if (null? data)
+      #f
+      (and (check-schema data) (check-types data))))
 
--- Check if a record has all required fields
-HasRequiredFields(\record -> 
-    let
-        required = ["name", "value", "date"];
-        exists(\f -> HasKey(record, f))
-    in 
-        Fold(\acc, \field -> acc && exists(field), true, required)
-)
+(define (check-schema data)
+  "Checks if data matches the expected schema."
+  (every (lambda (record)
+           (and (length=? 3 record) (string? (first record))))
+         data))
 
--- Validate value is within acceptable range (0 to 1000)
-IsValidRange(\value -> 
-    value >= 0 && value <= 1000
-)
-
--- Validate date is not empty and looks valid
-IsValidDate(\dateStr -> 
-    not IsEmpty(dateStr) && Length(dateStr) == 10
-)
-
--- Run all validations on a record
-ValidateRecord(\record -> 
-    let
-        fieldsValid = HasRequiredFields(record);
-        valueValid = IsValidRange(record["value"]);
-        dateValid = IsValidDate(record["date"])
-    in
-        {"valid": fieldsValid && valueValid && dateValid, "record": record}
-)
+(define (check-types data)
+  "Basic type checking for integrity."
+  (every (lambda (x)
+           (or (string? x) (number? x)))
+         data))

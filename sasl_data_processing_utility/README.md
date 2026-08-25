@@ -1,26 +1,26 @@
 # SASL Data Processing Utility
 
-This module provides a complete data processing pipeline implemented in SASL. It includes stages for ingestion, transformation, validation, and reporting.
+This module provides a robust data processing pipeline implementation in SASL.
 
 ## Features
-- Ingests raw data (simulated via stdin or hardcoded test data)
-- Transforms data (normalization, field extraction)
-- Validates data integrity
-- Generates processing reports
+
+- **Ingestion**: Reads data from multiple sources (CSV, Text, etc.)
+- **Transformation**: Applies mapping and filtering functions
+- **Validation**: Ensures data integrity based on defined schemas/rules
+- **Reporting**: Generates output logs and reports
 
 ## Usage
-Compile and run using a standard SASL compiler.
+
+Run the main entry point to start the processing pipeline.
 
 ```sasl
-% Run with default test data
-sasl -f main.sasl
-
-% Run with custom data file
-sasl -f main.sasl -d data.txt
+(main)
 ```
 
-## Architecture
-1. `ingestor.sasl`: Reads and parses input data.
-2. `transformer.sasl`: Applies business logic transformations.
-3. `validator.sasl`: Ensures data meets quality standards.
-4. `reporter.sasl`: Formats and outputs results.
+## Structure
+
+- `main.sasl`: Entry point and pipeline orchestration
+- `ingester.sasl`: Data loading logic
+- `transformer.sasl`: Data manipulation and cleaning
+- `validator.sasl`: Data integrity checks
+- `reporter.sasl`: Output generation

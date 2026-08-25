@@ -1,39 +1,24 @@
--- sasl_data_processing_utility/reporter.sasl
--- Provides reporting functions for the processing pipeline.
+(define (init-reporter output-path)
+  "Initializes the reporting subsystem."
+  (list :path output-path :success-count 0 :error-count 0))
 
--- Generate a summary string
-GenerateSummary(\inputCount, \processedCount, \validCount, \invalidCount -> 
-    concat(
-        "\n========================================\n",
-        "  DATA PROCESSING SUMMARY\n",
-        "========================================\n",
-        "Total Records Ingested: ", ToString(inputCount), "\n",
-        "Successfully Processed: ", ToString(processedCount), "\n",
-        "Valid Records:          ", ToString(validCount), "\n",
-        "Invalid Records:        ", ToString(invalidCount), "\n",
-        "========================================\n",
-        "  PROCESSING COMPLETE\n",
-        "========================================"
-    )
-)
+(define (report-clean reporter data)
+  "Logs successfully processed records."
+  (update-counts reporter 'success (length data))
+  (append-to-file (: path reporter)
+                  (map format-record data)))
 
--- Format a single record for output
-FormatRecord(\record -> 
-    concat(
-        "Name: ", ToString(record["name"]), " | ",
-        "Value: ", ToString(record["value"]), " | ",
-        "Date: ", ToString(record["date"])
-    )
-)
+(define (report-errors reporter data)
+  "Logs validation errors."
+  (update-counts reporter 'error (length data))
+  (append-to-file (: path reporter)
+                  (list "Validation Errors:")
+                  data))
 
--- Print all valid records
-PrintValidRecords(\validRecords -> 
-    Print("\\n--- Valid Records ---")
-    ForEach(\r -> Print(FormatRecord(r)), validRecords)
-)
+(define (deinit-reporter reporter)
+  "Finalizes the report and closes handles."
+  (append-to-file (: path reporter) '()))
 
--- Print all invalid records with reasons (simplified)
-PrintInvalidRecords(\invalidRecords -> 
-    Print("\\n--- Invalid Records ---")
-    ForEach(\r -> Print(concat("INVALID: ", FormatRecord(r))), invalidRecords)
-)
+(define (format-record record)
+  "Formats a data record for output."
+  (join " | " record))
