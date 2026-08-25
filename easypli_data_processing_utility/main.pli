@@ -1,29 +1,65 @@
-     EASYPLI_DATA_PROCESSING_UTILITY PROGRAM;
+/* Main Entry Point for Easy PL/I Data Processing Utility */
 
-     /* MAIN ENTRY POINT */
-     DECLARE I FIXED BINARY INIT(0);
-     DECLARE DATA_RECORD CHARACTER(100);
-     DECLARE IS_EOF BIT;
+PROCESS OPTIMIZE;
 
-     /* OPEN INPUT FILE */
-     OPEN FILE(INPUT_FILE) RECORD;
-     OPEN FILE(OUTPUT_FILE) RECORD;
+DCL 1 InputRecord,
+      Field1 CHAR(20),
+      Field2 DEC FIXED(10,2),
+      Field3 CHAR(10);
 
-     DO WHILE(IS_EOF = '0'B);
-        READ FILE(INPUT_FILE) INTO(DATA_RECORD);
-        IF ERROR THEN IS_EOF = '1'B;
-        ELSE DO;
-           /* PARSE DATA */
-           CALL PARSE_DATA(DATA_RECORD);
-           /* TRANSFORM DATA */
-           CALL TRANSFORM_DATA(DATA_RECORD);
-           /* VALIDATE DATA */
-           IF VALIDATE_DATA(DATA_RECORD) THEN
-              WRITE FILE(OUTPUT_FILE) FROM(DATA_RECORD);
-        END;
-     END;
+DCL 1 OutputRecord,
+      Field1 CHAR(20),
+      Field2 DEC FIXED(10,2),
+      Field3 CHAR(10);
 
-     CLOSE FILE(INPUT_FILE);
-     CLOSE FILE(OUTPUT_FILE);
+DCL 1 ValidationResult,
+      IsValid BIT(1) INIT('1'B),
+      ErrorCode CHAR(10);
 
-     END EASYPLI_DATA_PROCESSING_UTILITY;
+DCL 1 ReportResult,
+      TotalRecords FIXED DEC(10),
+      ValidRecords FIXED DEC(10),
+      FailedRecords FIXED DEC(10);
+
+/* External Procedure Declarations */
+DCL ParseInput PROC (CHAR(20), CHAR(10)) RETURNS (BIT(1));
+DCL TransformData PROC (CHAR(20), DEC FIXED(10,2), CHAR(10)) RETURNS (CHAR(20), DEC FIXED(10,2), CHAR(10));
+DCL ValidateRecord PROC (CHAR(20), DEC FIXED(10,2), CHAR(10)) RETURNS (BIT(1));
+DCL GenerateReport PROC (FIXED DEC(10), FIXED DEC(10), FIXED DEC(10));
+
+/* Local Variables */
+DCL CurrentLine CHAR(255);
+DCL RecordCount FIXED DEC(10) INIT(0);
+DCL ValidCount FIXED DEC(10) INIT(0);
+DCL InvalidCount FIXED DEC(10) INIT(0);
+DCL EOF BIT(1) INIT('0'B);
+
+/* Main Procedure */
+BEGIN;
+
+  PUT SKIP LIST('Easy PL/I Data Processing Utility Started');
+
+  DO WHILE (EOF = '0'B);
+    /* Ingest Data */
+    CALL ParseInput(CurrentLine, Field1);
+    IF EOF = '1'B THEN LEAVE;
+
+    /* Transform Data */
+    CALL TransformData(Field1, Field2, Field3);
+
+    /* Validate Data */
+    CALL ValidateRecord(Field1, Field2, Field3, ValidationResult);
+
+    IF ValidationResult.IsValid = '1'B THEN
+      ValidCount = ValidCount + 1;
+    ELSE
+      InvalidCount = InvalidCount + 1;
+
+    RecordCount = RecordCount + 1;
+  END;
+
+  /* Generate Report */
+  CALL GenerateReport(RecordCount, ValidCount, InvalidCount);
+
+  PUT SKIP LIST('Easy PL/I Data Processing Utility Finished');
+END;

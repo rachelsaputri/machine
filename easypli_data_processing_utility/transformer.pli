@@ -1,14 +1,43 @@
-     TRANSFORM_DATA MODULE(DATA_RECORD);
+/* Transformer Module for Easy PL/I Data Processing Utility */
 
-     /* TRANSFORM DATA MODULE */
-     DECLARE DATA_RECORD CHARACTER(100);
-     DECLARE TRANSFORMED_RECORD CHARACTER(100);
+PROCESS OPTIMIZE;
 
-     /* APPLY TRANSFORMATIONS */
-     TRANSFORMED_RECORD = TO_UPPER(DATA_RECORD);
-     /* ADD MORE TRANSFORMATIONS AS NEEDED */
+DCL CurrentField1 CHAR(20);
+DCL CurrentField2 DEC FIXED(10,2);
+DCL CurrentField3 CHAR(10);
 
-     /* UPDATE DATA_RECORD */
-     DATA_RECORD = TRANSFORMED_RECORD;
+/* Transform Data */
+DCL TransformData PROC (CHAR(20), DEC FIXED(10,2), CHAR(10)) RETURNS (CHAR(20), DEC FIXED(10,2), CHAR(10));
 
-     END TRANSFORM_DATA;
+DCL Transformed1 CHAR(20);
+DCL Transformed2 DEC FIXED(10,2);
+DCL Transformed3 CHAR(10);
+
+BEGIN;
+  /* Initialize transformer state */
+END;
+
+DCL TransformData PROC (CHAR(20), DEC FIXED(10,2), CHAR(10)) RETURNS (CHAR(20), DEC FIXED(10,2), CHAR(10));
+  DCL T_Field1 CHAR(20);
+  DCL T_Field2 DEC FIXED(10,2);
+  DCL T_Field3 CHAR(10);
+  
+  /* Store input */
+  T_Field1 = CurrentField1;
+  T_Field2 = CurrentField2;
+  T_Field3 = CurrentField3;
+  
+  /* Apply transformations */
+  /* Example: Convert Field1 to uppercase */
+  Transformed1 = TRANSLATE(T_Field1, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz');
+  
+  /* Example: Multiply Field2 by 1.1 */
+  Transformed2 = T_Field2 * 1.1;
+  
+  /* Example: Pad Field3 with zeros */
+  Transformed3 = T_FIELD3 || '000';
+  
+  /* Return transformed data */
+  /* This is a simplified representation */
+  RETURN(Transformed1, Transformed2, Transformed3);
+END;

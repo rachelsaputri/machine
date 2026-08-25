@@ -1,19 +1,56 @@
-     PARSE_DATA MODULE(DATA_RECORD);
+/* Parser Module for Easy PL/I Data Processing Utility */
 
-     /* PARSE DATA MODULE */
-     DECLARE DATA_RECORD CHARACTER(100);
-     DECLARE FIELD1 CHARACTER(20);
-     DECLARE FIELD2 CHARACTER(20);
-     DECLARE FIELD3 CHARACTER(20);
+PROCESS OPTIMIZE;
 
-     /* EXTRACT FIELDS */
-     FIELD1 = SUBSTR(DATA_RECORD, 1, 20);
-     FIELD2 = SUBSTR(DATA_RECORD, 21, 20);
-     FIELD3 = SUBSTR(DATA_RECORD, 41, 20);
+DCL CurrentLine CHAR(255);
+DCL EOF BIT(1) INIT('0'B);
 
-     /* PROCESS FIELDS */
-     CALL PROCESS_FIELD1(FIELD1);
-     CALL PROCESS_FIELD2(FIELD2);
-     CALL PROCESS_FIELD3(FIELD3);
+/* Parse Input Data */
+DCL ParseInput PROC (CHAR(20), CHAR(10)) RETURNS (BIT(1));
+DCL GetLine PROC (CHAR(255)) RETURNS (BIT(1));
 
-     END PARSE_DATA;
+DCL InputBuffer CHAR(255);
+
+BEGIN;
+  /* Initialize parser state */
+  EOF = '0'B;
+END;
+
+DCL ParseInput PROC (CHAR(20), CHAR(10)) RETURNS (BIT(1));
+  DCL P_Field1 CHAR(20);
+  DCL P_Field2 CHAR(10);
+  DCL P_EOF BIT(1);
+  
+  /* Read next line */
+  P_EOF = GetLine(InputBuffer);
+  IF P_EOF = '1'B THEN RETURN('1'B);
+  
+  /* Parse line into fields */
+  /* Assume comma-delimited for this example */
+  P_Field1 = SUBSTR(InputBuffer, 1, INDEX(InputBuffer, ',') - 1);
+  P_Field2 = SUBSTR(InputBuffer, INDEX(InputBuffer, ',') + 1);
+  
+  /* Pass data to main program */
+  /* This is a simplified representation */
+  RETURN('0'B);
+END;
+
+DCL GetLine PROC (CHAR(255)) RETURNS (BIT(1));
+  DCL P_Input CHAR(255);
+  DCL Line CHAR(255);
+  DCL EOF_FLAG BIT(1);
+  
+  /* Simulate reading a line */
+  /* In a real implementation, this would read from stdin or a file */
+  GET LIST(Line);
+  
+  IF TRIM(Line) = '' THEN
+    EOF_FLAG = '1'B;
+  ELSE
+    DO
+      P_Input = Line;
+      EOF_FLAG = '0'B;
+    END;
+  
+  RETURN(EOF_FLAG);
+END;
