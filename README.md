@@ -356,3 +356,5 @@ MIT
 - Created/Updated module: `c_data_processing_utility` (See `c_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `lagoona_data_processing_utility` (See `lagoona_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `sail_data_processing_utility` (See `sail_data_processing_utility/README.md` for details)
