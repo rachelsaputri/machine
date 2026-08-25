@@ -1,0 +1,62 @@
+// DataFlex Data Processing Utility - Main Module
+// Module: dp_main.dfx
+
+include dp_engine.dfx
+include dp_types.dfx
+
+// Main entry point for the data processing utility
+function cMain
+
+    boolean gbSuccess
+    cstring csSourcePath
+    cstring csTransformRule
+
+    // Define default paths and rules
+    set csSourcePath to "data/input.csv"
+    set csTransformRule to "STANDARD_CLEANSE"
+
+    // Initialize the engine
+    set gbSuccess to cInitializeEngine("")
+    
+    if not gbSuccess
+        // In a real app, this would use error handling UI
+        print "Failed to initialize engine: " + get_ErrorLog()
+        stop
+    end
+    
+    print "Engine initialized successfully."
+
+    // Load data from source
+    set gbSuccess to cLoadData(csSourcePath, ",")
+    
+    if not gbSuccess
+        print "Failed to load data: " + get_ErrorLog()
+        cShutdownEngine
+        stop
+    end
+    
+    print "Data loaded successfully."
+
+    // Process the dataset
+    set gbSuccess to cProcessDataset(csTransformRule)
+    
+    if not gbSuccess
+        print "Processing failed: " + get_ErrorLog()
+        // In a real app, you might generate a partial report or error report
+    else
+        print "Dataset processed successfully."
+    end
+
+    // Generate report (simulated call to dp_reporter)
+    // cGenerateReport("output/report.csv")
+
+    // Shutdown engine
+    cShutdownEngine
+    print "Engine shut down."
+
+end
+
+// Entry point for standalone execution
+if __name__ = "dp_main"
+    call cMain
+end if

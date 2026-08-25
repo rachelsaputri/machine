@@ -1,0 +1,31 @@
+// DataFlex Data Processing Utility - Types Module
+// Module: dp_types.dfx
+
+// Define custom types for the data processing utility
+
+type 
+    tDataRecord
+        string Field1
+        string Field2
+        string Field3
+        integer RecordStatus
+        cstring ErrorMessage
+    end_type
+    
+tDataSource
+    object InternalHandle
+    integer RecordCount
+    cstring SourcePath
+end_type
+
+// Define constants for engine states
+cstring STATE_IDLE = "IDLE"
+cstring STATE_RUNNING = "RUNNING"
+cstring STATE_READY = "READY"
+cstring STATE_STOPPED = "STOPPED"
+
+// Define constants for record statuses
+cstring STATUS_NEW = "NEW"
+cstring STATUS_VALID = "VALID"
+cstring STATUS_ERROR = "ERROR"
+cstring STATUS_TRANSFORMED = "TRANSFORMED"
