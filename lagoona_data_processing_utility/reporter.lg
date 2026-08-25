@@ -1,0 +1,19 @@
+module Reporter
+
+import io
+
+generate_report(results: List[Any], output_path: String): void {
+    let file = io.open_write(output_path)
+    file.write_line("Lagoona Data Processing Report")
+    file.write_line("==============================")
+    file.write_line("Total Records: " + results.size)
+    file.write_line("")
+    
+    for i in results.each_index() {
+        let record = results.get(i)
+        file.write_line("Record " + (i + 1) + ": " + record)
+    }
+    
+    file.close()
+    println("Report generated at: " + output_path)
+}

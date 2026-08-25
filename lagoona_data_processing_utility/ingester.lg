@@ -1,0 +1,29 @@
+module Ingestor
+
+import io
+import collections
+
+function ingest_from_file(path: String): List[String] {
+    let file = io.open_read(path)
+    let lines = file.read_all()
+    return lines
+}
+
+function ingest_from_stream(stream: InputStream): List[Any] {
+    let data = []
+    for line in stream.read_all() {
+        let parsed = parse_line(line)
+        if parsed != null {
+            data.add(parsed)
+        }
+    }
+    return data
+}
+
+function parse_line(line: String): Any {
+    // Simple CSV-like parsing example
+    if line.starts_with("#") {
+        return null
+    }
+    return line.split(",")
+}

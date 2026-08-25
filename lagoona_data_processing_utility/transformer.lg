@@ -1,0 +1,31 @@
+module Transformer
+
+function uppercase_transform(value: String): String {
+    return value.upper()
+}
+
+function format_date(value: String): String {
+    // Placeholder for date formatting logic
+    return value
+}
+
+function apply_transformations(data: List[List[String]], transformers: List[Function]): List[List[String]] {
+    let result = []
+    for row in data {
+        let new_row = []
+        for i in row.each_index() {
+            let val = row.get(i)
+            let transformed_val = apply_transformer(val, transformers)
+            new_row.add(transformed_val)
+        }
+        result.add(new_row)
+    }
+    return result
+}
+
+function apply_transformer(value: Any, transformers: List[Function]): Any {
+    for transformer in transformers {
+        value = transformer.apply(value)
+    }
+    return value
+}

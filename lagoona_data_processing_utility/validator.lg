@@ -1,0 +1,31 @@
+module Validator
+
+function validate_record(record: List[String]): Result {
+    if record.is_empty() {
+        return Result.failure("Record is empty")
+    }
+    
+    for field in record {
+        if field.is_empty() {
+            return Result.failure("Missing field value")
+        }
+    }
+    return Result.success()
+}
+
+function validate_batch(records: List[List[String]]): Result {
+    let errors = []
+    for i in records.each_index() {
+        let record = records.get(i)
+        let result = validate_record(record)
+        if !result.is_success() {
+            errors.add("Record " + i + ": " + result.message)
+        }
+    }
+    
+    if errors.is_empty() {
+        return Result.success()
+    } else {
+        return Result.failure("Validation errors: " + errors.join(" | "))
+    }
+}
