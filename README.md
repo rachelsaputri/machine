@@ -386,3 +386,5 @@ MIT
 - Created/Updated module: `easypli_data_processing_utility` (See `easypli_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `dylan_data_processing_utility` (See `dylan_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `espol_data_processing_utility` (See `espol_data_processing_utility/README.md` for details)
