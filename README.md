@@ -396,3 +396,5 @@ MIT
 - Created/Updated module: `metal_data_processing_utility` (See `metal_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `factor_data_processing_utility` (See `factor_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `./flow_matic_data_processing_utility` (See `./flow_matic_data_processing_utility/README.md` for details)
