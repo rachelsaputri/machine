@@ -384,3 +384,5 @@ MIT
 - Created/Updated module: `amiga_e_data_processing_utility` (See `amiga_e_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `easypli_data_processing_utility` (See `easypli_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `dylan_data_processing_utility` (See `dylan_data_processing_utility/README.md` for details)
