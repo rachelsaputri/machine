@@ -1,0 +1,30 @@
+! MAIN.M204 - Model 204 Data Processing Utility Entry Point
+! This program orchestrates the data processing pipeline.
+
+   ! Declare variables
+   DEFINE process_count = 0
+   DEFINE error_count = 0
+   DEFINE status_code = 0
+
+   ! Initialize the processing session
+   PRINT 'STARTING MODEL 204 DATA PROCESSING UTILITY'
+   PRINT '--------------------------------------------------'
+
+   ! Call the validator to ensure data integrity before processing
+   CALL validate_data(status_code)
+   IF status_code <> 0 THEN
+      PRINT 'DATA VALIDATION FAILED. ABORTING PROCESS.'
+      STOP 1
+   END
+
+   ! Call the processor to handle the transformation
+   CALL process_records(process_count, error_count)
+
+   ! Generate final report
+   PRINT '--------------------------------------------------'
+   PRINT 'PROCESSING COMPLETE'
+   PRINT 'Records Processed: ', process_count
+   PRINT 'Errors Encountered: ', error_count
+   PRINT '--------------------------------------------------'
+
+   STOP 0

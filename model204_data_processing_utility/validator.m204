@@ -1,0 +1,36 @@
+! VALIDATOR.M204 - Data Integrity and Validation Rules
+
+   PROCEDURE validate_data(return_status)
+   DEFINE return_status = INTEGER
+   DEFINE record_count = 0
+   DEFINE invalid_count = 0
+   DEFINE check_status = 0
+
+   ! Count total records in the source file
+   COUNT data_source INTO record_count
+
+   IF record_count = 0 THEN
+      PRINT 'WARNING: NO RECORDS FOUND TO PROCESS'
+      return_status = 1
+      RETURN
+   END
+
+   ! Validate primary key uniqueness
+   VALIDATE UNIQUE keys ON data_source STATUS check_status
+   IF check_status <> 0 THEN
+      PRINT 'ERROR: DUPLICATE PRIMARY KEYS DETECTED'
+      return_status = 1
+      RETURN
+   END
+
+   ! Validate required fields
+   VALIDATE MANDATORY fields ON data_source STATUS check_status
+   IF check_status <> 0 THEN
+      PRINT 'ERROR: MISSING REQUIRED FIELDS'
+      return_status = 1
+      RETURN
+   END
+
+   PRINT 'VALIDATION PASSED'
+   return_status = 0
+   RETURN

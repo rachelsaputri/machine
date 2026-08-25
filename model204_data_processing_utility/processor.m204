@@ -1,0 +1,36 @@
+! PROCESSOR.M204 - Core Data Transformation Logic
+
+   PROCEDURE process_records(count_var, error_var)
+   DEFINE count_var = INTEGER
+   DEFINE error_var = INTEGER
+   DEFINE record_id = 0
+   DEFINE status = 0
+
+   ! Open the source data file
+   OPEN INPUT data_source
+
+   ! Check if file was opened successfully
+   IF status <> 0 THEN
+      PRINT 'ERROR: CANNOT OPEN DATA SOURCE'
+      error_var = error_var + 1
+      RETURN
+   END
+
+   ! Loop through all records in the file
+   FETCH data_source INTO record_id
+   WHILE status = 0 DO
+      ! Perform data transformation
+      CALL transform_record(record_id, status)
+      IF status <> 0 THEN
+         error_var = error_var + 1
+      ELSE
+         count_var = count_var + 1
+      END
+
+      ! Move to the next record
+      FETCH data_source INTO record_id
+   END
+
+   ! Close the source file
+   CLOSE data_source
+   RETURN
