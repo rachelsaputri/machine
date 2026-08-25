@@ -1,0 +1,32 @@
+# MetaL Data Processing Utility - Main Entry Point
+# This file orchestrates the entire data processing pipeline.
+
+include "ingester.mtl"
+include "transformer.mtl"
+include "validator.mtl"
+include "reporter.mtl"
+
+function main(input_file, output_file) {
+    # Step 1: Ingest data
+    raw_data = ingest_data(input_file)
+    
+    # Step 2: Validate data
+    if not validate_data(raw_data) {
+        log_error("Data validation failed. Aborting pipeline.")
+        return
+    }
+    
+    # Step 3: Transform data
+    processed_data = transform_data(raw_data)
+    
+    # Step 4: Export data
+    export_data(processed_data, output_file)
+    
+    # Step 5: Generate report
+    generate_report(input_file, output_file, "success")
+    
+    log_message("Data processing pipeline completed successfully.")
+}
+
+# Entry point
+main("./input/data.csv", "./output/processed_data.csv")

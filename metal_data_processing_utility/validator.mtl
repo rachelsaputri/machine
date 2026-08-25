@@ -1,0 +1,61 @@
+# MetaL Data Processing Utility - Data Validator
+# Validates the integrity and structure of the data.
+
+function validate_data(data) {
+    if length(data) == 0 {
+        log_warning("No data to validate.")
+        return true
+    }
+    
+    required_fields = ["email", "name"]
+    
+    for i = 0 to length(data) - 1 {
+        record = data[i]
+        
+        for field in required_fields {
+            if not (field in record) {
+                log_error("Missing required field: " + field + " in record " + (i + 1))
+                return false
+            }
+            
+            if record[field] == "" {
+                log_error("Empty value for field: " + field + " in record " + (i + 1))
+                return false
+            }
+        }
+        
+        # Validate email format (simple check)
+        email = record["email"]
+        if not contains(email, "@") or not contains(email, ".") {
+            log_error("Invalid email format: " + email + " in record " + (i + 1))
+            return false
+        }
+    }
+    
+    return true
+}
+
+function contains(text, substring) {
+    if length(substring) == 0 {
+        return true
+    }
+    
+    if length(text) < length(substring) {
+        return false
+    }
+    
+    for i = 1 to length(text) - length(substring) + 1 {
+        match = true
+        for j = 1 to length(substring) {
+            if text[i + j - 1] != substring[j] {
+                match = false
+                break
+            }
+        }
+        if match {
+            return true
+        }
+    }
+    
+    return false
+}

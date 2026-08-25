@@ -1,0 +1,80 @@
+# MetaL Data Processing Utility - Data Transformer
+# Applies transformation rules to the data.
+
+function transform_data(data) {
+    transformed_records = []
+    
+    for record in data {
+        transformed_record = {}
+        
+        # Example transformation: Normalize email to lowercase
+        if "email" in record {
+            transformed_record["email"] = lowercase(record["email"])
+        } else {
+            transformed_record["email"] = null
+        }
+        
+        # Example transformation: Trim whitespace from name
+        if "name" in record {
+            transformed_record["name"] = trim(record["name"])
+        } else {
+            transformed_record["name"] = null
+        }
+        
+        # Copy other fields as-is
+        for key in record {
+            if key notin ["email", "name"] {
+                transformed_record[key] = record[key]
+            }
+        }
+        
+        push(transformed_records, transformed_record)
+    }
+    
+    return transformed_records
+}
+
+function lowercase(text) {
+    # MetaL doesn't have built-in lowercase, implementing a simple version
+    result = ""
+    for char in text {
+        if char >= "A" and char <= "Z" {
+            result = result + char + 32
+        } else {
+            result = result + char
+        }
+    }
+    return result
+}
+
+function trim(text) {
+    # Trim leading and trailing whitespace
+    start = 1
+    end = length(text)
+    
+    while start <= end and is_whitespace(text[start]) {
+        start++
+    }
+    
+    while end >= start and is_whitespace(text[end]) {
+        end--
+    }
+    
+    if start > end {
+        return ""
+    }
+    
+    return substring(text, start, end - start + 1)
+}
+
+function is_whitespace(char) {
+    return char == " " or char == "\t" or char == "\n" or char == "\r"
+}
+
+function substring(text, start, length) {
+    result = ""
+    for i = 0 to length - 1 {
+        result = result + text[start + i - 1]
+    }
+    return result
+}

@@ -1,0 +1,84 @@
+# MetaL Data Processing Utility - Data Exporter
+# Handles writing processed data to output files.
+
+function export_data(data, output_file) {
+    # Ensure output directory exists
+    output_dir = get_directory(output_file)
+    if not directory_exists(output_dir) {
+        create_directory(output_dir)
+    }
+    
+    # Get headers from first record
+    if length(data) == 0 {
+        log_warning("No data to export.")
+        return
+    }
+    
+    first_record = data[0]
+    headers = get_keys(first_record)
+    
+    # Build CSV content
+    csv_content = join(headers, ",") + "\n"
+    
+    for record in data {
+        row_values = []
+        for header in headers {
+            if header in record {
+                push(row_values, escape_csv_field(record[header]))
+            } else {
+                push(row_values, "")
+            }
+        }
+        csv_content = csv_content + join(row_values, ",") + "\n"
+    }
+    
+    # Write to file
+    handle = open_file(output_file, "write")
+    write(handle, csv_content)
+    close_file(handle)
+    
+    log_message("Data exported to: " + output_file)
+}
+
+function get_keys(record) {
+    keys = []
+    for key in record {
+        push(keys, key)
+    }
+    return keys
+}
+
+function escape_csv_field(value) {
+    # Escape commas and quotes in CSV fields
+    if contains(value, ",") or contains(value, "\"") or contains(value, "\n") {
+        escaped = replace(value, "\"", "\"\"")
+        return "\"" + escaped + "\""
+    }
+    return value
+}
+
+function get_directory(file_path) {
+    # Simple directory extraction
+    last_slash = 0
+    for i = 1 to length(file_path) {
+        if file_path[i] == "/" {
+            last_slash = i
+        }
+    }
+    if last_slash == 0 {
+        return "."
+    }
+    return substring(file_path, 1, last_slash - 1)
+}
+
+function create_directory(dir_path) {
+    # Placeholder for directory creation
+    # In a real implementation, this would use system calls
+    log_message("Creating directory: " + dir_path)
+}
+
+function directory_exists(dir_path) {
+    # Placeholder for directory existence check
+    # In a real implementation, this would use system calls
+    return true
+}

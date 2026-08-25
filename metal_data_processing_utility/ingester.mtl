@@ -1,0 +1,35 @@
+# MetaL Data Processing Utility - Data Ingester
+# Handles loading data from input files.
+
+function ingest_data(file_path) {
+    if not file_exists(file_path) {
+        log_error("Input file not found: " + file_path)
+        return null
+    }
+    
+    file_handle = open_file(file_path, "read")
+    data_buffer = read_all(file_handle)
+    close_file(file_handle)
+    
+    parsed_data = parse_csv(data_buffer)
+    return parsed_data
+}
+
+function parse_csv(csv_content) {
+    # Simple CSV parsing logic
+    lines = split(csv_content, "\n")
+    header = split(lines[0], ",")
+    records = []
+    
+    for i = 1 to length(lines) - 1 {
+        if lines[i] == "" continue
+        values = split(lines[i], ",")
+        record = {}
+        for j = 0 to length(header) - 1 {
+            record[header[j]] = values[j]
+        }
+        push(records, record)
+    }
+    
+    return records
+}
