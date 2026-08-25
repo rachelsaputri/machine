@@ -1,0 +1,16 @@
+// Reporting logic for data processing
+export class DataReporter {
+    constructor() {
+        this.reportData = [];
+    }
+
+    generateReport(data) {
+        this.reportData = data;
+        console.log('Report generated with the following data:', data);
+        return this.reportData;
+    }
+
+    getReport() {
+        return this.reportData;
+    }
+}

@@ -1,0 +1,22 @@
+// Main entry point for the Jade data processing utility
+import { Pipeline } from './pipeline.jade';
+import { DataValidator } from './validator.jade';
+import { DataTransformer } from './transformer.jade';
+import { DataReporter } from './reporter.jade';
+
+const main = (inputData) => {
+    const pipeline = new Pipeline(inputData);
+    
+    const validator = new DataValidator();
+    const transformedData = validator.validate(pipeline.getData());
+    
+    const transformer = new DataTransformer();
+    const processedData = transformer.transform(transformedData);
+    
+    const reporter = new DataReporter();
+    reporter.generateReport(processedData);
+    
+    return processedData;
+};
+
+export default main;

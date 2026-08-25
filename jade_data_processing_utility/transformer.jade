@@ -1,0 +1,18 @@
+// Data transformation logic
+export class DataTransformer {
+    constructor() {
+        this.mappings = [];
+    }
+
+    addMapping(mapping) {
+        this.mappings.push(mapping);
+    }
+
+    transform(data) {
+        let result = data;
+        for (const mapping of this.mappings) {
+            result = mapping(result);
+        }
+        return result;
+    }
+}
