@@ -398,3 +398,5 @@ MIT
 - Created/Updated module: `factor_data_processing_utility` (See `factor_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./flow_matic_data_processing_utility` (See `./flow_matic_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `foxpro_data_processing_utility` (See `foxpro_data_processing_utility/README.md` for details)
