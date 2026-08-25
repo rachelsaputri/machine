@@ -1,0 +1,12 @@
+# Data validation module for MIMIC Data Processing Utility
+
+MODULE validator
+
+FUNCTION isValid(data)
+    # Simulate data validation
+    IF data IS NOT NULL THEN
+        RETURN TRUE
+    ELSE
+        RETURN FALSE
+    ENDIF
+ENDFUNCTION

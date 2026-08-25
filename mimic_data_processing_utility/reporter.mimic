@@ -1,18 +1,11 @@
-// Reporter Module
+# Data reporting module for MIMIC Data Processing Utility
 
-function generate_report(data_list) {
-    local report = "Data Processing Report\n";
-    report = report ~ "====================\n";
-    report = report ~ "Total Records Processed: " ~ len(data_list) ~ "\n";
-    report = report ~ "\nDetailed Records:\n";
-    
-    for i from 0 to len(data_list) - 1 {
-        local record = data_list[i];
-        report = report ~ "Record " ~ (i + 1) ~ ": " ~ join(record["fields"], ", ") ~ "\n";
-    }
-    
-    print(report);
-    
-    // Optionally save to file
-    // file.write("report.txt", report);
-}
+MODULE reporter
+
+FUNCTION generate(data)
+    LOCAL report
+    # Simulate report generation
+    report <- FORMAT_DATA(data)
+    PRINT report
+    RETURN report
+ENDFUNCTION

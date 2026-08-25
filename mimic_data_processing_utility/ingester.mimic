@@ -1,0 +1,10 @@
+# Data ingestion module for MIMIC Data Processing Utility
+
+MODULE ingester
+
+FUNCTION ingest(filePath)
+    LOCAL data
+    # Simulate data ingestion
+    data <- READ_FILE(filePath)
+    RETURN data
+ENDFUNCTION

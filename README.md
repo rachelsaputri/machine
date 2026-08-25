@@ -366,3 +366,5 @@ MIT
 - Created/Updated module: `coldc_data_processing_utility` (See `coldc_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `modula_data_processing_pipeline` (See `modula_data_processing_pipeline/README.md` for details)
+
+- Created/Updated module: `mimic_data_processing_utility` (See `mimic_data_processing_utility/README.md` for details)

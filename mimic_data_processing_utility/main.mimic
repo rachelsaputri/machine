@@ -1,28 +1,32 @@
-// Main MIMIC script for data processing utility
-import data_ingestion;
-import data_transformer;
-import data_validator;
-import reporter;
+# Main entry point for MIMIC Data Processing Utility
 
-function main() {
-    print("Starting Data Processing Utility...");
+MODULE main
 
-    // Ingest data
-    local data_list = data_ingestion.ingest_all();
-    print("Ingested " ~ len(data_list) ~ " records.");
+IMPORT ingester
+IMPORT transformer
+IMPORT validator
+IMPORT reporter
 
-    // Validate data
-    local valid_data = data_validator.validate_all(data_list);
-    print("Validated " ~ len(valid_data) ~ " records.");
+FUNCTION main
+    LOCAL data
+    LOCAL processedData
+    LOCAL report
 
-    // Transform data
-    local transformed_data = data_transformer.transform_all(valid_data);
-    print("Transformed " ~ len(transformed_data) ~ " records.");
+    # Ingest data
+    data <- ingester.ingest("data.csv")
 
-    // Generate report
-    reporter.generate_report(transformed_data);
+    # Validate data
+    IF validator.isValid(data) THEN
+        # Transform data
+        processedData <- transformer.transform(data)
 
-    print("Data processing completed successfully.");
-}
+        # Generate report
+        report <- reporter.generate(processedData)
 
-main();
+        PRINT "Processing complete. Report generated."
+    ELSE
+        PRINT "Data validation failed."
+    ENDIF
+ENDFUNCTION
+
+main()
