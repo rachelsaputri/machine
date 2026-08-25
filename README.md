@@ -378,3 +378,5 @@ MIT
 - Created/Updated module: `data_processing_datflex_utility` (See `data_processing_datflex_utility/README.md` for details)
 
 - Created/Updated module: `jade_data_processing_utility` (See `jade_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `deesel_data_processing_utility` (See `deesel_data_processing_utility/README.md` for details)
