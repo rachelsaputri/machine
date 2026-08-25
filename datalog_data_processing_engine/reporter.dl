@@ -1,0 +1,28 @@
+.decl ValidCount(count: number)
+.output ValidCount
+
+.decl InvalidCount(count: number)
+.output InvalidCount
+
+// Aggregate statistics
+validCount(Id) :-
+    ProcessedData(Id, _, _),
+    !InvalidRecord(Id).
+
+invalidCount(Id) :-
+    InvalidRecord(Id).
+
+// Sum up totals
+totalValid(N) :-
+    sum(Id, N) :- validCount(Id).
+totalInvalid(N) :-
+    sum(Id, N) :- invalidCount(Id).
+
+// Generate final report
+generateReport :-
+    totalValid(ValidNum),
+    totalInvalid(InvalidNum),
+    Total = ValidNum + InvalidNum,
+    ReportSummary(Total, ValidNum, InvalidNum).
+
+generateReport.
