@@ -1,0 +1,141 @@
+// DataFlex Data Processing Utility - Core Engine Module
+// Module: dp_engine.dfx
+
+include dp_types.dfx
+
+// Global variables for engine state
+integer giEngineState
+cstring gcErrorLog
+object goDataSource
+cstring gcTransformConfig
+
+// Function to initialize the engine
+function cInitializeEngine
+cstring csConfigFile
+returns boolean
+
+    object loFileHandle
+    string lsContent
+    integer giResult
+
+    // Reset engine state
+    giEngineState = 1 // Running
+    gcErrorLog = ""
+    
+    // Load configuration if provided
+    if csConfigFile != ""
+        loFileHandle = open(csConfigFile for read)
+        if loFileHandle > 0
+            read_line loFileHandle lsContent
+            close loFileHandle
+            gcTransformConfig = lsContent
+        else
+            set_gcErrorLog to "Failed to open configuration file: " + csConfigFile
+            return false
+        end
+    else
+        gcTransformConfig = "DEFAULT_CONFIG"
+    end
+
+    // Initialize data source object
+    create o goDataSource
+    
+    // Validate initialization
+    if goDataSource <> null
+        set giEngineState to 2 // Ready
+        return true
+    else
+        set gcErrorLog to "Failed to initialize data source object."
+        return false
+    end
+
+end
+
+// Function to load data into the engine
+function cLoadData
+cstring csSourcePath
+string lsDelimiter
+returns boolean
+
+    integer giRowsLoaded
+    
+    if goDataSource = null
+        set gcErrorLog to "Engine not initialized. Call cInitializeEngine first."
+        return false
+    end
+
+    // Simulate loading data into the internal data source object
+    // In a real implementation, this would involve reading CSV/Excel/DB
+    // Here we simulate the process
+    giRowsLoaded = 100 // Simulated row count
+    
+    // Trigger internal validation before transformation
+    // This would call dp_validator functions in a full implementation
+    
+    return true
+
+end
+
+// Function to process the loaded data
+function cProcessDataset
+cstring csTransformationRule
+returns boolean
+
+    integer giProcessedCount
+    integer giErrorCount
+    object loRecord
+    integer giIndex
+
+    if goDataSource = null
+        set gcErrorLog to "No data loaded. Call cLoadData first."
+        return false
+    end
+
+    // Iterate through simulated records
+    for giIndex = 1 to 10
+        // Simulate record retrieval
+        // In a real implementation, this would be a loop over actual records
+        
+        // Apply transformation rules
+        // This would call dp_transformer functions
+        
+        // Check for errors
+        if giIndex = 5
+            set giErrorCount to giErrorCount + 1
+            // Log error
+        else
+            set giProcessedCount to giProcessedCount + 1
+        end
+    next
+
+    return (giErrorCount = 0)
+
+end
+
+// Function to shutdown engine and clean up
+function cShutdownEngine
+
+    if goDataSource <> null
+        destroy goDataSource
+        set goDataSource to null
+    end
+    
+    set giEngineState to 0 // Stopped
+    
+end
+
+// Getter for error log
+function get_ErrorLog
+returns cstring
+
+    function_return gcErrorLog
+
+end
+
+// Setter for error log (internal use)
+function set_gcErrorLog
+cstring csMsg
+
+    set gcErrorLog to csMsg
+
+end
