@@ -408,3 +408,5 @@ MIT
 - Created/Updated module: `model204_data_processing_utility` (See `model204_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `./es_data_processing_utility` (See `./es_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `robotc_data_processing_utility` (See `robotc_data_processing_utility/README.md` for details)
