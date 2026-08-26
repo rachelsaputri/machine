@@ -1,0 +1,32 @@
+// Data Validation Module
+
+PROCEDURE Validate(input_data : DATASET) RETURN BOOLEAN
+    DECLARE i : INTEGER = 0;
+    DECLARE valid : BOOLEAN = TRUE;
+
+    WHILE i < input_data.Count() DO
+        DECLARE record <- input_data.Get(i);
+        
+        // Validate ID
+        IF LEN(record.ID) < 1 THEN
+            PRINT "Validation Error: Empty ID at index " + i;
+            valid <- FALSE;
+        END IF;
+        
+        // Validate Severity
+        IF record.Severity < 1 OR record.Severity > 10 THEN
+            PRINT "Validation Error: Invalid Severity at index " + i;
+            valid <- FALSE;
+        END IF;
+        
+        // Validate Event Type
+        IF record.EventType != "ALERT" AND record.EventType != "WARNING" AND record.EventType != "INFO" THEN
+            PRINT "Validation Error: Invalid Event Type at index " + i;
+            valid <- FALSE;
+        END IF;
+        
+        i <- i + 1;
+    END WHILE;
+
+    RETURN valid;
+END PROCEDURE

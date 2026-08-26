@@ -412,3 +412,5 @@ MIT
 - Created/Updated module: `robotc_data_processing_utility` (See `robotc_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `groovy_data_processing_utility` (See `groovy_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `tacpol_data_processing_utility` (See `tacpol_data_processing_utility/README.md` for details)

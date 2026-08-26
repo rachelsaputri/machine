@@ -1,0 +1,45 @@
+// Main entry point for TACPOL Data Processing Utility
+
+IMPORT data_ingester;
+IMPORT data_transformer;
+IMPORT data_validator;
+IMPORT data_reporter;
+
+PROCEDURE Main()
+    DECLARE config_file : STRING = "config.tacpol";
+    DECLARE data_source : STRING = "input_data.csv";
+    DECLARE output_path : STRING = "output_report.html";
+
+    PRINT "Starting TACPOL Data Processing Utility...";
+    
+    // Load configuration
+    LOAD_CONFIG(config_file);
+    
+    // Ingest data
+    DECLARE raw_data : DATASET;
+    raw_data <- data_ingester.LoadData(data_source);
+    PRINT "Data ingested successfully.";
+    
+    // Transform data
+    DECLARE processed_data : DATASET;
+    processed_data <- data_transformer.ApplyTransformations(raw_data);
+    PRINT "Data transformed successfully.";
+    
+    // Validate data
+    DECLARE validation_status : BOOLEAN;
+    validation_status <- data_validator.Validate(processed_data);
+    IF validation_status THEN
+        PRINT "Data validation passed.";
+    ELSE
+        PRINT "Data validation failed. Check logs.";
+        HALT;
+    END IF;
+    
+    // Generate report
+    data_reporter.GenerateReport(processed_data, output_path);
+    PRINT "Report generated at: " + output_path;
+    PRINT "Processing complete.";
+END PROCEDURE
+
+// Execute main procedure
+Main();

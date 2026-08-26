@@ -1,0 +1,98 @@
+// Data Ingestion Module
+
+IMPORT file_utils;
+
+PROCEDURE LoadData(source_path : STRING) RETURN DATASET
+    DECLARE raw_data : DATASET;
+    DECLARE file_handle : INTEGER;
+    DECLARE line : STRING;
+
+    file_handle <- file_utils.Open(source_path, "r");
+    IF file_handle < 0 THEN
+        PRINT "Error: Cannot open file " + source_path;
+        HALT;
+    END IF;
+
+    // Skip header if it's a CSV
+    line <- file_utils.ReadLine(file_handle);
+    IF CONTAINS(line, "ID") THEN
+        // Assume header and skip
+    ELSE
+        // Push header line as first record if no ID column
+        raw_data.Add( ParseLine(line) );
+    END IF;
+
+    WHILE TRUE DO
+        line <- file_utils.ReadLine(file_handle);
+        IF line == NULL THEN BREAK;
+        raw_data.Add( ParseLine(line) );
+    END WHILE;
+
+    file_utils.Close(file_handle);
+    RETURN raw_data;
+END PROCEDURE
+
+FUNCTION ParseLine(line : STRING) RETURN RECORD
+    DECLARE fields : ARRAY OF STRING;
+    DECLARE record : RECORD;
+    
+    fields <- Split(line, ',');
+    
+    IF LENGTH(fields) >= 4 THEN
+        record.ID <- fields[0];
+        record.Timestamp <- fields[1];
+        record.EventType <- fields[2];
+        record.Description <- fields[3];
+        record.Severity <- ConvertToInt(fields[4]);
+    END IF;
+    
+    RETURN record;
+END FUNCTION
+
+FUNCTION Split(text : STRING, delimiter : STRING) RETURN ARRAY OF STRING
+    DECLARE result : ARRAY OF STRING;
+    DECLARE current : STRING = "";
+    DECLARE i : INTEGER = 0;
+
+    WHILE i < LENGTH(text) DO
+        IF SUBSTRING(text, i, 1) == delimiter THEN
+            result.Add(current);
+            current <- "";
+        ELSE
+            current <- current + SUBSTRING(text, i, 1);
+        END IF;
+        i <- i + 1;
+    END WHILE;
+    
+    IF current != "" THEN
+        result.Add(current);
+    END IF;
+    
+    RETURN result;
+END FUNCTION
+
+FUNCTION ConvertToInt(text : STRING) RETURN INTEGER
+    // Simplified conversion for demonstration
+    DECLARE result : INTEGER = 0;
+    DECLARE is_negative : BOOLEAN = FALSE;
+    DECLARE i : INTEGER = 0;
+
+    IF SUBSTRING(text, 0, 1) == '-' THEN
+        is_negative <- TRUE;
+        i <- 1;
+    END IF;
+
+    WHILE i < LENGTH(text) DO
+        DECLARE char_code <- ASC(SUBSTRING(text, i, 1));
+        IF char_code >= 48 AND char_code <= 57 THEN
+            result <- result * 10 + (char_code - 48);
+        END IF;
+        i <- i + 1;
+    END WHILE;
+
+    IF is_negative THEN
+        result <- -result;
+    END IF;
+
+    RETURN result;
+END FUNCTION

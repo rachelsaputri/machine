@@ -1,0 +1,40 @@
+// Data Transformation Module
+
+PROCEDURE ApplyTransformations(input_data : DATASET) RETURN DATASET
+    DECLARE processed_data : DATASET;
+    DECLARE record : RECORD;
+    DECLARE i : INTEGER = 0;
+
+    WHILE i < input_data.Count() DO
+        record <- input_data.Get(i);
+        
+        // Standardize Event Type
+        IF record.EventType == "alert" OR record.EventType == "ALERT" THEN
+            record.EventType <- "ALERT";
+        ELSEIF record.EventType == "warning" OR record.EventType == "WARNING" THEN
+            record.EventType <- "WARNING";
+        ELSEIF record.EventType == "info" OR record.EventType == "INFO" THEN
+            record.EventType <- "INFO";
+        END IF;
+        
+        // Normalize Severity
+        IF record.Severity > 10 THEN
+            record.Severity <- 10;
+        ELSEIF record.Severity < 1 THEN
+            record.Severity <- 1;
+        END IF;
+        
+        // Add Processing Timestamp
+        record.ProcessedAt <- GetCurrentTimestamp();
+        
+        processed_data.Add(record);
+        i <- i + 1;
+    END WHILE;
+
+    RETURN processed_data;
+END PROCEDURE
+
+FUNCTION GetCurrentTimestamp() RETURN STRING
+    // Placeholder for actual timestamp generation
+    RETURN "2023-10-27T12:00:00Z";
+END FUNCTION

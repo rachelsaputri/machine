@@ -1,0 +1,28 @@
+// Data Reporting Module
+
+IMPORT file_utils;
+
+PROCEDURE GenerateReport(data : DATASET, output_path : STRING)
+    DECLARE report_content : STRING = "";
+    DECLARE i : INTEGER = 0;
+    
+    report_content <- "<html>\n<head><title>Compliance Report</title></head>\n<body>\n<h1>Data Processing Report</h1>\n<table border='1'>\n<tr>\n<th>ID</th>\n<th>Timestamp</th>\n<th>Event Type</th>\n<th>Description</th>\n<th>Severity</th>\n<th>Processed At</th>\n</tr>\n";
+    
+    WHILE i < data.Count() DO
+        DECLARE record <- data.Get(i);
+        report_content <- report_content + "<tr>\n";
+        report_content <- report_content + "<td>" + record.ID + "</td>\n";
+        report_content <- report_content + "<td>" + record.Timestamp + "</td>\n";
+        report_content <- report_content + "<td>" + record.EventType + "</td>\n";
+        report_content <- report_content + "<td>" + record.Description + "</td>\n";
+        report_content <- report_content + "<td>" + record.Severity + "</td>\n";
+        report_content <- report_content + "<td>" + record.ProcessedAt + "</td>\n";
+        report_content <- report_content + "</tr>\n";
+        i <- i + 1;
+    END WHILE;
+    
+    report_content <- report_content + "</table>\n</body>\n</html>";
+    
+    file_utils.WriteFile(output_path, report_content);
+    PRINT "Report written to: " + output_path;
+END PROCEDURE
