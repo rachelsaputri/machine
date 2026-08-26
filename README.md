@@ -422,3 +422,5 @@ MIT
 - Created/Updated module: `mill_data_processing_utility` (See `mill_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `plex_data_processing_utility` (See `plex_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `cl_compliance_data_processor` (See `cl_compliance_data_processor/README.md` for details)
