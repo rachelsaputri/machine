@@ -418,3 +418,5 @@ MIT
 - Created/Updated module: `lisp_compliance_data_processor` (See `lisp_compliance_data_processor/README.md` for details)
 
 - Created/Updated module: `haxe_data_processing_utility` (See `haxe_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `mill_data_processing_utility` (See `mill_data_processing_utility/README.md` for details)
