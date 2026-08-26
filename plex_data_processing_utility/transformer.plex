@@ -1,116 +1,26 @@
-PLEX
+MODULE TRANSFORMER
 
-MODULE Transformer
+IMPORTS SYSTEM, MATH
 
-PROCEDURE Transform(data : ARRAY[ARRAY[STRING]], config : RECORD) : ARRAY[ARRAY[STRING]]
-    VAR rowIndex : INTEGER
-    VAR colIndex : INTEGER
-    VAR value : STRING
-    VAR transformedValue : STRING
-    VAR row : ARRAY[STRING]
-    VAR transformedRow : ARRAY[STRING]
-    VAR transformedRows : ARRAY[ARRAY[STRING]]
+FUNCTION ApplyTransformations(Records: LIST OF DataRecord) RETURNS LIST OF DataRecord
+    DECLARE 
+        ProcessedList: LIST OF DataRecord;
+        CurrentRecord: DataRecord;
+        Index: INTEGER;
+    END DECLARE;
 
-    IF data = NIL OR LENGTH(data) = 0 THEN
-        RETURN NIL
-    END_IF
+    FOR Index := 1 TO LENGTH(Records) DO
+        CurrentRecord := RECORDS[Index];
+        
+        // Example Transformation: Uppercase the value
+        CurrentRecord.Value := TO_UPPER(CurrentRecord.Value);
+        
+        // Example Transformation: Adjust timestamp by offset
+        // Note: PLEX datetime math might require custom helpers
+        // CurrentRecord.Timestamp := CurrentRecord.Timestamp + INTERVAL(0,0,1,0,0);
+        
+        APPEND ProcessedList CurrentRecord;
+    END FOR;
 
-    transformedRows <- NEW ARRAY[ARRAY[STRING]]
-    ; Copy header
-    transformedRows <- ADD_TO(transformedRows, data[0])
-
-    ; Transform data rows
-    FOR rowIndex <- 1 TO LENGTH(data) - 1 DO
-        row <- data[rowIndex]
-        transformedRow <- NEW ARRAY[STRING]
-
-        FOR colIndex <- 0 TO LENGTH(row) - 1 DO
-            value <- row[colIndex]
-            transformedValue <- value
-
-            ; Apply transformations based on config
-            IF config.normalizeStrings THEN
-                transformedValue <- TO_UPPER(transformedValue)
-            END_IF
-
-            ; Check if value is numeric and apply rounding
-            IF IsNumeric(value) THEN
-                transformedValue <- ROUND_NUMERIC(value, config.roundDecimals)
-            END_IF
-
-            ADD TO transformedRow VALUE transformedValue
-        END_FOR
-
-        ADD TO transformedRows VALUE transformedRow
-    END_FOR
-
-    RETURN transformedRows
-END_PROCEDURE
-
-PROCEDURE ROUND_NUMERIC(value : STRING, decimals : INTEGER) : STRING
-    VAR numValue : FLOAT
-    VAR multiplier : FLOAT
-    VAR result : STRING
-
-    numValue <- PARSE_FLOAT(value)
-    multiplier <- 10 ^ decimals
-    numValue <- numValue * multiplier
-    numValue <- FLOOR(numValue + 0.5) ; Round half up
-    numValue <- numValue / multiplier
-
-    ; Format the number back to string with correct decimal places
-    ; This is a simplified approach
-    result <- TO_STRING(numValue)
-    ; Ensure correct number of decimal places
-    IF decimals > 0 THEN
-        IF NOT CONTAINS(result, ".") THEN
-            result <- result + "."
-            VAR i : INTEGER
-            FOR i <- 1 TO decimals DO
-                result <- result + "0"
-            END_FOR
-        ELSE
-            ; Truncate or pad decimals
-            VAR parts : ARRAY[STRING]
-            SPLIT result INTO parts BY "."
-            IF LENGTH(parts[1]) < decimals THEN
-                VAR j : INTEGER
-                FOR j <- LENGTH(parts[1]) + 1 TO decimals DO
-                    parts[1] <- parts[1] + "0"
-                END_FOR
-            ELSE IF LENGTH(parts[1]) > decimals THEN
-                parts[1] <- SUBSTR(parts[1], 1, decimals)
-            END_IF
-            result <- parts[0] + "." + parts[1]
-        END_IF
-    END_IF
-
-    RETURN result
-END_PROCEDURE
-
-PROCEDURE IsNumeric(value : STRING) : BOOLEAN
-    VAR index : INTEGER
-    VAR hasDot : BOOLEAN
-
-    IF value = "" THEN
-        RETURN FALSE
-    END_IF
-
-    hasDot <- FALSE
-    FOR index <- 1 TO LENGTH(value) DO
-        IF SUBSTR(value, index, 1) = "." THEN
-            IF hasDot THEN
-                RETURN FALSE
-            END_IF
-            hasDot <- TRUE
-        ELSE IF NOT (SUBSTR(value, index, 1) >= "0" AND SUBSTR(value, index, 1) <= "9") THEN
-            ; Allow negative sign
-            IF index = 1 AND SUBSTR(value, index, 1) = "-" THEN
-                CONTINUE
-            END_IF
-            RETURN FALSE
-        END_IF
-    END_FOR
-
-    RETURN TRUE
-END_PROCEDURE
+    RETURN ProcessedList;
+END FUNCTION

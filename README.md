@@ -420,3 +420,5 @@ MIT
 - Created/Updated module: `haxe_data_processing_utility` (See `haxe_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `mill_data_processing_utility` (See `mill_data_processing_utility/README.md` for details)
+
+- Created/Updated module: `plex_data_processing_utility` (See `plex_data_processing_utility/README.md` for details)

@@ -1,101 +1,31 @@
-PLEX
+MODULE VALIDATOR
 
-MODULE Validator
+FUNCTION CheckIntegrity(Records: LIST OF DataRecord) RETURNS LIST OF DataRecord
+    DECLARE 
+        ValidList: LIST OF DataRecord;
+        CurrentRecord: DataRecord;
+        Index: INTEGER;
+        IsValid: BOOLEAN;
+    END DECLARE;
 
-IMPORT System
+    FOR Index := 1 TO LENGTH(Records) DO
+        CurrentRecord := RECORDS[Index];
+        IsValid := TRUE;
+        
+        // Validation Rule 1: ID must be positive
+        IF CurrentRecord.ID <= 0 THEN
+            IsValid := FALSE;
+        END IF;
+        
+        // Validation Rule 2: Value must not be empty
+        IF LENGTH(CurrentRecord.Value) = 0 THEN
+            IsValid := FALSE;
+        END IF;
+        
+        IF IsValid THEN
+            APPEND ValidList CurrentRecord;
+        END IF;
+    END FOR;
 
-TYPE ValidationRule = RECORD
-    fieldName : STRING
-    fieldType : STRING
-    required : BOOLEAN
-END_RECORD
-
-PROCEDURE Validate(data : ARRAY[ARRAY[STRING]], config : RECORD) : ARRAY[ARRAY[STRING]]
-    VAR rowIndex : INTEGER
-    VAR colIndex : INTEGER
-    VAR value : STRING
-    VAR isValid : BOOLEAN
-    VAR validRows : ARRAY[ARRAY[STRING]]
-    VAR header : ARRAY[STRING]
-    VAR row : ARRAY[STRING]
-
-    IF data = NIL OR LENGTH(data) = 0 THEN
-        RETURN NIL
-    END_IF
-
-    ; Assume first row is header
-    header <- data[0]
-    validRows <- NEW ARRAY[ARRAY[STRING]]
-    ADD TO validRows VALUE header
-
-    ; Iterate through data rows
-    FOR rowIndex <- 1 TO LENGTH(data) - 1 DO
-        row <- data[rowIndex]
-        isValid <- TRUE
-
-        ; Validate each column
-        FOR colIndex <- 0 TO MIN(LENGTH(header), LENGTH(row)) - 1 DO
-            value <- row[colIndex]
-
-            ; Check if field is in nullable list
-            IF IsNullable(config.nullableFields, header[colIndex]) THEN
-                CONTINUE
-            END_IF
-
-            ; Check if value is empty and field is required
-            IF value = "" AND config.strictMode THEN
-                PRINT "Warning: Empty value for field " + header[colIndex] + " at row " + TO_STRING(rowIndex)
-                isValid <- FALSE
-            END_IF
-
-            ; Additional type validation can be added here
-            ; For example, check if a field is numeric
-            ; IF IsNumeric(value) AND header[colIndex] = "amount" THEN
-            ;     ... validation logic ...
-            ; END_IF
-        END_FOR
-
-        IF isValid THEN
-            ADD TO validRows VALUE row
-        END_IF
-    END_FOR
-
-    RETURN validRows
-END_PROCEDURE
-
-PROCEDURE IsNullable(nullableFields : ARRAY[STRING], fieldName : STRING) : BOOLEAN
-    VAR index : INTEGER
-    FOR index <- 0 TO LENGTH(nullableFields) - 1 DO
-        IF nullableFields[index] = fieldName THEN
-            RETURN TRUE
-        END_IF
-    END_FOR
-    RETURN FALSE
-END_PROCEDURE
-
-PROCEDURE IsNumeric(value : STRING) : BOOLEAN
-    VAR index : INTEGER
-    VAR hasDot : BOOLEAN
-
-    IF value = "" THEN
-        RETURN FALSE
-    END_IF
-
-    hasDot <- FALSE
-    FOR index <- 1 TO LENGTH(value) DO
-        IF SUBSTR(value, index, 1) = "." THEN
-            IF hasDot THEN
-                RETURN FALSE
-            END_IF
-            hasDot <- TRUE
-        ELSE IF NOT (SUBSTR(value, index, 1) >= "0" AND SUBSTR(value, index, 1) <= "9") THEN
-            ; Allow negative sign
-            IF index = 1 AND SUBSTR(value, index, 1) = "-" THEN
-                CONTINUE
-            END_IF
-            RETURN FALSE
-        END_IF
-    END_FOR
-
-    RETURN TRUE
-END_PROCEDURE
+    RETURN ValidList;
+END FUNCTION
