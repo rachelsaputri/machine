@@ -416,3 +416,5 @@ MIT
 - Created/Updated module: `tacpol_data_processing_utility` (See `tacpol_data_processing_utility/README.md` for details)
 
 - Created/Updated module: `lisp_compliance_data_processor` (See `lisp_compliance_data_processor/README.md` for details)
+
+- Created/Updated module: `haxe_data_processing_utility` (See `haxe_data_processing_utility/README.md` for details)

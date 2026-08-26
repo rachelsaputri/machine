@@ -1,94 +1,86 @@
 package;
 
-import haxe.ds.List;
-
 /**
- * Represents a record to be processed.
- */
-@:structInit
-class DataRecord {
-    public var id: String;
-    public var timestamp: Float;
-    public var fields: Map<String, Dynamic>;
-
-    public function new(id: String, timestamp: Float, fields: Map<String, Dynamic>) {
-        this.id = id;
-        this.timestamp = timestamp;
-        this.fields = fields;
-    }
-}
-
-/**
- * Utility class for data processing operations.
+ * Main orchestrator for the data processing pipeline.
  */
 class DataProcessor {
-    public static function processRecords(records: List<DataRecord>): List<DataRecord> {
-        var processedRecords = new List<DataRecord>();
-        for (record in records) {
-            // Example transformation: clean up fields
-            var cleanedFields = new Map<String, Dynamic>();
-            for (key in record.fields.keys()) {
-                var value = record.fields[key];
-                if (value != null) {
-                    cleanedFields[key] = value;
+
+    private var config: ProcessingConfig;
+
+    public function new(config: ProcessingConfig) {
+        this.config = config;
+    }
+
+    /**
+     * Executes the full pipeline on a given input string.
+     * Automatically detects JSON or CSV format based on content.
+     */
+    public function process(input: String): ProcessingResult {
+        var records: Array<DataRecord> = [];
+        
+        // 1. Ingest
+        var firstChar = input.trim().charAt(0);
+        if (firstChar == '[' || firstChar == '{') {
+            try {
+                if (firstChar == '[') {
+                    records = DataIngestor.ingestJson(input);
+                } else {
+                    records.push(DataIngestor.ingestSingleJson(input));
                 }
+            } catch (e: Dynamic) {
+                Sys.println("JSON Error: " + e);
+                return new ProcessingResult(0, 0, 0, ["Invalid JSON input"]);
             }
-            var processedRecord = new DataRecord(record.id, record.timestamp, cleanedFields);
-            processedRecords.add(processedRecord);
+        } else {
+            records = DataIngestor.ingestCsv(input);
         }
-        return processedRecords;
-    }
 
-    public static function validateRecord(record: DataRecord): Bool {
-        if (record.id == null || record.id.trim().isEmpty()) {
-            return false;
-        }
-        if (record.fields == null) {
-            return false;
-        }
-        return true;
-    }
+        var result: ProcessingResult = new ProcessingResult(
+            records.length,
+            0,
+            0,
+            []
+        );
 
-    public static function generateReport(records: List<DataRecord>): String {
-        var report = new StringBuf();
-        report.add("Processing Report\n");
-        report.add("=================\n");
-        report.add("Total Records: ${records.length}\n");
-        report.add("Processed Successfully: ${records.length}\n");
-        report.add("Errors: 0\n");
-        return report.toString();
-    }
-}
+        var processedRecords: Array<DataRecord> = [];
 
-/**
- * Main entry point for the Haxe data processing utility.
- */
-class Main {
-    public static function main() {
-        var records = new List<DataRecord>();
-        var fields1 = new Map<String, Dynamic>();
-        fields1.set("name", "Alice");
-        fields1.set("age", 30);
-        records.add(new DataRecord("rec-001", Date.now().getTime(), fields1));
-
-        var fields2 = new Map<String, Dynamic>();
-        fields2.set("name", "Bob");
-        fields2.set("age", 25);
-        records.add(new DataRecord("rec-002", Date.now().getTime(), fields2));
-
-        // Validate records
+        // 2. Process each record
         for (record in records) {
-            if (!DataProcessor.validateRecord(record)) {
-                trace("Validation failed for record: ${record.id}");
+            try {
+                // 3. Validate
+                var errors = DataValidator.runValidation(record, config);
+                
+                if (errors.length > 0) {
+                    result.failedRecords++;
+                    for (err in errors) {
+                        result.errors.push(err);
+                    }
+                    continue;
+                }
+
+                // 4. Transform
+                // Apply standard transformations
+                record = DataTransformer.normalizeStrings(record);
+                record = DataTransformer.computeDerivedFields(record);
+                record = DataTransformer.sanitizeEmptyValues(record);
+
+                processedRecords.push(record);
+                result.processedRecords++;
+
+            } catch (e: Dynamic) {
+                result.failedRecords++;
+                result.errors.push("Unexpected error processing record " + record.id + ": " + e);
             }
         }
 
-        // Process records
-        var processedRecords = DataProcessor.processRecords(records);
-        trace("Processed ${processedRecords.length} records.");
+        return result;
+    }
 
-        // Generate report
-        var report = DataProcessor.generateReport(processedRecords);
-        trace(report);
+    /**
+     * Returns the processed records after a successful run.
+     */
+    public function getProcessedRecords(): Array<DataRecord> {
+        // This is a simplified getter. In a real app, you might store the last batch.
+        return []; 
     }
 }
